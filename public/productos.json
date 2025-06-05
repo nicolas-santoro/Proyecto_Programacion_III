@@ -3,6 +3,7 @@
     {
         "id": 1,
         "tipo": "libro",
+        "sub-tipo": "libro",
         "titulo": "Harry Potter y la Piedra Filosofal",
         "autor": "J.K. Rowling",
         "anioPublicacion": 1997,
@@ -13,6 +14,7 @@
     {
         "id": 2,
         "tipo": "libro",
+        "sub-tipo": "libro",
         "titulo": "Harry Potter y el Prisionero de Azkaban",
         "autor": "J.K. Rowling",
         "anioPublicacion": 1999,
@@ -23,6 +25,7 @@
     {
         "id": 3,
         "tipo": "libro",
+        "sub-tipo": "libro",
         "titulo": "El Hobbit",
         "autor": "J.R.R. Tolkien",
         "anioPublicacion": 1937,
@@ -33,6 +36,7 @@
     {
         "id": 4,
         "tipo": "libro",
+        "sub-tipo": "libro",
         "titulo": "El Señor de los Anillos: La Comunidad del Anillo",
         "autor": "J.R.R. Tolkien",
         "anioPublicacion": 1954,
@@ -43,6 +47,7 @@
     {
         "id": 5,
         "tipo": "libro",
+        "sub-tipo": "comic",
         "titulo": "Spider-Man: La Última Cacería de Kraven (60°)",
         "autor": "J.M. DeMatteis",
         "anioPublicacion": 2022,
@@ -53,6 +58,7 @@
     {
         "id": 6,
         "tipo": "libro",
+        "sub-tipo": "comic",
         "titulo": "Superior Ironman: Infamous",
         "autor": "Tom Taylor",
         "anioPublicacion": 2015,
@@ -63,6 +69,7 @@
     {
         "id": 7,
         "tipo": "libro",
+        "sub-tipo": "comic",
         "titulo": "Civil War",
         "autor": "Mark Millar",
         "anioPublicacion": 2006,
@@ -73,6 +80,7 @@
     {
         "id": 8,
         "tipo": "libro",
+        "sub-tipo": "comic",
         "titulo": "X-Men: Días del Futuro Pasado",
         "autor": "Chris Claremont",
         "anioPublicacion": 1981,
@@ -83,16 +91,18 @@
     {
         "id": 9,
         "tipo": "libro",
-        "titulo": "JoJo's Bizarre Adventure: Vento Aureo Vol.7",
-        "autor": "Hirohiko Araki",
-        "anioPublicacion": 1997,
-        "paginas": 322,
+        "sub-tipo": "manga",
+        "titulo": "Hunter X Hunter Vol.28",
+        "autor": "Yoshihiro Togashi",
+        "anioPublicacion": 2010,
+        "paginas": 208,
         "calificacion": 4.4,
-        "imagen": "../public/img/jojos-bizarre-adventure-vento-aureo-vol-7.png"
+        "imagen": "../public/img/hunter-x-hunter-vol-28.png"
     },
     {
         "id": 10,
         "tipo": "libro",
+        "sub-tipo": "manga",
         "titulo": "JoJo's Bizarre Adventure: Stone Ocean Vol.11",
         "autor": "Hirohiko Araki",
         "anioPublicacion": 2002,
@@ -103,6 +113,7 @@
     {
         "id": 11,
         "tipo": "libro",
+        "sub-tipo": "manga",
         "titulo": "JoJo's Bizarre Adventure: Stardust Crusaders Vol.9",
         "autor": "Hirohiko Araki",
         "anioPublicacion": 1991,
@@ -113,6 +124,7 @@
     {
         "id": 12,
         "tipo": "libro",
+        "sub-tipo": "manga",
         "titulo": "JoJo's Bizarre Adventure: Steel Ball Run Vol.2",
         "autor": "Hirohiko Araki",
         "anioPublicacion": 2004,
