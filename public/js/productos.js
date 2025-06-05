@@ -1,45 +1,49 @@
-fetch("http://localhost:3000/api/productos")
-  .then(res => res.json())
-  .then(productos => {
-    // Filtrar solo productos activos
-    const activos = productos.filter(p => p.activo);
+document.addEventListener('DOMContentLoaded', () => {
+  fetch("http://localhost:3000/api/productos")
+    .then(res => res.json())
+    .then(productos => {
+        console.log('Productos recibidos:', productos); // <-- AGREGÁ ESTA LÍNEA
+      // Filtrar solo productos activos
+      const activos = productos.filter(p => p.activo);
 
-    // Obtener los contenedores de cada categoría
-    const librosDiv = document.getElementById("libros-container");
-    const comicsDiv = document.getElementById("comics-container");
-    const mangasDiv = document.getElementById("mangas-container");
-    const separadoresDiv = document.getElementById("separadores-container");
+      // Obtener los contenedores de cada categoría
+      const librosDiv = document.getElementById("libros-container");
+      const comicsDiv = document.getElementById("comics-container");
+      const mangasDiv = document.getElementById("mangas-container");
+      const separadoresDiv = document.getElementById("separadores-container");
 
-    // Limpiar contenedores
-    if (librosDiv) librosDiv.innerHTML = '';
-    if (comicsDiv) comicsDiv.innerHTML = '';
-    if (mangasDiv) mangasDiv.innerHTML = '';
-    if (separadoresDiv) separadoresDiv.innerHTML = '';
+      // Limpiar contenedores
+      if (librosDiv) librosDiv.innerHTML = '';
+      if (comicsDiv) comicsDiv.innerHTML = '';
+      if (mangasDiv) mangasDiv.innerHTML = '';
+      if (separadoresDiv) separadoresDiv.innerHTML = '';
 
-
-    // Renderizar productos según su categoría
-    activos.forEach(prod => {
+      // Renderizar productos según su categoría
+      activos.forEach(prod => {
+      console.log(prod);
       const div = document.createElement("div");
       div.classList.add("producto", "card", "m-2", "p-2");
       div.innerHTML = `
         <div class="card-body">
-          <h5 class="card-title">${prod.nombre}</h5>
-          <p class="card-text">Precio: $${prod.precio}</p>
+        <img src="${prod.imagen || '/img/placeholder.png'}" class="card-img-top mb-2" alt="${prod.nombre}">
+        <h5 class="card-title">${prod.nombre}</h5>
+        <p class="card-text">Precio: $${prod.precio}</p>
         </div>
       `;
 
-      if (prod.categoria === "libro" && librosDiv) {
-        librosDiv.appendChild(div);
-      } else if (prod.categoria === "comic" && comicsDiv) {
-        comicsDiv.appendChild(div);
-      } else if (prod.categoria === "manga" && mangasDiv) {
-        mangasDiv.appendChild(div);
-      } else if (prod.categoria === "separador" && separadoresDiv) {
-        separadoresDiv.appendChild(div);
-      }
-    });
-  })
-  .catch(error => console.error('Error al cargar los productos:', error));
+        if (prod.categoria === "libro" && librosDiv) {
+          librosDiv.appendChild(div);
+        } else if (prod.categoria === "comic" && comicsDiv) {
+          comicsDiv.appendChild(div);
+        } else if (prod.categoria === "manga" && mangasDiv) {
+          mangasDiv.appendChild(div);
+        } else if (prod.categoria === "separador" && separadoresDiv) {
+          separadoresDiv.appendChild(div);
+        }
+      });
+    })
+    .catch(error => console.error('Error al cargar los productos:', error));
+});
   /*El carrito aún no está porque todavía no trabajé en eso*/
 
 /* Esto tengo que cambiarlo, lo hice mal
