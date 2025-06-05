@@ -1,62 +1,37 @@
-let productosDisponibles = [];
+fetch("http://localhost:3000/api/productos")
+  .then(res => res.json())
+  .then(productos => {
+    // Filtrar solo productos activos
+    const activos = productos.filter(p => p.activo);
 
-fetch('../public/productos.json')
-  .then(respuesta => respuesta.json())
-  .then(data => {
-    data.productos.forEach(producto => productosDisponibles.push(producto))
+    // Obtener los contenedores de cada categoría
+    const librosDiv = document.getElementById("libros-container");
+    const separadoresDiv = document.getElementById("separadores-container");
 
-    renderProductos(productosDisponibles)
+    // Limpiar contenedores
+    if (librosDiv) librosDiv.innerHTML = '';
+    if (separadoresDiv) separadoresDiv.innerHTML = '';
+
+    // Renderizar productos según su categoría
+    activos.forEach(prod => {
+      const div = document.createElement("div");
+      div.classList.add("producto", "card", "m-2", "p-2");
+      div.innerHTML = `
+        <div class="card-body">
+          <h5 class="card-title">${prod.nombre}</h5>
+          <p class="card-text">Precio: $${prod.precio}</p>
+        </div>
+      `;
+
+      if (prod.categoria === "libro" && librosDiv) {
+        librosDiv.appendChild(div);
+      } else if (prod.categoria === "separador" && separadoresDiv) {
+        separadoresDiv.appendChild(div);
+      }
+    });
   })
-  .catch(error => console.error('Error al cargar el JSON:', error));
-
-const carrito = [];
-
-function renderProductos(productosToRender) {
-    const librosDiv = document.getElementById('libros-container');
-    const separadoresDiv = document.getElementById('separadores-container');
-
-    librosDiv.innerHTML = '';
-    separadoresDiv.innerHTML = '';
-
-    productosToRender.forEach(producto => {
-        const card = document.createElement('div');
-        card.classList.add('producto');
-        card.classList.add('card');
-
-        card.innerHTML = `
-                        <img src="${producto.imagen}" class="card-img-top" alt="${producto.titulo || producto.tematica}">
-                        <div class="card-body">
-                            <h5 class="card-title">${producto.titulo || producto.tematica}</h5>
-                            <p class="card-text">
-                            ${producto.tipo === 'libro' ? `
-                                Autor: ${producto.autor}<br>
-                                Año: ${producto.anioPublicacion}<br>
-                                Páginas: ${producto.paginas}<br>
-                                Calificación: ${producto.calificacion}
-                            ` : `
-                                Tamaño: ${producto.longitud} x ${producto.anchura} cm
-                            `}
-                            </p>
-                            <button class="btn btn-primary" onclick="agregarAlCarrito(${producto.id})">Agregar</button>
-                            <button class="btn btn-danger d-none" onclick="quitarDelCarrito(${producto.id})">Quitar</button>
-                        </div>
-                        `;
-
-        if (producto.tipo === 'libro') {
-            librosDiv.appendChild(card);
-        } 
-        
-        else {
-            separadoresDiv.appendChild(card);
-        }
-    })
-
-    const estaEnCarrito = carrito.some(p => p.id === producto.id);
-    if (estaEnCarrito) {
-        card.querySelector('.btn-primary').classList.add('d-none');
-        card.querySelector('.btn-danger').classList.remove('d-none');
-    }
-};
+  .catch(error => console.error('Error al cargar los productos:', error));
+  /*El carrito aún no está porque todavía no trabajé en eso*/
 
 /* Esto tengo que cambiarlo, lo hice mal
 function agregarAlCarrito(id) {
