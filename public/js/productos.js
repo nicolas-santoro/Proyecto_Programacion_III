@@ -1,4 +1,4 @@
-let productosDisponibles = []; // Aquí irás guardando los productos
+let productosDisponibles = [];
 
 fetch('../public/productos.json')
   .then(respuesta => respuesta.json())
