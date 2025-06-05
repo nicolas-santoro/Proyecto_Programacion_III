@@ -92,12 +92,12 @@
         "id": 9,
         "tipo": "libro",
         "sub-tipo": "manga",
-        "titulo": "Hunter X Hunter Vol.28",
+        "titulo": "Hunter X Hunter Vol.17",
         "autor": "Yoshihiro Togashi",
-        "anioPublicacion": 2010,
+        "anioPublicacion": 2003,
         "paginas": 208,
-        "calificacion": 4.4,
-        "imagen": "../public/img/hunter-x-hunter-vol-28.png"
+        "calificacion": 4.3,
+        "imagen": "../public/img/hunter-x-hunter-vol-17.png"
     },
     {
         "id": 10,
