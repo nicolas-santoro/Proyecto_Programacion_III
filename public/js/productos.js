@@ -6,11 +6,16 @@ fetch("http://localhost:3000/api/productos")
 
     // Obtener los contenedores de cada categoría
     const librosDiv = document.getElementById("libros-container");
+    const comicsDiv = document.getElementById("comics-container");
+    const mangasDiv = document.getElementById("mangas-container");
     const separadoresDiv = document.getElementById("separadores-container");
 
     // Limpiar contenedores
     if (librosDiv) librosDiv.innerHTML = '';
+    if (comicsDiv) comicsDiv.innerHTML = '';
+    if (mangasDiv) mangasDiv.innerHTML = '';
     if (separadoresDiv) separadoresDiv.innerHTML = '';
+
 
     // Renderizar productos según su categoría
     activos.forEach(prod => {
@@ -25,6 +30,10 @@ fetch("http://localhost:3000/api/productos")
 
       if (prod.categoria === "libro" && librosDiv) {
         librosDiv.appendChild(div);
+      } else if (prod.categoria === "comic" && comicsDiv) {
+        comicsDiv.appendChild(div);
+      } else if (prod.categoria === "manga" && mangasDiv) {
+        mangasDiv.appendChild(div);
       } else if (prod.categoria === "separador" && separadoresDiv) {
         separadoresDiv.appendChild(div);
       }
