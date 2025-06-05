@@ -81,7 +81,9 @@ form label {
   color: #ccc;
 }
 
-form input[type="text"] {
+form input[type="text"],
+form input[type="email"],
+form input[type="password"] {
   width: 80%;
   padding: 0.5em;
   margin-bottom: 1em;
@@ -89,9 +91,14 @@ form input[type="text"] {
   border-radius: 4px;
   background-color: #333;
   color: #f0f0f0;
+  text-align: center;
+  display: block;
+  margin: 0 auto;
 }
 
-form input[type="text"]::placeholder {
+form input[type="text"]::placeholder,
+form input[type="email"]::placeholder,
+form input[type="password"]::placeholder {
   color: #bbb;
 }
 
