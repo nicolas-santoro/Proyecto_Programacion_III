@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "hachis-parmentier",
   "version": "1.0.0",
   "description": "",
@@ -20,6 +21,7 @@
   },
   "homepage": "https://github.com/MilenaRodriguezzz/hachis-parmentier-website#readme",
   "dependencies": {
+    "@supabase/supabase-js": "^2.49.10",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
