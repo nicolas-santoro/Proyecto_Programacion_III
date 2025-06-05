@@ -21,6 +21,7 @@
   "homepage": "https://github.com/MilenaRodriguezzz/hachis-parmentier-website#readme",
   "dependencies": {
     "@supabase/supabase-js": "^2.49.10",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
