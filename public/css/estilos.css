@@ -231,3 +231,90 @@ footer {
 .producto button:hover {
   background-color: #a020f0;
 }
+
+/* Botón de acceso al carrito arriba a la derecha */
+#carrito-access {
+  position: absolute;
+  top: 1.5em;
+  right: 2em;
+  z-index: 10;
+}
+
+.btn-carrito {
+  display: inline-block;
+  background-color: #6a0dad;
+  color: #fff;
+  padding: 0.6em 1.2em;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s;
+  position: relative;
+}
+
+.btn-carrito:hover {
+  background-color: #a020f0;
+  color: #fff;
+}
+
+.btn-carrito .bi-cart {
+  margin-right: 0.5em;
+  font-size: 1.2em;
+  vertical-align: middle;
+}
+
+.carrito-cantidad {
+  background: #d020d0;
+  color: #fff;
+  border-radius: 50%;
+  padding: 0.2em 0.6em;
+  font-size: 0.9em;
+  position: absolute;
+  top: -10px;
+  right: -15px;
+}
+
+/* Botones del carrito personalizados */
+.btn-outline-light {
+  border: 2px solid #a020f0 !important;
+  color: #fff !important;
+  background: transparent !important;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn-outline-light:hover, .btn-outline-light:focus {
+  background: #a020f0 !important;
+  color: #fff !important;
+}
+
+.btn-gradient-pink {
+  background: linear-gradient(90deg, #d020d0 0%, #a020f0 100%);
+  color: #fff !important;
+  border: none;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px #a020f055;
+}
+
+.btn-gradient-pink:hover, .btn-gradient-pink:focus {
+  background: linear-gradient(90deg, #a020f0 0%, #d020d0 100%);
+  color: #fff !important;
+  box-shadow: 0 4px 16px #a020f099;
+}
+
+.btn-eliminar {
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.total-destacado {
+  color: #fff;
+  text-shadow: 0 2px 8px #a020f099, 0 0 2px #fff;
+  font-size: 2rem;
+  letter-spacing: 1px;
+}
+
+.total-destacado #carrito-total {
+  color: #d020d0;
+  font-size: 2.2rem;
+  text-shadow: 0 2px 8px #a020f099, 0 0 2px #fff;
+}
