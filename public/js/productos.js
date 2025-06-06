@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
   fetch("http://localhost:3000/api/productos")
     .then(res => res.json())
     .then(productos => {
-        console.log('Productos recibidos:', productos); // <-- AGREGÁ ESTA LÍNEA
       // Filtrar solo productos activos
       const activos = productos.filter(p => p.activo);
 
@@ -23,16 +22,21 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log(prod);
       const div = document.createElement("div");
       div.classList.add("producto", "card", "m-2", "p-2");
-      div.innerHTML = `
+      div.innerHTML = ` 
         <div class="card-body">
-        <img src="${prod.imagen || '/img/placeholder.png'}" class="card-img-top mb-2" alt="${prod.nombre}">
-        <h5 class="card-title">${prod.nombre}</h5>
-        <p class="card-text">Precio: $${prod.precio}</p>
+          <img src="${prod.imagen || '/img/placeholder.png'}" class="card-img-top mb-2" alt="${prod.nombre}">
+          <h5 class="card-title">${prod.nombre}</h5>
+          <p class="card-text">Precio: $${prod.precio}</p>
+          <button class="btn btn-primary btn-agregar" data-id="${prod._id}">Agregar al carrito</button>
         </div>
       `;
+      div.querySelector('.btn-agregar').addEventListener('click', () => {
+        agregarAlCarrito(prod); // cuando se hace click en el botón, se salta la alerta
+        alert('Producto agregado al carrito');
+      });
 
-        if (prod.categoria === "libro" && librosDiv) {
-          librosDiv.appendChild(div);
+        if (prod.categoria === "libro" && librosDiv) { // si el producto es un libro y existe el contenedor de libros
+          librosDiv.appendChild(div); // Agrega el div al contenedor de libros
         } else if (prod.categoria === "comic" && comicsDiv) {
           comicsDiv.appendChild(div);
         } else if (prod.categoria === "manga" && mangasDiv) {
@@ -44,6 +48,32 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .catch(error => console.error('Error al cargar los productos:', error));
 });
+
+function getCarrito() {
+  return JSON.parse(localStorage.getItem('carrito')) || [];
+}
+
+function setCarrito(carrito) {
+  localStorage.setItem('carrito', JSON.stringify(carrito));
+}
+
+function agregarAlCarrito(producto) {
+  let carrito = getCarrito();
+  const index = carrito.findIndex(p => p._id === producto._id);
+  if (index !== -1) {
+    carrito[index].cantidad += 1;
+  } else {
+    carrito.push({ ...producto, cantidad: 1 });
+  }
+  setCarrito(carrito);
+}
+
+function quitarDelCarrito(id) {
+  let carrito = getCarrito();
+  carrito = carrito.filter(p => p._id !== id);
+  setCarrito(carrito);
+}
+
   /*El carrito aún no está porque todavía no trabajé en eso*/
 
 /* Esto tengo que cambiarlo, lo hice mal
