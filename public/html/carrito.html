@@ -54,8 +54,27 @@
             <p class="fs-4 text-end total-destacado">Total: <span id="carrito-total" class="fw-bold"></span></p>
 
             <form id="formCompra" class="mt-4">
-                <button type="submit" class="btn btn-primary w-50">Confirmar compra</button>
+                <button type="submit" class="btn btn-primary w-50">Confirmar Compra</button>
             </form>
+
+            <!-- Modal de Confirmación -->
+            <div class="modal fade" id="modalConfirmacion" tabindex="-1" aria-labelledby="modalConfirmacionLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalConfirmacionLabel">Confirmar Compra</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body">
+                            ¿Estás seguro de que deseas finalizar la compra?
+                        </div>
+                        <div class="d-flex justify-content-center mt-3 gap-2">
+                            <button type="button" class="btn btn-primary w-50" id="btnConfirmarCompra">Sí</button>
+                            <button type="button" class="btn btn-secondary w-50" id="btnCancelarCompra" data-bs-dismiss="modal">No</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
     <footer>

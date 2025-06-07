@@ -77,18 +77,29 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Esta es la lógica para finalizar la compra del carrito y poder acceder al ticket
-document.getElementById('formCompra').addEventListener('submit', async function(e) {
-  e.preventDefault();
+// Obtenemos los elementos
+const formCompra = document.getElementById('formCompra');
+const modalConfirmacion = new bootstrap.Modal(document.getElementById('modalConfirmacion'));
+const btnConfirmarCompra = document.getElementById('btnConfirmarCompra');
 
-  const nombreCliente = localStorage.getItem('nombreUsuario') || 'Cliente'; // Obtiene el nombre del cliente del input en index.html
-  const carrito = getCarrito(); // Obtiene el carrito del localStorage
+formCompra.addEventListener('submit', function(e) {
+  e.preventDefault();
+  modalConfirmacion.show(); // Mostrar el modal de confirmación
+});
+
+// Ahora la lógica de la compra la ejecutamos al presionar el botón "Sí"
+btnConfirmarCompra.addEventListener('click', async function() {
+  const nombreCliente = localStorage.getItem('nombreUsuario') || 'Cliente';
+  const carrito = getCarrito();
+
   if (!nombreCliente || carrito.length === 0) {
-    mostrarAlerta('Debe ingresar su nombre y tener productos en el carrito...', 'danger'); // Validación del cliente
+    mostrarAlerta('Debe ingresar su nombre y tener productos en el carrito...', 'danger');
+    modalConfirmacion.hide();
     return;
   }
-  const total = carrito.reduce((acc, p) => acc + p.precio * p.cantidad, 0); // Calcula el total del carrito
-  const venta = { // Crea el objeto venta con los datos necesarios
+
+  const total = carrito.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
+  const venta = {
     nombreCliente,
     productos: carrito.map(p => ({
       id: p._id,
@@ -100,7 +111,6 @@ document.getElementById('formCompra').addEventListener('submit', async function(
     fecha: new Date().toISOString()
   };
 
-  // Guardar en backend con un post
   try {
     const res = await fetch('/api/ventas', {
       method: 'POST',
@@ -110,14 +120,15 @@ document.getElementById('formCompra').addEventListener('submit', async function(
 
     if (!res.ok) throw new Error('Error al guardar la venta');
 
-    // Guardar en localStorage para el ticket que se va a usar después
     localStorage.setItem('ticket', JSON.stringify(venta));
-    localStorage.removeItem('carrito'); // Vacía el carrito
+    localStorage.removeItem('carrito');
 
-    // Redirigir a ticket.html
+    // Cierra el modal y redirige
+    modalConfirmacion.hide();
     window.location.href = '/html/ticket.html';
   } catch (err) {
     mostrarAlerta('No se pudo finalizar la compra. Intente de nuevo.', 'danger');
+    modalConfirmacion.hide();
   }
 });
 

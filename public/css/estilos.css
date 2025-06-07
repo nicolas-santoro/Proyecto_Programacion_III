@@ -338,6 +338,41 @@ footer {
   transition: box-shadow 0.2s, background 0.2s;
 }
 
+/* Modal fondo gris oscuro y texto blanco */
+.modal-content {
+  background-color: #212529 !important;
+  color: #fff !important;
+  border: none;
+}
+
+.modal-header, .modal-footer {
+  border: none;
+}
+
+.modal-title {
+  color: #fff;
+}
+
+/* Botones del modal */
+#btnConfirmarCompra {
+  background-color: #6f42c1; /* violeta */
+  border: none;
+}
+
+#btnConfirmarCompra:hover {
+  background-color: #59359c; /* un poco más oscuro */
+}
+
+#btnCancelarCompra {
+  background-color: #4637a7; /* Azul oscuro */
+  border: none;
+}
+
+#btnCancelarCompra:hover {
+  background-color: #2c226c; /* Azul aún más oscuro */
+}
+
+
 #ticket-container {
   background-color: #222;
   box-shadow: 0 4px 6px rgba(160, 32, 240, 0.3);
