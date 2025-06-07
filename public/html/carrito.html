@@ -15,26 +15,29 @@
     </header>
     <nav id="navAdmin">
         <a href="./loginAdmin.html" class="btn-admin">Ingresar como Administrador</a>
-        <a href="./productos.html" class="btn-back">Volver a productos</a>
+        <a href="./productos.html" class="btn-back">Volver a Comprar</a>
     </nav>
     <main>
         <section class="welcome-section">
             <table class="table table-dark table-hover align-middle text-center rounded shadow">
                 <thead>
                     <tr>
-                    <th>Nombre</th>
-                    <th>Precio</th>
-                    <th>Cantidad</th>
-                    <th>Subtotal</th>
-                    <th>Acciones</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Subtotal</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
+                
                 <tbody id="carrito-body"></tbody>
-                </table>
-                <p class="fs-4 text-end total-destacado">Total: <span id="carrito-total" class="fw-bold"></span></p>
-                <form id="formCompra" class="mt-4">
+            </table>
+
+            <p class="fs-4 text-end total-destacado">Total: <span id="carrito-total" class="fw-bold"></span></p>
+
+            <form id="formCompra" class="mt-4">
                 <button type="submit" class="btn btn-primary w-50">Confirmar compra</button>
-                </form>
+            </form>
         </section>
     </main>
     <footer>
