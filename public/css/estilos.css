@@ -175,7 +175,8 @@ footer {
 }
 
 
-#mainProductos h1, #mainProductos h3 {
+#mainProductos h1, #mainProductos h3,
+#mainTicket h1, #mainTicket h3 {
   color: #a020f0;
 }
 
@@ -338,4 +339,36 @@ footer {
   font-weight: bold;
   text-shadow: 0 0 8px #a020f0, 0 0 2px #fff;
   transition: box-shadow 0.2s, background 0.2s;
+}
+
+#ticket-container {
+  background-color: #222;
+  box-shadow: 0 4px 6px rgba(160, 32, 240, 0.3);
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+#ticket-container p {
+  color: #fff;
+  margin: 10px 0;
+  font-size: 1rem;
+}
+
+#ticket-container strong {
+  color: #c320f0;
+}
+
+#ticket-container h3 {
+  margin-top: 20px;
+  color: #a020f0;
+  font-size: 1.2rem;
+}
+
+#productos {
+  color: #fff;
+  list-style-type: disc;
+  margin-left: 20px;
+  padding-left: 0;
 }
