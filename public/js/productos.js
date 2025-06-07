@@ -7,16 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Obtener los contenedores de cada categoría
       const librosDiv = document.getElementById("libros-container");
-      const comicsDiv = document.getElementById("comics-container");
-      const mangasDiv = document.getElementById("mangas-container");
       const separadoresDiv = document.getElementById("separadores-container");
 
       // Función para renderizar todos los productos
       function renderizarProductos() {
         // Limpiar contenedores
         if (librosDiv) librosDiv.innerHTML = '';
-        if (comicsDiv) comicsDiv.innerHTML = '';
-        if (mangasDiv) mangasDiv.innerHTML = '';
         if (separadoresDiv) separadoresDiv.innerHTML = '';
 
         activos.forEach(prod => {
@@ -54,18 +50,14 @@ document.addEventListener('DOMContentLoaded', () => {
           });
 
           // Agregar el div al contenedor correspondiente
-          if (prod.categoria === "libro" && librosDiv) {
+          if (prod.categoria === "libro" || prod.categoria === "comic" || prod.categoria === "manga"){
             librosDiv.appendChild(div);
-          } else if (prod.categoria === "comic" && comicsDiv) {
-            comicsDiv.appendChild(div);
-          } else if (prod.categoria === "manga" && mangasDiv) {
-            mangasDiv.appendChild(div);
-          } else if (prod.categoria === "separador" && separadoresDiv) {
+          } else {
             separadoresDiv.appendChild(div);
           }
         });
       }
-
+      
       renderizarProductos();
       actualizarCantidadCarrito();
     })

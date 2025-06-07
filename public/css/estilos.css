@@ -269,6 +269,35 @@ footer {
   background-color: #a020f0;
 }
 
+/* Estilos base para la lista */
+.nav-list {
+  list-style: none;
+  display: flex;
+  gap: 10px;
+  padding: 0;
+  margin: 10px 0;
+}
+
+/* Estilo para los botones */
+.btn-header {
+  background-color: violet;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  margin: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-header:hover {
+  background-color: purple;
+}
+
+.btn-header.activo {
+  background-color: darkviolet;
+  color: white;
+}
+
 
 /* Botones del carrito personalizados */
 .btn-outline-light {
