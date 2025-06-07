@@ -13,6 +13,10 @@ body {
   flex-direction: column;
 }
 
+body.modo-claro {
+  background: linear-gradient(to right, #ffffff, #e5e5e5);
+}
+
 /* Encabezado */
 header {
   text-align: center;
