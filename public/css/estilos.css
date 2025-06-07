@@ -26,7 +26,7 @@ header img {
   margin-bottom: 0.5em;
 }
 
-#navAdmin {
+#navBtn {
   display: flex;
   justify-content: center;  /* Centra horizontalmente todos los hijos */
   align-items: center;      /* Centra verticalmente */
@@ -36,10 +36,10 @@ header img {
 }
 
 /* Estilo común para los botones */
-#navAdmin .btn-admin,
-#navAdmin .btn-log,
-#navAdmin .btn-products,
-#navAdmin .btn-carrito {
+#navBtn .btn-admin,
+#navBtn .btn-log,
+#navBtn .btn-products,
+#navBtn .btn-carrito {
   display: inline-block;
   padding: 0.5em 1em;
   color: white;
@@ -49,24 +49,17 @@ header img {
   transition: background-color 0.3s;
 }
 
-#navAdmin .btn-admin:hover,
-#navAdmin .btn-log:hover,
-#navAdmin .btn-products:hover,
-#navAdmin .btn-carrito:hover {
+#navBtn .btn-admin:hover,
+#navBtn .btn-log:hover,
+#navBtn .btn-products:hover,
+#navBtn .btn-carrito:hover {
   background-color: #a020f0;
 }
 
 /* Mantén el estilo especial del icono y contador del carrito */
 .btn-carrito {
-  font-weight: bold;
   position: relative;
   padding: 0.6em 1.2em;
-}
-
-.btn-carrito .bi-cart {
-  margin-right: 0.5em;
-  font-size: 1.2em;
-  vertical-align: middle;
 }
 
 .carrito-cantidad {
@@ -81,7 +74,7 @@ header img {
 }
 
 /* Quita flex del contenedor del carrito para que no afecte */
-#navAdmin #carrito-access {
+#navBtn #carrito-access {
   display: inline-block;
   align-items: unset;
 }
