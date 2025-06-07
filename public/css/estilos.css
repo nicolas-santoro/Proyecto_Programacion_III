@@ -28,11 +28,17 @@ header img {
 
 /* Navegación */
 #navAdmin {
+  display: flex;
+  align-items: center;  /* centra verticalmente */
   background-color: #4b0082;
   padding: 0.5em;
+  /* no uses justify-content: space-between para que no se separen */
 }
 
-#navAdmin .btn-admin, #navAdmin .btn-back {
+/* Botones admin, back y carrito */
+#navAdmin .btn-admin,
+#navAdmin .btn-back,
+#navAdmin .btn-carrito {
   display: inline-block;
   padding: 0.5em 1em;
   color: white;
@@ -40,11 +46,44 @@ header img {
   background-color: #800080;
   border-radius: 4px;
   transition: background-color 0.3s;
-  margin: 0 0.3em;
+  margin: 0 0.3em; /* espacio entre botones */
 }
 
-#navAdmin .btn-admin:hover, #navAdmin .btn-back:hover {
+#navAdmin .btn-admin:hover,
+#navAdmin .btn-back:hover,
+#navAdmin .btn-carrito:hover {
   background-color: #a020f0;
+}
+
+/* Mantén el estilo especial del icono y contador del carrito */
+.btn-carrito {
+  font-weight: bold;
+  position: relative;
+  background-color: #6a0dad;
+  padding: 0.6em 1.2em;
+}
+
+.btn-carrito .bi-cart {
+  margin-right: 0.5em;
+  font-size: 1.2em;
+  vertical-align: middle;
+}
+
+.carrito-cantidad {
+  background: #d020d0;
+  color: #fff;
+  border-radius: 50%;
+  padding: 0.2em 0.6em;
+  font-size: 0.9em;
+  position: absolute;
+  top: -10px;
+  right: -15px;
+}
+
+/* Quita flex del contenedor del carrito para que no afecte */
+#navAdmin #carrito-access {
+  display: inline-block;
+  align-items: unset;
 }
 
 
@@ -232,47 +271,6 @@ footer {
   background-color: #a020f0;
 }
 
-/* Botón de acceso al carrito arriba a la derecha */
-#carrito-access {
-  position: absolute;
-  top: 1.5em;
-  right: 2em;
-  z-index: 10;
-}
-
-.btn-carrito {
-  display: inline-block;
-  background-color: #6a0dad;
-  color: #fff;
-  padding: 0.6em 1.2em;
-  border-radius: 4px;
-  text-decoration: none;
-  font-weight: bold;
-  transition: background-color 0.3s;
-  position: relative;
-}
-
-.btn-carrito:hover {
-  background-color: #a020f0;
-  color: #fff;
-}
-
-.btn-carrito .bi-cart {
-  margin-right: 0.5em;
-  font-size: 1.2em;
-  vertical-align: middle;
-}
-
-.carrito-cantidad {
-  background: #d020d0;
-  color: #fff;
-  border-radius: 50%;
-  padding: 0.2em 0.6em;
-  font-size: 0.9em;
-  position: absolute;
-  top: -10px;
-  right: -15px;
-}
 
 /* Botones del carrito personalizados */
 .btn-outline-light {
