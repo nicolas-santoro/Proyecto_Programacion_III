@@ -11,42 +11,63 @@ document.addEventListener('DOMContentLoaded', () => {
       const mangasDiv = document.getElementById("mangas-container");
       const separadoresDiv = document.getElementById("separadores-container");
 
-      // Limpiar contenedores
-      if (librosDiv) librosDiv.innerHTML = '';
-      if (comicsDiv) comicsDiv.innerHTML = '';
-      if (mangasDiv) mangasDiv.innerHTML = '';
-      if (separadoresDiv) separadoresDiv.innerHTML = '';
+      // Función para renderizar todos los productos
+      function renderizarProductos() {
+        // Limpiar contenedores
+        if (librosDiv) librosDiv.innerHTML = '';
+        if (comicsDiv) comicsDiv.innerHTML = '';
+        if (mangasDiv) mangasDiv.innerHTML = '';
+        if (separadoresDiv) separadoresDiv.innerHTML = '';
 
-      // Renderizar productos según su categoría
-      activos.forEach(prod => {
-      const div = document.createElement("div");
-      div.classList.add("producto", "card", "m-2", "p-2");
-      div.innerHTML = ` 
-        <div class="card-body">
-          <img src="${prod.imagen || '/img/placeholder.png'}" class="card-img-top mb-2" alt="${prod.nombre}">
-          <h5 class="card-title">${prod.nombre}</h5>
-          <p class="card-text">Precio: $${prod.precio}</p>
-          <button class="btn btn-primary btn-agregar" data-id="${prod._id}">Agregar al carrito</button>
-        </div>
-      `;
-      // Después de agregar un producto al carrito:
-      div.querySelector('.btn-agregar').addEventListener('click', () => {
-        agregarAlCarrito(prod);
-        actualizarCantidadCarrito();
-        alert('Producto agregado al carrito');
-      });
+        activos.forEach(prod => {
+          const div = document.createElement("div");
+          div.classList.add("producto", "card", "m-2", "p-2");
 
-        if (prod.categoria === "libro" && librosDiv) { // si el producto es un libro y existe el contenedor de libros
-          librosDiv.appendChild(div); // Agrega el div al contenedor de libros
-        } else if (prod.categoria === "comic" && comicsDiv) {
-          comicsDiv.appendChild(div);
-        } else if (prod.categoria === "manga" && mangasDiv) {
-          mangasDiv.appendChild(div);
-        } else if (prod.categoria === "separador" && separadoresDiv) {
-          separadoresDiv.appendChild(div);
-        }
-        actualizarCantidadCarrito(); // Actualiza la cantidad de productos en el carrito -a penas se abra la página-
-      });
+          // Obtener cantidad actual en el carrito
+          const carrito = getCarrito();
+          const itemEnCarrito = carrito.find(p => p._id === prod._id);
+          const cantidad = itemEnCarrito ? itemEnCarrito.cantidad : 0;
+
+          div.innerHTML = ` 
+            <div class="card-body position-relative">
+              <img src="${prod.imagen || '/img/placeholder.png'}" class="card-img-top mb-2" alt="${prod.nombre}">
+              <h5 class="card-title">${prod.nombre}</h5>
+              <p class="card-text">Precio: $${prod.precio}</p>
+              <button class="btn btn-primary btn-agregar" data-id="${prod._id}">Agregar al carrito</button>
+              ${cantidad > 0 ? `<span class="badge bg-gradient position-absolute top-0 end-0 cantidad-badge">${cantidad}</span>` : ''}
+            </div>
+          `;
+
+          // Efecto destacado al hacer hover
+          div.addEventListener('mouseenter', () => {
+            div.classList.add('destacado');
+          });
+          div.addEventListener('mouseleave', () => {
+            div.classList.remove('destacado');
+          });
+
+          // Botón agregar al carrito
+          div.querySelector('.btn-agregar').addEventListener('click', () => {
+            agregarAlCarrito(prod);
+            actualizarCantidadCarrito();
+            renderizarProductos(); // Vuelve a renderizar todos los productos para actualizar los badges
+          });
+
+          // Agregar el div al contenedor correspondiente
+          if (prod.categoria === "libro" && librosDiv) {
+            librosDiv.appendChild(div);
+          } else if (prod.categoria === "comic" && comicsDiv) {
+            comicsDiv.appendChild(div);
+          } else if (prod.categoria === "manga" && mangasDiv) {
+            mangasDiv.appendChild(div);
+          } else if (prod.categoria === "separador" && separadoresDiv) {
+            separadoresDiv.appendChild(div);
+          }
+        });
+      }
+
+      renderizarProductos();
+      actualizarCantidadCarrito();
     })
     .catch(error => console.error('Error al cargar los productos:', error));
 });

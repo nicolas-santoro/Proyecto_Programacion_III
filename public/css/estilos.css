@@ -326,3 +326,18 @@ footer {
   transform: scale(1.03);
   transition: box-shadow 0.2s, border 0.2s, transform 0.2s;
 }
+
+.cantidad-badge {
+  background: #fff;
+  color: #6a0dad !important; /* si no, lo sobreescriben */
+  font-size: 1.3em;
+  padding: 0.35em 0.9em;
+  border-radius: 50%;
+  box-shadow: 0 0 12px #ff00cc, 0 0 24px #a020f0;
+  z-index: 2;
+  margin: 0.3em 0.3em 0 0;
+  border: 2.5px solid #fff;
+  font-weight: bold;
+  text-shadow: 0 0 8px #a020f0, 0 0 2px #fff;
+  transition: box-shadow 0.2s, background 0.2s;
+}
