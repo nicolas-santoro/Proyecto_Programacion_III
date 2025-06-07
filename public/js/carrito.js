@@ -84,7 +84,7 @@ document.getElementById('formCompra').addEventListener('submit', async function(
   const nombreCliente = localStorage.getItem('nombreUsuario') || 'Cliente'; // Obtiene el nombre del cliente del input en index.html
   const carrito = getCarrito(); // Obtiene el carrito del localStorage
   if (!nombreCliente || carrito.length === 0) {
-    alert('Debe ingresar su nombre y tener productos en el carrito.'); // Validación del cliente
+    mostrarAlerta('Debe ingresar su nombre y tener productos en el carrito...', 'danger'); // Validación del cliente
     return;
   }
   const total = carrito.reduce((acc, p) => acc + p.precio * p.cantidad, 0); // Calcula el total del carrito
@@ -117,6 +117,8 @@ document.getElementById('formCompra').addEventListener('submit', async function(
     // Redirigir a ticket.html
     window.location.href = '/html/ticket.html';
   } catch (err) {
-    alert('No se pudo finalizar la compra. Intente de nuevo.');
+    mostrarAlerta('No se pudo finalizar la compra. Intente de nuevo.', 'danger');
   }
 });
+
+import { mostrarAlerta } from './alertas.js';

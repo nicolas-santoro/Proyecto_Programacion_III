@@ -26,18 +26,19 @@ header img {
   margin-bottom: 0.5em;
 }
 
-/* Navegación */
 #navAdmin {
   display: flex;
-  align-items: center;  /* centra verticalmente */
+  justify-content: center;  /* Centra horizontalmente todos los hijos */
+  align-items: center;      /* Centra verticalmente */
   background-color: #4b0082;
   padding: 0.5em;
-  /* no uses justify-content: space-between para que no se separen */
+  gap: 0.6em; /* Espacio entre botones */
 }
 
-/* Botones admin, back y carrito */
+/* Estilo común para los botones */
 #navAdmin .btn-admin,
-#navAdmin .btn-back,
+#navAdmin .btn-log,
+#navAdmin .btn-products,
 #navAdmin .btn-carrito {
   display: inline-block;
   padding: 0.5em 1em;
@@ -46,11 +47,11 @@ header img {
   background-color: #800080;
   border-radius: 4px;
   transition: background-color 0.3s;
-  margin: 0 0.3em; /* espacio entre botones */
 }
 
 #navAdmin .btn-admin:hover,
-#navAdmin .btn-back:hover,
+#navAdmin .btn-log:hover,
+#navAdmin .btn-products:hover,
 #navAdmin .btn-carrito:hover {
   background-color: #a020f0;
 }
@@ -59,7 +60,6 @@ header img {
 .btn-carrito {
   font-weight: bold;
   position: relative;
-  background-color: #6a0dad;
   padding: 0.6em 1.2em;
 }
 

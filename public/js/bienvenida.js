@@ -12,7 +12,7 @@ document.getElementById('btnEnviar').addEventListener('click', function() {
     // Validación: solo letras (sin espacios, sin números ni caracteres especiales)
     const regex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$/;
     if (!regex.test(nombre)) {
-        mostrarAlerta('El nombre solo puede contener letras (sin espacios ni caracteres especiales).', 'warning');
+        mostrarAlerta('El nombre solo puede contener letras (sin espacios ni caracteres especiales).', 'danger');
 
         return;
     }
@@ -27,20 +27,4 @@ document.getElementById('btnEnviar').addEventListener('click', function() {
     window.location.href = './productos.html';
 });
 
-function mostrarAlerta(mensaje, tipo) {
-    const alertPlaceholder = document.getElementById('alertPlaceholder');
-    alertPlaceholder.innerHTML = `
-        <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
-        ${mensaje}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>`;
-
-    const alertaAccesible = document.getElementById('alertaAccesible');
-    if (alertaAccesible) {
-        alertaAccesible.textContent = '';
-
-        setTimeout(() => {
-            alertaAccesible.textContent = mensaje;
-        }, 100);
-    }
-}
+import { mostrarAlerta } from './alertas.js';
