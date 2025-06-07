@@ -76,3 +76,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     });
 });
+
+// Esta es la lógica para finalizar la compra del carrito y poder acceder al ticket
+document.getElementById('formCompra').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const nombreCliente = localStorage.getItem('nombreUsuario') || 'Cliente'; // Obtiene el nombre del cliente del input en index.html
+  const carrito = getCarrito(); // Obtiene el carrito del localStorage
+  if (!nombreCliente || carrito.length === 0) {
+    alert('Debe ingresar su nombre y tener productos en el carrito.'); // Validación del cliente
+    return;
+  }
+  const total = carrito.reduce((acc, p) => acc + p.precio * p.cantidad, 0); // Calcula el total del carrito
+  const venta = { // Crea el objeto venta con los datos necesarios
+    nombreCliente,
+    productos: carrito.map(p => ({
+      id: p._id,
+      nombre: p.nombre,
+      precio: p.precio,
+      cantidad: p.cantidad
+    })),
+    total,
+    fecha: new Date().toISOString()
+  };
+
+  // Guardar en backend con un post
+  try {
+    const res = await fetch('/api/ventas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(venta)
+    });
+
+    if (!res.ok) throw new Error('Error al guardar la venta');
+
+    // Guardar en localStorage para el ticket que se va a usar después
+    localStorage.setItem('ticket', JSON.stringify(venta));
+    localStorage.removeItem('carrito'); // Vacía el carrito
+
+    // Redirigir a ticket.html
+    window.location.href = '/html/ticket.html';
+  } catch (err) {
+    alert('No se pudo finalizar la compra. Intente de nuevo.');
+  }
+});
