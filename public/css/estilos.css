@@ -269,6 +269,23 @@ footer {
   background-color: #a020f0;
 }
 
+.botones-categorias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.btn-violeta {
+  color: #fff;
+  background-color: #6f42c1; /* violeta Bootstrap similar */
+  border-color: #6f42c1;
+}
+
+.btn-violeta.active, .btn-violeta:active, .btn-violeta.show {
+  background-color: #5a3793;
+  border-color: #5a3793;
+}
+
 /* Estilos base para la lista */
 .nav-list {
   list-style: none;

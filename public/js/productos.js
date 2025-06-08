@@ -1,30 +1,34 @@
 document.addEventListener('DOMContentLoaded', () => {
   fetch("http://localhost:3000/api/productos")
-    .then(res => res.json()) // Obtener productos desde la API
+    .then(res => res.json())
     .then(productos => {
-      // Filtrar solo productos activos
       const activos = productos.filter(p => p.activo);
+      activos.sort((a, b) => a.nombre.localeCompare(b.nombre));
 
-      // Obtener los contenedores de cada categoría
-      const librosDiv = document.getElementById("libros-container");
-      const separadoresDiv = document.getElementById("separadores-container");
+      const botonesDiv = document.querySelector('.botones-categorias');
+      
+      if (botonesDiv) {
+        botonesDiv.innerHTML = `
+          <button class="btn btn-outline-primary me-2" data-categoria="todos">Todos</button>
+          <button class="btn btn-outline-primary me-2" data-categoria="libro">Libros</button>
+          <button class="btn btn-outline-primary me-2" data-categoria="comic">Cómics</button>
+          <button class="btn btn-outline-primary me-2" data-categoria="manga">Mangas</button>
+        `;
+      }
 
-      // Función para renderizar todos los productos
-      function renderizarProductos() {
-        // Limpiar contenedores
-        if (librosDiv) librosDiv.innerHTML = '';
-        if (separadoresDiv) separadoresDiv.innerHTML = '';
+      const contenedorLibros = document.getElementById('libros-container');
+      const contenedorSeparadores = document.getElementById('separadores-container');
 
-        activos.forEach(prod => {
+      function renderizarProductos(contenedor, productos) {
+        contenedor.innerHTML = '';
+        productos.forEach(prod => {
           const div = document.createElement("div");
           div.classList.add("producto", "card", "m-2", "p-2");
-
-          // Obtener cantidad actual en el carrito
           const carrito = getCarrito();
           const itemEnCarrito = carrito.find(p => p._id === prod._id);
           const cantidad = itemEnCarrito ? itemEnCarrito.cantidad : 0;
 
-          div.innerHTML = ` 
+          div.innerHTML = `
             <div class="card-body position-relative">
               <img src="${prod.imagen || '/img/placeholder.png'}" class="card-img-top mb-2" alt="${prod.nombre}">
               <h5 class="card-title">${prod.nombre}</h5>
@@ -34,33 +38,62 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           `;
 
-          // Efecto destacado al hacer hover
-          div.addEventListener('mouseenter', () => {
-            div.classList.add('destacado');
-          });
-          div.addEventListener('mouseleave', () => {
-            div.classList.remove('destacado');
-          });
-
-          // Botón agregar al carrito
           div.querySelector('.btn-agregar').addEventListener('click', () => {
             agregarAlCarrito(prod);
             actualizarCantidadCarrito();
-            renderizarProductos(); // Vuelve a renderizar todos los productos para actualizar los badges
+            const activeTab = document.querySelector('.nav-link.active').dataset.bsTarget;
+            if (activeTab === '#libros') {
+              renderizarProductosPorCategoria(categoriaActual);
+            } else {
+              renderizarSeparadores();
+            }
           });
 
-          // Agregar el div al contenedor correspondiente
-          if (prod.categoria === "libro" || prod.categoria === "comic" || prod.categoria === "manga"){
-            librosDiv.appendChild(div);
-          } else {
-            separadoresDiv.appendChild(div);
-          }
+          contenedor.appendChild(div);
         });
       }
-      
-      renderizarProductos();
-      actualizarCantidadCarrito();
-    })
+
+      let categoriaActual = 'todos'; // Muestra todos por default
+
+      function renderizarProductosPorCategoria(categoria) {
+        let filtrados;
+        if (categoria === 'todos') {
+          filtrados = activos.filter(p => p.categoria !== 'separador');
+        } else {
+          filtrados = activos.filter(p => p.categoria === categoria);
+        }
+        renderizarProductos(contenedorLibros, filtrados);
+      }
+
+      function renderizarSeparadores() {
+        const separadores = activos.filter(p => p.categoria === 'separador');
+        renderizarProductos(contenedorSeparadores, separadores);
+      }
+
+      // Eventos para los botones de categorías
+      botonesDiv.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') {
+          // Elimina 'active' de todos
+          botonesDiv.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+          
+          // Agrega 'active' al botón clickeado
+          e.target.classList.add('active');
+
+          // Actualiza la categoría actual y renderiza
+          categoriaActual = e.target.dataset.categoria;
+          renderizarProductosPorCategoria(categoriaActual);
+        }
+      });
+
+      // Después de generar los botones dinámicamente, activa el de 'Todos' por defecto
+      botonesDiv.querySelector('button[data-categoria="todos"]').classList.add('active');
+
+        // Inicialización
+        renderizarProductosPorCategoria(categoriaActual); // Muestra todos al inicio
+        renderizarSeparadores();
+        actualizarCantidadCarrito();
+      })
+
     .catch(error => console.error('Error al cargar los productos:', error));
 });
 
