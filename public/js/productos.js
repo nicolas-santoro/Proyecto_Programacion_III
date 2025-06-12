@@ -1,10 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
-  fetch("http://localhost:3000/api/productos")
+  fetch("http://localhost:3000/api/productos") // Trae los productos desde la API 
     .then(res => res.json())
     .then(productos => {
-      const activos = productos.filter(p => p.activo);
+      const activos = productos.filter(p => p.activo); // filtra solo los productos activos y los ordena alfabéticamente por nombre
+
       activos.sort((a, b) => a.nombre.localeCompare(b.nombre));
 
+      // va a agarrar los contenedores de botones y productos por categoría
       const botonesDiv = document.querySelector('.botones-categorias');
       const contenedorLibros = document.getElementById('libros-container');
       const contenedorSeparadores = document.getElementById('separadores-container');
@@ -21,17 +23,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Función principal para renderizar productos
       function renderizarProductos(contenedor, productos) {
-        contenedor.innerHTML = '';
+        contenedor.innerHTML = ''; // hay que limpiar el contenedor antes de poder renderizarlo
 
         productos.forEach(prod => {
           const div = document.createElement("div");
           div.classList.add("producto", "card", "m-2", "p-2");
 
+          // tiene que saber la cantidad actual del producto que hay en el carrito
           const carrito = getCarrito();
-          const itemEnCarrito = carrito.find(p => p._id === prod._id);
-          const cantidad = itemEnCarrito ? itemEnCarrito.cantidad : 0;
+          const itemEnCarrito = carrito.find(p => p._id === prod._id); // va a buscar dentro del array del carrito si ya existe un producto con el mismo id
+          const cantidad = itemEnCarrito ? itemEnCarrito.cantidad : 0; // si lo encuentra, va a devolver ese producto, sino, su cantidad es 0 
 
-          div.innerHTML = `
+          div.innerHTML = ` 
             <div class="card-body position-relative">
               <img src="${prod.imagen || '/img/placeholder.png'}" class="card-img-top mb-2" alt="${prod.nombre}">
               <h5 class="card-title">${prod.nombre}</h5>
@@ -54,57 +57,59 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           `;
 
+          // toma el div de la cantidad de productos y el container del boton agregar
           const controlDiv = div.querySelector('.control-cantidad');
           const agregarDiv = div.querySelector('.boton-agregar-container');
 
-          // Botón [+]
+          // Evento del botón sumar [+]
           controlDiv.querySelector('.btn-sumar').addEventListener('click', () => {
             agregarAlCarrito(prod);
-            const nuevaCantidad = getCantidadEnCarrito(prod._id);
-            controlDiv.querySelector('.cantidad-text').textContent = nuevaCantidad;
-            actualizarCantidadCarrito();
-            actualizarBadge(div, nuevaCantidad);
+            const nuevaCantidad = getCantidadEnCarrito(prod._id); // va a obtener una nueva cantidad
+            controlDiv.querySelector('.cantidad-text').textContent = nuevaCantidad; // actualiza el numero que se muestra en la pantalla
+            actualizarCantidadCarrito(); 
+            actualizarBadge(div, nuevaCantidad); // actualiza el badge (circulito) con la cantidad actual del producto
           });
 
-          // Botón [-]
+          // Evento del boton restar [-]
           controlDiv.querySelector('.btn-restar').addEventListener('click', () => {
             restarDelCarrito(prod._id);
             const nuevaCantidad = getCantidadEnCarrito(prod._id);
-            if (nuevaCantidad <= 0) {
-              controlDiv.classList.add('d-none');
-              agregarDiv.classList.remove('d-none');
-              actualizarBadge(div, 0);
+            if (nuevaCantidad <= 0) { // si la cantidad llega a 0
+              controlDiv.classList.add('d-none'); // oculta el div de control de cantidad
+              agregarDiv.classList.remove('d-none'); // muestra el div de agregar al carrito
+              actualizarBadge(div, 0); // elimina el badge de cantidad
             } else {
-              controlDiv.querySelector('.cantidad-text').textContent = nuevaCantidad;
+              controlDiv.querySelector('.cantidad-text').textContent = nuevaCantidad; // si sigue siendo mayor a 0, actualiza el número
               actualizarBadge(div, nuevaCantidad);
             }
             actualizarCantidadCarrito();
           });
 
-          // Botón Eliminar
+          // Evento del botón para eliminar [X]
           controlDiv.querySelector('.btn-eliminar').addEventListener('click', () => {
-            quitarDelCarrito(prod._id);
-            controlDiv.classList.add('d-none');
-            agregarDiv.classList.remove('d-none');
+            quitarDelCarrito(prod._id); // quita el producto
+            controlDiv.classList.add('d-none'); // oculta los controles de cantidad
+            agregarDiv.classList.remove('d-none'); // muestra el botón de agregar al carrito
             actualizarBadge(div, 0);
             actualizarCantidadCarrito();
           });
 
-          // Botón Agregar al carrito
+          // Evento del botón para agregar ["Agregar al Carrito"]
           div.querySelector('.btn-agregar').addEventListener('click', () => {
             agregarAlCarrito(prod);
-            controlDiv.classList.remove('d-none');
+            controlDiv.classList.remove('d-none'); 
             agregarDiv.classList.add('d-none');
             controlDiv.querySelector('.cantidad-text').textContent = getCantidadEnCarrito(prod._id);
             actualizarBadge(div, getCantidadEnCarrito(prod._id));
             actualizarCantidadCarrito();
           });
 
+          // va a tomar el contenedor y agregar la tarjeta del producto al contenedor correspondiente
           contenedor.appendChild(div);
         });
       }
 
-      // Actualiza el badge con la cantidad actual
+      // Actualiza el badge (circulito) con la cantidad actual de un producto
       function actualizarBadge(div, cantidad) {
         let badge = div.querySelector('.cantidad-badge');
         if (!badge && cantidad > 0) {
@@ -123,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let categoriaActual = 'todos';
 
-      // Renderiza productos según categoría
+      // Renderiza productos según la categoría seleccionada (para separarlos)
       function renderizarProductosPorCategoria(categoria) {
         let filtrados;
         if (categoria === 'todos') {
@@ -140,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderizarProductos(contenedorSeparadores, separadores);
       }
 
-      // Botones de categorías
+      // Maneja el click en los botones de categorías
       botonesDiv.addEventListener('click', (e) => {
         if (e.target.tagName === 'BUTTON') {
           botonesDiv.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
@@ -150,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      // Inicialización
+      // Inicialización: muestra todos los productos y separadores al cargar la página
       botonesDiv.querySelector('button[data-categoria="todos"]').classList.add('active');
       renderizarProductosPorCategoria(categoriaActual);
       renderizarSeparadores();
@@ -162,20 +167,20 @@ document.addEventListener('DOMContentLoaded', () => {
 // ---------------------
 // Funciones de carrito
 // ---------------------
-function getCarrito() {
+function getCarrito() { // así lee el carrito del localStorage y lo devuelve como un array
   return JSON.parse(localStorage.getItem('carrito')) || [];
 }
 
-function setCarrito(carrito) {
+function setCarrito(carrito) { // para guardar el array que se tomó arriba en un localStorage
   localStorage.setItem('carrito', JSON.stringify(carrito));
 }
 
-function agregarAlCarrito(producto) {
+function agregarAlCarrito(producto) { // va a sumar un producto al carrito o aumentar la cantidad si ya existe
   let carrito = getCarrito();
   const index = carrito.findIndex(p => p._id === producto._id);
   if (index !== -1) {
     carrito[index].cantidad += 1;
-  } else {
+  } else { // si no existe, lo agrega con cantidad 1
     carrito.push({
       _id: producto._id,
       nombre: producto.nombre,
@@ -183,37 +188,37 @@ function agregarAlCarrito(producto) {
       cantidad: 1
     });
   }
-  setCarrito(carrito);
+  setCarrito(carrito); // actualiza el localStorage con el carrito modificado
 }
 
-function restarDelCarrito(id) {
+function restarDelCarrito(id) { // resta una unidad
   let carrito = getCarrito();
-  const index = carrito.findIndex(p => p._id === id);
-  if (index !== -1) {
+  const index = carrito.findIndex(p => p._id === id); // busca el índice del producto en el carrito por su id -- comparando
+  if (index !== -1) { // si existe en el carrito, le resta 1
     if (carrito[index].cantidad > 1) {
       carrito[index].cantidad -= 1;
     } else {
-      carrito.splice(index, 1);
+      carrito.splice(index, 1); // si la cantidad es 1, lo elimina del carrito
     }
   }
   setCarrito(carrito);
 }
 
-function quitarDelCarrito(id) {
+function quitarDelCarrito(id) { // lo elimina del carrito 
   let carrito = getCarrito();
-  carrito = carrito.filter(p => p._id !== id);
+  carrito = carrito.filter(p => p._id !== id); // va a filtrar el carrito para eliminar el producto con el id que le pasamos
   setCarrito(carrito);
 }
 
-function actualizarCantidadCarrito() {
+function actualizarCantidadCarrito() { // actualiza el contador de productos en el carrito
   const carrito = getCarrito();
-  const cantidad = carrito.reduce((acc, prod) => acc + prod.cantidad, 0);
-  const span = document.getElementById('carrito-cantidad');
-  if (span) span.textContent = cantidad;
+  const cantidad = carrito.reduce((acc, prod) => acc + prod.cantidad, 0); // usa reduce para sumar todas las cantidades de los productos en el carrito
+  const span = document.getElementById('carrito-cantidad'); // busca el span que muestra la cantidad de productos en el carrito 
+  if (span) span.textContent = cantidad; //   actualiza el texto del span con la cantidad total de productos en el carrito
 }
 
-function getCantidadEnCarrito(id) {
+function getCantidadEnCarrito(id) { // obtiene la cantidad de un producto específico en el carrito, esto se usa para mostrar en la vista de productos cuántas unidades de un producto ya hay
   const carrito = getCarrito();
-  const item = carrito.find(p => p._id === id);
+  const item = carrito.find(p => p._id === id); // busca el producto en el carrito por su id, donde los dos id sean iguales
   return item ? item.cantidad : 0;
 }
