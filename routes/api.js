@@ -1,16 +1,10 @@
 const express = require('express');
-const router = express.Router();
+const app = express();
 
-const productoController = require('../controllers/productoController');
-const ventaController = require('../controllers/ventaController');
-const validarProducto = require('../middlewares/validarProducto');
-const validarVenta = require('../middlewares/validarVenta');
+const productoRoutes = require('./productos');
+const ventaRoutes = require('./ventas');
 
-// Productos
-router.post('/productos', validarProducto, productoController.crearProducto);
-router.get('/productos', productoController.obtenerProductos);
+app.use('/productos', productoRoutes);
+app.use('/ventas', ventaRoutes);
 
-// Ventas
-router.post('/ventas', validarVenta, ventaController.crearVenta);
-
-module.exports = router;
+module.exports = app;

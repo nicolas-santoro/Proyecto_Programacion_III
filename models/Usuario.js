@@ -28,4 +28,9 @@ usuarioSchema.pre('save', async function (next) {
   next();
 });
 
+//Método para validad la contraseña
+usuarioSchema.methods.validPassword = async function (passwordIngresada) {
+  return await bcrypt.compare(passwordIngresada, this.password);
+};
+
 module.exports = mongoose.model('Usuario', usuarioSchema);
