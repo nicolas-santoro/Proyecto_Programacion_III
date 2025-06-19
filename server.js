@@ -18,8 +18,8 @@ app.get('/', (req, res) => {
   res.send('Bienvenido a la API de Hachis Parmentier');
 });
 
-app.listen(3000, () => {
-  console.log('🚀 Servidor corriendo en http://localhost:3000');
+conectarDB().then(() => {
+  app.listen(3000, () => {
+    console.log('🚀 Servidor corriendo en http://localhost:3000');
+  });
 });
-
-conectarDB();

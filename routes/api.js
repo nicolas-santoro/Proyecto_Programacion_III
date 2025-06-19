@@ -1,10 +1,10 @@
 const express = require('express');
-const app = express();
+const router = express.Router();
 
 const productoRoutes = require('./productos');
 const ventaRoutes = require('./ventas');
 
-app.use('/productos', productoRoutes);
-app.use('/ventas', ventaRoutes);
+router.use('/productos', productoRoutes);
+router.use('/ventas', ventaRoutes);
 
-module.exports = app;
+module.exports = router;

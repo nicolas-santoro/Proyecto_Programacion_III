@@ -1,5 +1,5 @@
-const jwt = require('jsonwebtoken');
-const { Usuario } = require('../models');
+/*const jwt = require('jsonwebtoken');
+const { Usuario } = require('../models/Usuario');
 require('dotenv').config();
 
 //Middleware para verificar TOKEN JWT
@@ -23,4 +23,4 @@ exports.verifyToken = async (req, res, next) => {
     } catch (error){
         return res.status(401).json({message: 'TOKEN inválido o expirado'})
     }
-};
+};*/
