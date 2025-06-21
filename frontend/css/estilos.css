@@ -1,0 +1,466 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(to right, #1a1a1a, #000000);
+  color: #f0f0f0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+body.modo-claro {
+  background: linear-gradient(to right, #ffffff, #e5e5e5);
+}
+
+/* Encabezado */
+header {
+  text-align: center;
+  padding: 1em;
+  background-color: #6a0dad;
+  color: #fff;
+}
+
+header img {
+  max-width: 100px;
+  margin-bottom: 0.5em;
+}
+
+#navBtn {
+  display: flex;
+  justify-content: center;  /* Centra horizontalmente todos los hijos */
+  align-items: center;      /* Centra verticalmente */
+  background-color: #4b0082;
+  padding: 0.5em;
+  gap: 0.6em; /* Espacio entre botones */
+}
+
+/* Estilo común para los botones */
+#navBtn .btn-admin,
+#navBtn .btn-log,
+#navBtn .btn-products,
+#navBtn .btn-carrito {
+  display: inline-block;
+  padding: 0.5em 1em;
+  color: white;
+  text-decoration: none;
+  background-color: #800080;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+#navBtn .btn-admin:hover,
+#navBtn .btn-log:hover,
+#navBtn .btn-products:hover,
+#navBtn .btn-carrito:hover {
+  background-color: #a020f0;
+}
+
+/* Mantén el estilo especial del icono y contador del carrito */
+.btn-carrito {
+  position: relative;
+  padding: 0.6em 1.2em;
+}
+
+.carrito-cantidad {
+  background: #d020d0;
+  color: #fff;
+  border-radius: 50%;
+  padding: 0.2em 0.6em;
+  font-size: 0.9em;
+  position: absolute;
+  top: -10px;
+  right: -15px;
+}
+
+/* Quita flex del contenedor del carrito para que no afecte */
+#navBtn #carrito-access {
+  display: inline-block;
+  align-items: unset;
+}
+
+
+main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2em;
+}
+
+.welcome-section {
+  background: #222;
+  border-radius: 8px;
+  padding: 2em;
+  box-shadow: 0 4px 6px rgba(160, 32, 240, 0.3);
+  text-align: center;
+}
+
+.welcome-section h1 {
+  margin-bottom: 0.5em;
+  color: #a020f0;
+}
+
+.welcome-section h3 {
+  margin-bottom: 1.5em;
+  color: #d8b0ff;
+}
+
+form label {
+  display: block;
+  margin-bottom: 0.5em;
+  font-weight: bold;
+  color: #ccc;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"] {
+  width: 80%;
+  padding: 0.5em;
+  margin-bottom: 1em;
+  border: 1px solid #800080;
+  border-radius: 4px;
+  background-color: #333;
+  color: #f0f0f0;
+  text-align: center;
+  display: block;
+  margin: 0 auto;
+}
+
+form input[type="text"]::placeholder,
+form input[type="email"]::placeholder,
+form input[type="password"]::placeholder {
+  color: #bbb;
+}
+
+form button {
+  padding: 0.5em 1em;
+  margin: 0 0.5em;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: white;
+}
+
+form button[type="submit"] {
+  background-color: #6a0dad;
+}
+
+form button[type="submit"]:hover {
+  background-color: #a020f0;
+}
+
+form button[type="reset"] {
+  background-color: #8b008b;
+}
+
+form button[type="reset"]:hover {
+  background-color: #d020d0;
+}
+
+
+footer {
+  text-align: center;
+  padding: 1em;
+  background-color: #6a0dad;
+  color: white;
+}
+
+
+#mainProductos h1, #mainProductos h3,
+#mainTicket h1, #mainTicket h3 {
+  color: #a020f0;
+}
+
+
+.nav-tabs .nav-link {
+  color: #d8b0ff;
+  background-color: #4b0082;
+  border: none;
+  border-radius: 4px 4px 0 0;
+  margin-right: 0.2em;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: #6a0dad;
+  color: white;
+}
+
+.nav-tabs .nav-link:hover {
+  background-color: #800080;
+}
+
+
+.tab-content {
+  background-color: #222;
+  border-radius: 0 0 4px 4px;
+  padding: 1em;
+  box-shadow: 0 4px 6px rgba(160, 32, 240, 0.3);
+}
+
+.productos-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.card {
+  max-width: 250px;
+  background-color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  margin: 0.5rem;
+}
+
+
+.producto {
+  flex: 1 1 200px;
+  background-color: #333;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.producto img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  display: block;
+  margin: 0 auto 1rem;
+}
+
+#separadores .producto img {
+  max-height: 150px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 1rem;
+}
+
+.producto h4 {
+  color: #d8b0ff;
+  margin-bottom: 0.3em;
+}
+
+.producto p {
+  font-size: 0.9em;
+  color: #5d5d5d;
+}
+
+.producto button {
+  margin-top: 0.5em;
+  padding: 0.4em 0.8em;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: white;
+  background-color: #6a0dad;
+  transition: background-color 0.3s;
+}
+
+.producto button:hover {
+  background-color: #a020f0;
+}
+
+.botones-categorias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.control-cantidad {
+  display: flex;
+  flex-direction: column; /* Ahora apila verticalmente */
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.control-cantidad .btn-eliminar {
+  margin-left: 0; /* Quitamos margen lateral */
+  margin-top: 0.3rem; /* Separación vertical */
+}
+
+.cantidad-text {
+  min-width: 2rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+.control-cantidad .fila-controles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Estilos base para la lista */
+.nav-list {
+  list-style: none;
+  display: flex;
+  gap: 10px;
+  padding: 0;
+  margin: 10px 0;
+}
+
+/* Estilo para los botones */
+.btn-header {
+  background-color: violet;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  margin: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-header:hover {
+  background-color: purple;
+}
+
+.btn-header.activo {
+  background-color: darkviolet;
+  color: white;
+}
+
+
+/* Botones del carrito personalizados */
+.btn-outline-light {
+  border: 2px solid #a020f0 !important;
+  color: #fff !important;
+  background: transparent !important;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn-outline-light:hover, .btn-outline-light:focus {
+  background: #a020f0 !important;
+  color: #fff !important;
+}
+
+.btn-gradient-pink {
+  background: linear-gradient(90deg, #d020d0 0%, #a020f0 100%);
+  color: #fff !important;
+  border: none;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px #a020f055;
+}
+
+.btn-gradient-pink:hover, .btn-gradient-pink:focus {
+  background: linear-gradient(90deg, #a020f0 0%, #d020d0 100%);
+  color: #fff !important;
+  box-shadow: 0 4px 16px #a020f099;
+}
+
+.btn-eliminar {
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.total-destacado {
+  color: #fff;
+  text-shadow: 0 2px 8px #a020f099, 0 0 2px #fff;
+  font-size: 2rem;
+  letter-spacing: 1px;
+}
+
+.total-destacado #carrito-total {
+  color: #d020d0;
+  font-size: 2.2rem;
+  text-shadow: 0 2px 8px #a020f099, 0 0 2px #fff;
+}
+
+/* Para destacar la tarjeta */
+.producto.card:hover, .producto.card.destacado {
+  box-shadow: 0 0 20px #a020f0, 0 0 8px #fff2;
+  border: 2px solid #a020f0;
+  transform: scale(1.03);
+  transition: box-shadow 0.2s, border 0.2s, transform 0.2s;
+}
+
+.cantidad-badge {
+  background: #fff;
+  color: #6a0dad !important; /* si no, lo sobreescriben */
+  font-size: 1.3em;
+  padding: 0.35em 0.9em;
+  border-radius: 50%;
+  box-shadow: 0 0 12px #ff00cc, 0 0 24px #a020f0;
+  z-index: 2;
+  margin: 0.3em 0.3em 0 0;
+  border: 2.5px solid #fff;
+  font-weight: bold;
+  text-shadow: 0 0 8px #a020f0, 0 0 2px #fff;
+  transition: box-shadow 0.2s, background 0.2s;
+}
+
+/* Modal fondo gris oscuro y texto blanco */
+.modal-content {
+  background-color: #212529 !important;
+  color: #fff !important;
+  border: none;
+}
+
+.modal-header, .modal-footer {
+  border: none;
+}
+
+.modal-title {
+  color: #fff;
+}
+
+/* Botones del modal */
+#btnConfirmarCompra {
+  background-color: #6f42c1; /* violeta */
+  border: none;
+}
+
+#btnConfirmarCompra:hover {
+  background-color: #59359c; /* un poco más oscuro */
+}
+
+#btnCancelarCompra {
+  background-color: #4637a7; /* Azul oscuro */
+  border: none;
+}
+
+#btnCancelarCompra:hover {
+  background-color: #2c226c; /* Azul aún más oscuro */
+}
+
+
+#ticket-container {
+  background-color: #222;
+  box-shadow: 0 4px 6px rgba(160, 32, 240, 0.3);
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+#ticket-container p {
+  color: #fff;
+  margin: 10px 0;
+  font-size: 1rem;
+}
+
+#ticket-container strong {
+  color: #c320f0;
+}
+
+#ticket-container h3 {
+  margin-top: 20px;
+  color: #a020f0;
+  font-size: 1.2rem;
+}
+
+#productos {
+  color: #fff;
+  list-style-type: disc;
+  margin-left: 20px;
+  padding-left: 0;
+}
