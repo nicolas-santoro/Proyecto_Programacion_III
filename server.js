@@ -12,6 +12,7 @@ app.use(express.static('frontend')); // <-- ESTA LÍNEA es clave
 
 // Rutas CRUD
 app.use('/api', require('./backend/routes/apiRoutes'));
+app.use('/api/authRoutes', require('./backend/routes/authRoutes'));
 
 
 app.get('/', (req, res) => {

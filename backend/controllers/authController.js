@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const { Usuario } = require('../models');
+const path = require('path');
+const Usuario = require(path.join(__dirname, '../models/Usuario'));
 require('dotenv').config();
 
 //Controlador para login
@@ -32,7 +33,7 @@ exports.login = async (req, res) => {
             message: 'Inicio de sesión exitoso',
             user: {
                 id: user.id,
-                nombre: user.bombre,
+                nombre: user.nombre,
                 email: user.email,
                 rol: user.rol
             },
@@ -43,10 +44,19 @@ exports.login = async (req, res) => {
     }
 };
 
+// Controlador para logout
+exports.logout = async (req, res) => {
+    try {
+        return res.status(200).json({ message: 'Logout exitoso' });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
 //Controlador para obtener el perfil del usuario
 exports.getProfile = async (req, res) => {
     try {
-        const user = await Usuario.fyndById(req.user.id, {
+        const user = await Usuario.findById(req.user.id, {
             attributes: {exclude: ['password']}
         });
 
@@ -63,7 +73,7 @@ exports.getProfile = async (req, res) => {
 //Controlador para obtener a todos los usuarios
 exports.getAllProfiles = async (req, res) => {
     try {
-        const user = await Usuario.find( {
+        const user = await Usuario.find({
             attributes: {exclude: ['password']}
         });
 

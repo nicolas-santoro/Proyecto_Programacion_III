@@ -1,6 +1,5 @@
 const AuthController = {
     elements: {
-        loginBtn: document.getElementById('btnAdminLogin'),
         logoutBtn: document.getElementById('btnAdminLogout'),
         loginForm: document.getElementById('formAdminLogin')
     },
@@ -18,13 +17,6 @@ const AuthController = {
 
     // Configurar listeners de eventos
     setupEventListeners() {
-        // Iniciar sesión
-        if (this.elements.loginBtn) {
-            this.elements.loginBtn.addEventListener('click', () => {
-                this.login();
-            });
-        }
-
         // Cerrar sesión
         if (this.elements.logoutBtn) {
             this.elements.logoutBtn.addEventListener('click', () => {
@@ -36,7 +28,7 @@ const AuthController = {
         if (this.elements.loginForm){
             this.elements.loginForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                this.handleLogin;
+                this.handleLogin();
             });
         }
     },
@@ -47,15 +39,14 @@ const AuthController = {
         if (token){
             try {
                 // Obtener perfil del usuario
-                const userData = await ApiClient.getProfile();
-                this.updateUiForAuthenticatedUser(userData);
+                await ApiClient.getProfile();
+                window.location.href = './adminCenter.html';
             } catch (error){
                 // Token inválido o expirado
-                console.error('Error al verificar el estado de autenticación: ', error);
-                this.logout();
+                console.log('Error al verificar el estado de autenticación:', error);
+
+                //this.logout();
             }
-        } else {
-            this.updateUiForAuthenticatedUser();
         }
     },
 
@@ -72,15 +63,14 @@ const AuthController = {
             localStorage.setItem('token', response.token);
 
             // Guardar datos del usuario en localStorage
-            logalStorage.setItem('user', JSON.stringify(response.user));
+            localStorage.setItem('user', JSON.stringify(response.user));
 
-            // Actualizar UI
-            this.updateUiForAuthenticatedUser(response.user);
-
-            // Mostrar mensaje de éxito
-            this.showToast('Bienvenido!', 'Has iniciado sesión correctamente')
+            // Redirigir directamente
+            window.location.href = './adminCenter.html';
         } catch (error){
-
+            console.log('Usuario equivocado:', error);
         }
     }
 }
+
+AuthController.init();

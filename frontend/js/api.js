@@ -1,5 +1,5 @@
 // URL base de la API
-const API_BASE_URL = 'http:localhost:3000/api';
+const API_BASE_URL = 'http://localhost:3000/api';
 
 // Cliente API
 const ApiClient = {
@@ -16,7 +16,7 @@ const ApiClient = {
         };
 
         // Añadir token de autorización si existe
-        if (token) {
+        if (token && endpoint !== '/authRoutes/login') {
             deafultHeaders['Authorization'] = `Bearer ${token}`;
         }
 
@@ -47,14 +47,22 @@ const ApiClient = {
 
     // Inicio de sesión
     async login(credentials){
-        return this.fetchApi('/auth/login', {
+        return this.fetchApi('/authRoutes/login', {
             method: 'POST',
             body: JSON.stringify(credentials)
         });
     },
 
+    // Cerrar Sesión
+    async logout() {
+        await this.fetchApi('/authRoutes/logout', { method: 'POST' });
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/adminLogin.html';
+    },
+
     // Obtener perfil del usuario
     async getProfile(){
-        return this.fetchApi('/auth/profile');
+        return this.fetchApi('/authRoutes/profile');
     }
 }
