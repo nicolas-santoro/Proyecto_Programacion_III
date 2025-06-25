@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-  fetch("http://localhost:3000/api/productos") // Trae los productos desde la API 
-    .then(res => res.json())
+  ApiClient.fetchApi('/productosRoutes/obtener', 
+    { method: 'GET' }) // Trae los productos desde la API 
     .then(productos => {
       const activos = productos.filter(p => p.activo); // filtra solo los productos activos y los ordena alfabÃ©ticamente por nombre
 
@@ -160,6 +160,8 @@ document.addEventListener('DOMContentLoaded', () => {
       renderizarProductosPorCategoria(categoriaActual);
       renderizarSeparadores();
       actualizarCantidadCarrito();
+
+      cancelarCompra(); //Habilita la posibilidad de cancelar la compra
     })
     .catch(error => console.error('Error al cargar los productos:', error));
 });
@@ -222,3 +224,5 @@ function getCantidadEnCarrito(id) { // obtiene la cantidad de un producto especÃ
   const item = carrito.find(p => p._id === id); // busca el producto en el carrito por su id, donde los dos id sean iguales
   return item ? item.cantidad : 0;
 }
+
+import { cancelarCompra } from './cancelar.js';

@@ -75,6 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCarrito();
     }
     });
+
+  cancelarCompra(); //Habilita la posibilidad de cancelar la compra
 });
 
 // Obtenemos los elementos
@@ -112,18 +114,20 @@ btnConfirmarCompra.addEventListener('click', async function() {
   };
 
   try {
-    const res = await fetch('/api/ventas', {
+    const data = await ApiClient.fetchApi('/ventasRoutes/crear', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(venta)
     });
 
-    if (!res.ok) throw new Error('Error al guardar la venta');
+    if (!data || data.error) {
+      throw new Error(data.error || 'Error al guardar la venta');
+    }
 
     localStorage.setItem('ticket', JSON.stringify(venta));
     localStorage.removeItem('carrito');
 
     // Cierra el modal y redirige
+    document.activeElement.blur();
     modalConfirmacion.hide();
     window.location.href = '/html/ticket.html';
   } catch (err) {
@@ -133,3 +137,4 @@ btnConfirmarCompra.addEventListener('click', async function() {
 });
 
 import { mostrarAlerta } from './alertas.js';
+import { cancelarCompra } from './cancelar.js';

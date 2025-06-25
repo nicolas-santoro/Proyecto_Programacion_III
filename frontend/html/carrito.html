@@ -22,8 +22,8 @@
         </button>
     </header>
     <nav id="navBtn">
-        <a href="./index.html" class="btn-log">
-            <i class="bi bi-upload"></i> Volver a Loguearse
+        <a class="btn-log" id="cancelarCompra">
+            <i class="bi bi-trash"></i> Cancelar Compra
         </a>
         <a href="./adminLogin.html" class="btn-admin">
            <i class="bi bi-door-open"></i> Ingresar como Administrador
@@ -75,11 +75,32 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Modal de Cancelación -->
+            <div class="modal fade" id="modalCancelacion" tabindex="-1" aria-labelledby="modalConfirmacionLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalConfirmacionLabel">Cancelar Compra</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body">
+                            ¿Estás seguro de que deseas cancelar la compra?
+                        </div>
+                        <div class="d-flex justify-content-center mt-3 gap-2">
+                            <button type="button" class="btn btn-primary w-50" id="btnConfirmarCompra">Sí</button>
+                            <button type="button" class="btn btn-secondary w-50" id="btnCancelarCompra" data-bs-dismiss="modal">No</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
     <footer>
         <p>&copy; 2025 Hachis Parmentier. Nicolás Santoro & Milena Rodriguez</p>
     </footer>
+    
+    <script src="../js/api.js"></script>
     
     <script type="module" src="../js/carrito.js"></script>
     <script src="../js/theme.js"></script>

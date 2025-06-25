@@ -45,7 +45,7 @@ const AuthController = {
                 // Token inválido o expirado
                 console.log('Error al verificar el estado de autenticación:', error);
 
-                //this.logout();
+                this.logout();
             }
         }
     },

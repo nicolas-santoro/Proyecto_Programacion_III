@@ -11,18 +11,21 @@ const ApiClient = {
     // Función para realizar peticiones a la API
     async fetchApi(endpoint, options = {}){
         const token = this.getToken();
-        const deafultHeaders = {
-            'Content-type': 'application/json'
-        };
+        const defaultHeaders = {};
+
+        // solo para POST, PUT, etc.
+        if (options.body) {
+            defaultHeaders['Content-Type'] = 'application/json';
+        }
 
         // Añadir token de autorización si existe
-        if (token && endpoint !== '/authRoutes/login') {
-            deafultHeaders['Authorization'] = `Bearer ${token}`;
+        if (token && !['/authRoutes/login', '/productosRoutes/obtener', '/ventasRoutes/crear']) {
+            defaultHeaders['Authorization'] = `Bearer ${token}`;
         }
 
         // Configuración por defecto para fetck
         const config = {
-            headers: {...deafultHeaders, ...options.headers},
+            headers: {...defaultHeaders, ...options.headers},
             ...options
         };
 

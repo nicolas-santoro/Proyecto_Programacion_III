@@ -52,6 +52,7 @@ header img {
   background-color: #800080;
   border-radius: 4px;
   transition: background-color 0.3s;
+  cursor: pointer;
 }
 
 #navBtn .btn-admin:hover,
