@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { Usuario } = require('../models/Usuario');
+const Usuario = require('../models/Usuario');
 require('dotenv').config();
 
 //Middleware para verificar TOKEN JWT
@@ -12,7 +12,7 @@ exports.verifyToken = async (req, res, next) => {
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        const user = await Usuario.findByPk(decoded.id);
+        const user = await Usuario.findById(decoded.id);
 
         if (!user){
             return res.status(404).json({message: 'Usuario no encontrado'})

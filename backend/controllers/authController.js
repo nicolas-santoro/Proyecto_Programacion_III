@@ -73,16 +73,110 @@ exports.getProfile = async (req, res) => {
 //Controlador para obtener a todos los usuarios
 exports.getAllProfiles = async (req, res) => {
     try {
-        const user = await Usuario.find({
+        const users = await Usuario.find({}, {
             attributes: {exclude: ['password']}
         });
 
-        if (!user) {
-            return res.status(404).json({message: 'Usuario no encontrado'})
-        }
-
-        return res.status(200).json(user);
+        return res.status(200).json(users);
     } catch (error){
         return res.status(500).json({message: error.message})
+    }
+};
+
+// ===== MÉTODOS PARA PANEL ADMIN =====
+
+//Obtener todos los usuarios para el panel admin
+exports.obtenerUsuarios = async (req, res) => {
+    try {
+        const usuarios = await Usuario.find({}, {
+            attributes: {exclude: ['password']}
+        });
+        return res.status(200).json(usuarios);
+    } catch (error) {
+        return res.status(500).json({message: error.message});
+    }
+};
+
+//Crear nuevo usuario/admin
+exports.crearUsuario = async (req, res) => {
+    try {
+        const { nombre, email, password, rol } = req.body;
+        
+        // Verificar si el usuario ya existe
+        const usuarioExistente = await Usuario.findOne({email});
+        if (usuarioExistente) {
+            return res.status(400).json({message: 'El usuario ya existe'});
+        }
+
+        // Crear nuevo usuario
+        const nuevoUsuario = new Usuario({
+            nombre,
+            email,
+            password,
+            rol: rol || 'vendedor' // rol por defecto
+        });
+
+        await nuevoUsuario.save();
+        
+        // Retornar sin password
+        const usuarioCreado = await Usuario.findById(nuevoUsuario._id, {
+            attributes: {exclude: ['password']}
+        });
+        
+        return res.status(201).json({
+            message: 'Usuario creado exitosamente',
+            usuario: usuarioCreado
+        });
+    } catch (error) {
+        return res.status(500).json({message: error.message});
+    }
+};
+
+//Editar usuario existente
+exports.editarUsuario = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { nombre, email, rol } = req.body;
+        
+        const usuario = await Usuario.findByIdAndUpdate(
+            id,
+            { nombre, email, rol },
+            { new: true, select: '-password' }
+        );
+        
+        if (!usuario) {
+            return res.status(404).json({message: 'Usuario no encontrado'});
+        }
+        
+        return res.status(200).json({
+            message: 'Usuario actualizado exitosamente',
+            usuario
+        });
+    } catch (error) {
+        return res.status(500).json({message: error.message});
+    }
+};
+
+//Eliminar usuario
+exports.eliminarUsuario = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // No permitir eliminar al usuario actual
+        if (id === req.user.id) {
+            return res.status(400).json({message: 'No puedes eliminar tu propia cuenta'});
+        }
+        
+        const usuario = await Usuario.findByIdAndDelete(id);
+        
+        if (!usuario) {
+            return res.status(404).json({message: 'Usuario no encontrado'});
+        }
+        
+        return res.status(200).json({
+            message: 'Usuario eliminado exitosamente'
+        });
+    } catch (error) {
+        return res.status(500).json({message: error.message});
     }
 };

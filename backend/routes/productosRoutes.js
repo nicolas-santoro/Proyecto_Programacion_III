@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { verifyToken } = require('../middlewares/authMiddleware');
-const checkRole = require('../middlewares/verificarRol');
+const { checkRole } = require('../middlewares/verificarRol');
 const productoController = require('../controllers/productoController');
 
 // Todos los usuarios pueden ver los productos

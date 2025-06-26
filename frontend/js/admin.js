@@ -1,123 +1,150 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Simula un usuario admin logueado
-  const usuarioAdmin = {
-    nombre: "Milena Rodriguez",
-    email: "milena@hachis.com",
-    rol: "admin"
-  };
+  // Obtener usuario logueado del localStorage
+  const usuarioActual = JSON.parse(localStorage.getItem('user'));
+  
+  // Verificar si hay usuario logueado
+  if (!usuarioActual) {
+    window.location.href = './adminLogin.html';
+    return;
+  }
 
-  // Simula productos y ventas
-  const productos = [
-    { _id: 1, nombre: "Libro A", precio: 1500, categoria: "libro", activo: true },
-    { _id: 2, nombre: "Manga B", precio: 2000, categoria: "manga", activo: false }
-  ];
-  const ventas = [
-    { _id: 1, nombreCliente: "Juan", total: 3000, fecha: "2025-06-20", productos: [{nombre: "Libro A", cantidad: 2}] }
-  ];
+  console.log('👤 Usuario logueado:', usuarioActual);
 
-  // Opciones según rol
+  // Configuración de opciones por rol
   const opcionesPorRol = {
     admin: [
-      { id: "verProductos", texto: "Gestionar Productos" },
-      { id: "verVentas", texto: "Ver Ventas" },
-      { id: "verUsuarios", texto: "Gestionar Usuarios" }
+      { id: "gestionarProductos", texto: "Gestionar Productos", icono: "📦" },
+      { id: "verVentas", texto: "Ver Ventas", icono: "🛒" },
+      { id: "gestionarUsuarios", texto: "Gestionar Usuarios", icono: "👥" },
+      { id: "verAuditoria", texto: "Ver Auditoría", icono: "📊" }
     ],
     editor: [
-      { id: "verProductos", texto: "Gestionar Productos" }
+      { id: "gestionarProductos", texto: "Gestionar Productos", icono: "📦" }
     ],
     vendedor: [
-      { id: "verVentas", texto: "Ver Ventas" }
+      { id: "verVentas", texto: "Ver Ventas", icono: "🛒" }
     ],
     auditor: [
-      { id: "verVentas", texto: "Ver Ventas" }
+      { id: "verVentas", texto: "Ver Ventas", icono: "🛒" },
+      { id: "verAuditoria", texto: "Ver Auditoría", icono: "📊" }
     ]
   };
 
-  // Mostrar saludo
-  document.getElementById('adminSaludo').textContent =
-    `¡Hola, ${usuarioAdmin.nombre}! Rol: ${usuarioAdmin.rol}`;
+  // Mostrar saludo personalizado
+  const elementoSaludo = document.getElementById('adminSaludo');
+  if (elementoSaludo) {
+    elementoSaludo.textContent = `¡Hola, ${usuarioActual.nombre}! Rol: ${usuarioActual.rol}`;
+    elementoSaludo.className = 'text-light text-center'; // pa que sea clarito el mensaje del admin
+  }
 
-  // Renderiza las opciones del panel según el rol
-  const panelOpciones = document.getElementById('panelOpciones');
-  panelOpciones.innerHTML = opcionesPorRol[usuarioAdmin.rol].map(op =>
-    `<button class="btn btn-primary me-2" data-opcion="${op.id}">${op.texto}</button>`
-  ).join('');
+  // Renderizar botones según el rol del usuario
+  const contenedorOpciones = document.getElementById('panelOpciones');
+  if (contenedorOpciones && opcionesPorRol[usuarioActual.rol]) {
+    contenedorOpciones.innerHTML = opcionesPorRol[usuarioActual.rol]
+      .map(opcion => `
+        <button class="btn btn-primary me-2 mb-2" data-opcion="${opcion.id}">
+          ${opcion.icono} ${opcion.texto}
+        </button>
+      `).join('');
 
-  // Maneja los clicks en las opciones
-  panelOpciones.addEventListener('click', (e) => {
-    if (e.target.dataset.opcion === "verProductos") {
-      renderizarProductos();
-    }
-    if (e.target.dataset.opcion === "verVentas") {
-      renderizarVentas();
-    }
-    if (e.target.dataset.opcion === "verUsuarios") {
-      renderizarUsuarios();
-    }
-  });
+    // Manejar clicks en los botones
+    contenedorOpciones.addEventListener('click', (evento) => {
+      const botonClickeado = evento.target.closest('[data-opcion]');
+      if (botonClickeado) {
+        const opcionSeleccionada = botonClickeado.dataset.opcion;
+        manejarSeleccionOpcion(opcionSeleccionada);
+      }
+    });
+  }
 
-  // Renderiza productos
-  function renderizarProductos() {
-    const cont = document.getElementById('panelContenido');
-    cont.innerHTML = `
-      <h3>Productos</h3>
-      <table class="table table-dark table-hover">
-        <thead><tr><th>Nombre</th><th>Precio</th><th>Categoría</th><th>Activo</th></tr></thead>
-        <tbody>
-          ${productos.map(p => `
-            <tr>
-              <td>${p.nombre}</td>
-              <td>$${p.precio}</td>
-              <td>${p.categoria}</td>
-              <td>${p.activo ? "Sí" : "No"}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
+  // Función para manejar la selección de opciones
+  function manejarSeleccionOpcion(opcion) {
+    const contenedorPrincipal = document.getElementById('panelContenido');
+    if (!contenedorPrincipal) return;
+
+    let tituloSeccion = '';
+    let mensajeTemporal = '';
+
+    switch (opcion) {
+      case 'gestionarProductos':
+        tituloSeccion = '📦 Gestión de Productos';
+        mensajeTemporal = 'Aquí podrás crear, editar y eliminar productos del sistema.';
+        break;
+      case 'verVentas':
+        tituloSeccion = '🛒 Gestión de Ventas';
+        mensajeTemporal = 'Aquí podrás ver y gestionar todas las ventas realizadas.';
+        break;
+      case 'gestionarUsuarios':
+        tituloSeccion = '👥 Gestión de Usuarios';
+        mensajeTemporal = 'Aquí podrás administrar los usuarios del sistema.';
+        break;
+      case 'verAuditoria':
+        tituloSeccion = '📊 Auditoría del Sistema';
+        mensajeTemporal = 'Aquí podrás revisar todas las acciones realizadas en el sistema.';
+        break;
+      default:
+        tituloSeccion = '⚙️ Función no disponible';
+        mensajeTemporal = 'Esta funcionalidad aún no está implementada.';
+    }
+
+    // Mostrar la sección seleccionada
+    contenedorPrincipal.innerHTML = `
+      <div class="card bg-dark border-primary">
+        <div class="card-header">
+          <h3 class="mb-0">${tituloSeccion}</h3>
+        </div>
+        <div class="card-body text-center py-5">
+          <div class="mb-4">
+            <i class="bi bi-tools display-1 text-warning"></i>
+          </div>
+          <h4 class="text-warning mb-3">🚧 En Desarrollo</h4>
+          <p class="lead text-light">${mensajeTemporal}</p>
+          <p class="text-light">Esta funcionalidad se implementará en las próximas versiones.</p>
+          <hr class="my-4">
+          <button class="btn btn-outline-primary" onclick="volverAInicio()">
+            ← Volver al Panel Principal
+          </button>
+        </div>
+      </div>
     `;
   }
 
-  // Renderiza ventas
-  function renderizarVentas() {
-    const cont = document.getElementById('panelContenido');
-    cont.innerHTML = `
-      <h3>Ventas</h3>
-      <table class="table table-dark table-hover">
-        <thead><tr><th>Cliente</th><th>Total</th><th>Fecha</th><th>Productos</th></tr></thead>
-        <tbody>
-          ${ventas.map(v => `
-            <tr>
-              <td>${v.nombreCliente}</td>
-              <td>$${v.total}</td>
-              <td>${v.fecha}</td>
-              <td>${v.productos.map(p => `${p.nombre} x${p.cantidad}`).join(', ')}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    `;
+  // Función para volver al inicio
+  window.volverAInicio = function() {
+    const contenedorPrincipal = document.getElementById('panelContenido');
+    if (contenedorPrincipal) {
+      contenedorPrincipal.innerHTML = `
+        <div class="text-center py-5">
+          <h2 class="text-primary mb-4"> Panel de Administración</h2>
+          <p class="lead text-light">Selecciona una opción del menú superior para comenzar.</p>
+          <div class="mt-4">
+            <i class="bi bi-book display-1 text-primary opacity-25"></i>
+          </div>
+        </div>
+      `;
+    }
+  };
+
+  // Configurar botón de cerrar sesión
+  const botonCerrarSesion = document.getElementById('btnAdminLogout');
+  if (botonCerrarSesion) {
+    botonCerrarSesion.addEventListener('click', () => {
+      // Confirmar antes de cerrar sesión
+      if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
+        // Limpiar datos del localStorage
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        
+        console.log('🚪 Sesión cerrada correctamente');
+        
+        // Redirigir al login
+        window.location.href = './adminLogin.html';
+      }
+    });
   }
 
-  // Renderiza usuarios (solo para admin)
-  function renderizarUsuarios() {
-    const cont = document.getElementById('panelContenido');
-    cont.innerHTML = `
-      <h3>Gestión de Usuarios (Simulado)</h3>
-      <p>Aquí podrías ver, crear o editar usuarios administradores.</p>
-    `;
-  }
+  // Mostrar mensaje de bienvenida por defecto
+  volverAInicio();
 
-  // Por defecto, muestra la primera opción disponible
-  if (opcionesPorRol[usuarioAdmin.rol][0]) {
-    const primera = opcionesPorRol[usuarioAdmin.rol][0].id;
-    if (primera === "verProductos") renderizarProductos();
-    if (primera === "verVentas") renderizarVentas();
-    if (primera === "verUsuarios") renderizarUsuarios();
-  }
-
-  // Cerrar sesión (simulado)
-  document.getElementById('btnLogout').addEventListener('click', () => {
-    alert('Sesión cerrada (simulado)');
-    window.location.href = './loginAdmin.html';
-  });
+  console.log('✅ Panel de administración cargado correctamente');
 });

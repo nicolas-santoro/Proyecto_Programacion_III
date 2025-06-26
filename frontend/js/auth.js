@@ -31,21 +31,21 @@ const AuthController = {
                 this.handleLogin();
             });
         }
-    },
-
-    async checkAuthStatus() {
+    },    async checkAuthStatus() {
         const token = localStorage.getItem('token');
+        const user = localStorage.getItem('user');
+        const currentPage = window.location.pathname;
 
-        if (token){
-            try {
-                // Obtener perfil del usuario
-                await ApiClient.getProfile();
+        if (token && user){
+            // Solo redirigir si estamos en la página de login
+            if (currentPage.includes('adminLogin.html') || currentPage === '/') {
                 window.location.href = './adminCenter.html';
-            } catch (error){
-                // Token inválido o expirado
-                console.log('Error al verificar el estado de autenticación:', error);
-
-                this.logout();
+            }
+            // Si ya estamos en adminCenter.html, no hacer nada
+        } else {
+            // Si no hay token/user y estamos en adminCenter, redirigir a login
+            if (currentPage.includes('adminCenter.html')) {
+                window.location.href = './adminLogin.html';
             }
         }
     },
@@ -70,6 +70,16 @@ const AuthController = {
         } catch (error){
             console.log('Usuario equivocado:', error);
         }
+    },
+
+    // Cerrar sesión
+    logout() {
+        // Limpiar localStorage
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        
+        // Redirigir al login
+        window.location.href = './adminLogin.html';
     }
 }
 

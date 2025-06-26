@@ -16,10 +16,9 @@ const ApiClient = {
         // solo para POST, PUT, etc.
         if (options.body) {
             defaultHeaders['Content-Type'] = 'application/json';
-        }
-
-        // Añadir token de autorización si existe
-        if (token && !['/authRoutes/login', '/productosRoutes/obtener', '/ventasRoutes/crear']) {
+        }        // Añadir token de autorización si existe (excepto para endpoints públicos)
+        const endpointsPublicos = ['/authRoutes/login', '/productosRoutes/obtener', '/ventasRoutes/crear'];
+        if (token && !endpointsPublicos.includes(endpoint)) {
             defaultHeaders['Authorization'] = `Bearer ${token}`;
         }
 
@@ -67,5 +66,71 @@ const ApiClient = {
     // Obtener perfil del usuario
     async getProfile(){
         return this.fetchApi('/authRoutes/profile');
+    },
+
+    // ===== MÉTODOS ADMIN =====
+    
+    // Productos
+    async obtenerProductosAdmin() {
+        return this.fetchApi('/admin/productos');
+    },
+
+    async crearProductoAdmin(producto) {
+        return this.fetchApi('/admin/productos', {
+            method: 'POST',
+            body: JSON.stringify(producto)
+        });
+    },
+
+    async editarProductoAdmin(id, producto) {
+        return this.fetchApi(`/admin/productos/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(producto)
+        });
+    },
+
+    async eliminarProductoAdmin(id) {
+        return this.fetchApi(`/admin/productos/${id}`, {
+            method: 'DELETE'
+        });
+    },
+
+    // Ventas
+    async obtenerVentasAdmin() {
+        return this.fetchApi('/admin/ventas');
+    },
+
+    async obtenerVentasPorRangoAdmin(fechaInicio, fechaFin) {
+        return this.fetchApi(`/admin/ventas/rango?inicio=${fechaInicio}&fin=${fechaFin}`);
+    },
+
+    // Usuarios
+    async obtenerUsuariosAdmin() {
+        return this.fetchApi('/admin/usuarios');
+    },
+
+    async crearUsuarioAdmin(usuario) {
+        return this.fetchApi('/admin/usuarios', {
+            method: 'POST',
+            body: JSON.stringify(usuario)
+        });
+    },
+
+    async editarUsuarioAdmin(id, usuario) {
+        return this.fetchApi(`/admin/usuarios/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(usuario)
+        });
+    },
+
+    async eliminarUsuarioAdmin(id) {
+        return this.fetchApi(`/admin/usuarios/${id}`, {
+            method: 'DELETE'
+        });
+    },
+
+    // Auditoría
+    async obtenerAuditoriaAdmin() {
+        return this.fetchApi('/admin/auditoria');
     }
 }

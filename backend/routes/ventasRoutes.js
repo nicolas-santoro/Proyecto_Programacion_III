@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { verifyToken } = require('../middlewares/authMiddleware');
-const checkRole = require('../middlewares/verificarRol');
+const { checkRole } = require('../middlewares/verificarRol');
 const ventaController = require('../controllers/ventaController');
 
 // Todos pueden crear ventas (usuarios pasajeros)
