@@ -4,27 +4,18 @@ const path = require('path'); // para manejar rutas de archivos
 const app = express(); // lo declaramos en una app crear una instancia de express
 const conectarDB = require('./backend/config/database'); // para conectar a la base de datos
 const cors = require('cors'); // para permitir solicitudes desde otros orígenes
-const cookieParser = require('cookie-parser'); // Para manejar cookies
 
 app.use(cors()); // es para que el frontend aunque esté en otro puerto le pueda hacer peticiones al backend
 
-// Configuración EJS
-app.set('view engine', 'ejs');
-app.set('views', './views');
-
 // Middlewares
 app.use(express.json()); // IMPORTANTE: para leer JSON del body
-app.use(express.urlencoded({ extended: true })); // Para formularios EJS
-app.use(cookieParser()); // Para leer cookies
+app.use(express.urlencoded({ extended: true })); // Para formularios
 app.use(express.static('frontend')); // Archivos estáticos (CSS, JS, imágenes)
 app.use('/uploads', express.static('uploads')); // Para servir imágenes subidas
 
 // Rutas API JSON
 app.use('/api', require('./backend/routes/apiRoutes'));
-app.use('/api/authRoutes', require('./backend/routes/authRoutes'));
-
-// Rutas EJS para vistas admin
-app.use('/admin', require('./backend/routes/adminRoutes'));
+app.use('/api/auth', require('./backend/routes/authRoutes'));
 
 
 app.get('/', (req, res) => {
