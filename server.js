@@ -15,8 +15,7 @@ app.use('/uploads', express.static('uploads')); // Para servir imágenes subidas
 
 // Rutas API JSON
 app.use('/api', require('./backend/routes/apiRoutes'));
-app.use('/api/auth', require('./backend/routes/authRoutes'));
-
+app.use('/api/authRoutes', require('./backend/routes/authRoutes'));
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend', 'html', 'index.html'));
