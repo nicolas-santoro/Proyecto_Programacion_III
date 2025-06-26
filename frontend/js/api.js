@@ -17,7 +17,7 @@ const ApiClient = {
         if (options.body) {
             defaultHeaders['Content-Type'] = 'application/json';
         }        // Añadir token de autorización si existe (excepto para endpoints públicos)
-        const endpointsPublicos = ['/authRoutes/login', '/productosRoutes/obtener', '/ventasRoutes/crear'];
+        const endpointsPublicos = ['/authRoutes/login', '/productos/obtener', '/ventas/crear'];
         if (token && !endpointsPublicos.includes(endpoint)) {
             defaultHeaders['Authorization'] = `Bearer ${token}`;
         }
@@ -60,7 +60,7 @@ const ApiClient = {
         await this.fetchApi('/authRoutes/logout', { method: 'POST' });
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = '/adminLogin.html';
+        window.location.href = '/admin/login';
     },
 
     // Obtener perfil del usuario

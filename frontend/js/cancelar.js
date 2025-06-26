@@ -1,6 +1,6 @@
 export function cancelarCompra() {
   const btnCancelar = document.getElementById('cancelarCompra'); // Botón que abre el modal
-  const btnConfirmar = document.getElementById('btnConfirmarCompra'); // Confirmar del modal
+  const btnConfirmarCancelacion = document.getElementById('btnConfirmarCancelacion'); // Confirmar cancelación del modal
   const modal = new bootstrap.Modal(document.getElementById('modalCancelacion'));
   
   if (btnCancelar) {
@@ -9,10 +9,13 @@ export function cancelarCompra() {
     });
   }
 
-  if (btnConfirmar) {
-    btnConfirmar.addEventListener('click', () => {
-      localStorage.clear();
-      window.location.href = '/html/index.html'; // Redirigir donde corresponda
+  if (btnConfirmarCancelacion) {
+    btnConfirmarCancelacion.addEventListener('click', () => {
+      // Limpiar solo el carrito, mantener el nombre del usuario
+      localStorage.removeItem('carrito');
+      modal.hide();
+      // Redirigir al index
+      window.location.href = '/html/index.html';
     });
   }
 }

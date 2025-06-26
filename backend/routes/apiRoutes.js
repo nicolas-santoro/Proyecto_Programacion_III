@@ -1,54 +1,61 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
 
 const productoRoutes = require('./productosRoutes');
 const ventaRoutes = require('./ventasRoutes');
 const { verifyToken } = require('../middlewares/authMiddleware');
-const { checkRole, soloAdmin, adminOEditor, adminOVendedor, todosRoles } = require('../middlewares/verificarRol');
 const usuarioController = require('../controllers/usuarioController');
 const productoController = require('../controllers/productoController');
 const ventaController = require('../controllers/ventaController');
 const auditoriaController = require('../controllers/auditoriaController');
 
-//const validarProducto = require('../middlewares/validarProducto');
-//const validarVenta = require('../middlewares/validarVenta');
+// Configuración de multer para subida de imágenes
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/') // Carpeta donde se guardan las imágenes
+  },
+  filename: function (req, file, cb) {
+    // Generar nombre único: timestamp + nombre original
+    const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname);
+    cb(null, uniqueName);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  // Solo permitir imágenes
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Solo se permiten archivos de imagen'), false);
+  }
+};
+
+const upload = multer({ 
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 } // Límite 5MB
+});
 
 router.use('/productos', productoRoutes);
 router.use('/ventas', ventaRoutes);
 
-// === RUTAS DE ADMINISTRACIÓN POR ROLES ===
+// RUTAS DE ADMINISTRACIÓN (Solo Admin)
+router.get('/admin/usuarios', verifyToken, usuarioController.obtenerUsuarios);
+router.post('/admin/usuarios', verifyToken, usuarioController.crearUsuario);
+router.put('/admin/usuarios/:id', verifyToken, usuarioController.actualizarUsuario);
+router.delete('/admin/usuarios/:id', verifyToken, usuarioController.eliminarUsuario);
 
-//  GESTIÓN DE USUARIOS (Solo Admin)
-router.get('/admin/usuarios', verifyToken, soloAdmin, usuarioController.obtenerUsuarios);
-router.get('/admin/usuarios/:id', verifyToken, soloAdmin, usuarioController.obtenerUsuarioPorId);
-router.post('/admin/usuarios', verifyToken, soloAdmin, usuarioController.crearUsuario);
-router.put('/admin/usuarios/:id', verifyToken, soloAdmin, usuarioController.actualizarUsuario);
-router.delete('/admin/usuarios/:id', verifyToken, soloAdmin, usuarioController.eliminarUsuario);
-router.put('/admin/usuarios/:id/password', verifyToken, soloAdmin, usuarioController.cambiarPassword);
+router.get('/admin/productos', verifyToken, productoController.obtenerTodosProductos);
+router.get('/admin/productos/:id', verifyToken, productoController.obtenerProductoPorId);
+router.post('/admin/productos', verifyToken, upload.single('imagen'), productoController.crearProducto);
+router.put('/admin/productos/:id', verifyToken, upload.single('imagen'), productoController.actualizarProducto);
+router.delete('/admin/productos/:id', verifyToken, productoController.eliminarProducto);
 
-//  GESTIÓN DE PRODUCTOS 
-// Admin: Acceso total | Editor: Modificar | Vendedor: Solo crear | Auditor: Solo ver
-router.get('/admin/productos', verifyToken, todosRoles, productoController.obtenerTodosProductos);
-router.get('/admin/productos/estadisticas', verifyToken, checkRole('admin', 'auditor'), productoController.obtenerEstadisticasProductos);
-router.post('/admin/productos', verifyToken, adminOVendedor, productoController.crearProducto);
-router.put('/admin/productos/:id', verifyToken, adminOEditor, productoController.actualizarProducto);
-router.delete('/admin/productos/:id', verifyToken, soloAdmin, productoController.eliminarProducto);
+router.get('/admin/ventas', verifyToken, ventaController.obtenerVentas);
+router.get('/admin/ventas/:id', verifyToken, ventaController.obtenerVentaPorId);
 
-//  GESTIÓN DE VENTAS
-// Admin: Acceso total | Editor: Solo ver | Vendedor: Ver propias | Auditor: Solo ver
-router.get('/admin/ventas', verifyToken, todosRoles, ventaController.obtenerVentas);
-router.get('/admin/ventas/:id', verifyToken, todosRoles, ventaController.obtenerVentaPorId);
-router.put('/admin/ventas/:id', verifyToken, soloAdmin, ventaController.actualizarVenta);
-router.delete('/admin/ventas/:id', verifyToken, soloAdmin, ventaController.eliminarVenta);
-
-//  ESTADÍSTICAS Y REPORTES (Admin y Auditor)
-router.get('/admin/estadisticas', verifyToken, checkRole('admin', 'auditor'), ventaController.obtenerEstadisticas);
-router.get('/admin/reportes/ventas', verifyToken, checkRole('admin', 'auditor'), ventaController.obtenerReporteVentas);
-
-//  AUDITORÍA (Admin y Auditor)
-router.get('/admin/auditoria', verifyToken, checkRole('admin', 'auditor'), auditoriaController.obtenerAcciones);
-router.get('/admin/auditoria/estadisticas', verifyToken, checkRole('admin', 'auditor'), auditoriaController.obtenerEstadisticasAuditoria);
-router.get('/admin/auditoria/buscar', verifyToken, checkRole('admin', 'auditor'), auditoriaController.buscarAcciones);
-router.delete('/admin/auditoria/limpiar', verifyToken, soloAdmin, auditoriaController.limpiarLogAntiguo);
+router.get('/admin/auditoria', verifyToken, auditoriaController.obtenerAcciones);
 
 module.exports = router;

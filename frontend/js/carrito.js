@@ -114,7 +114,7 @@ btnConfirmarCompra.addEventListener('click', async function() {
   };
 
   try {
-    const data = await ApiClient.fetchApi('/ventasRoutes/crear', {
+    const data = await ApiClient.fetchApi('/ventas/crear', {
       method: 'POST',
       body: JSON.stringify(venta)
     });

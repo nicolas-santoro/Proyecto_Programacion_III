@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  ApiClient.fetchApi('/productosRoutes/obtener', 
+  ApiClient.fetchApi('/productos/obtener', 
     { method: 'GET' }) // Trae los productos desde la API 
     .then(productos => {
       const activos = productos.filter(p => p.activo); // filtra solo los productos activos y los ordena alfabéticamente por nombre

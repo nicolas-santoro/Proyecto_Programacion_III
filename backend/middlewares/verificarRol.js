@@ -1,4 +1,4 @@
-// Middleware para verificar roles específicos
+// Middleware para verificar roles específicos (APIs JSON)
 // Roles: admin, editor, vendedor, auditor
 exports.checkRole = function(...rolesPermitidos) {
   return (req, res, next) => {
@@ -26,8 +26,34 @@ exports.checkRole = function(...rolesPermitidos) {
   };
 };
 
-// Middleware específico para diferentes niveles de acceso
+// Middleware para verificar roles específicos (vistas EJS)
+const verificarRol = function(rolesPermitidos) {
+  return (req, res, next) => {
+    const rol = req.usuario?.rol; // authMiddleware ya cargó el usuario
+
+    if (!rol) {
+      return res.redirect('/admin/login');
+    }
+
+    // Si es admin, pasa siempre (acceso total)
+    if (rol === 'admin') {
+      return next();
+    }
+
+    // Verificar si está en la lista de roles permitidos
+    if (rolesPermitidos.includes(rol)) {
+      return next();
+    }
+
+    return res.status(403).send('Acceso denegado: no tienes permisos para esta acción');
+  };
+};
+
+// Middleware específico para diferentes niveles de acceso (APIs JSON)
 exports.soloAdmin = exports.checkRole('admin');
 exports.adminOEditor = exports.checkRole('admin', 'editor');
 exports.adminOVendedor = exports.checkRole('admin', 'vendedor');
 exports.todosRoles = exports.checkRole('admin', 'editor', 'vendedor', 'auditor');
+
+// Exportar verificarRol para vistas EJS
+module.exports = verificarRol;

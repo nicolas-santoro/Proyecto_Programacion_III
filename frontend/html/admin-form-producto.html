@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Producto - Hachis Parmentier</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #4b0082 50%, #000000 100%);
+            color: #f0f0f0;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #6a0dad 0%, #a020f0 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 15px rgba(160, 32, 240, 0.3);
+        }
+        
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar h1 {
+            font-size: 1.5rem;
+        }
+        
+        .back-link {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+        
+        .form-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .form-header h2 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-header p {
+            color: #666;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        input[type="text"], 
+        input[type="number"], 
+        textarea, 
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, 
+        textarea:focus, 
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .file-input-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-input-label {
+            display: block;
+            padding: 12px;
+            border: 2px dashed #ddd;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+            background-color: #f9f9f9;
+        }
+        
+        .file-input-label:hover {
+            border-color: #667eea;
+            background-color: #f0f0f0;
+        }
+        
+        .current-image {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+            font-size: 1rem;
+            border: none;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .alert {
+            padding: 12px;
+            margin-bottom: 1rem;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        @media (max-width: 768px) {
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <h1 id="page-title">Nuevo Producto</h1>
+            <a href="#" class="back-link" onclick="volverAlDashboard()">← Volver al Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <h2 id="form-title">Agregar Nuevo Producto</h2>
+                <p id="form-subtitle">Completa la información del nuevo producto</p>
+            </div>
+            
+            <div id="alert" class="alert"></div>
+
+            <form id="producto-form">
+                <div class="form-group">
+                    <label for="nombre">Nombre del Producto:</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="precio">Precio ($):</label>
+                    <input type="number" id="precio" name="precio" step="0.01" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="categoria">Categoría:</label>
+                    <select id="categoria" name="categoria" required>
+                        <option value="">Selecciona una categoría</option>
+                        <option value="comic">Comic</option>
+                        <option value="libro">Libro</option>
+                        <option value="manga">Manga</option>
+                        <option value="separador">Separador</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Imagen del Producto:</label>
+                    <div id="current-image-container" style="display: none; margin-bottom: 1rem;">
+                        <p style="color: #666; margin-bottom: 0.5rem;">Imagen actual:</p>
+                        <img id="current-image" src="" alt="" class="current-image">
+                    </div>
+                    <div class="file-input-container">
+                        <input type="file" id="imagen" name="imagen" accept="image/*" class="file-input">
+                        <label for="imagen" class="file-input-label" id="file-label">
+                            Seleccionar imagen
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="submit-btn">
+                        Crear Producto
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="volverAlDashboard()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let isEditMode = false;
+        let productoId = null;
+
+        // Verificar autenticación al cargar la página
+        window.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/html/admin-login.html';
+                return;
+            }
+
+            // Verificar si estamos en modo edición
+            const urlParams = new URLSearchParams(window.location.search);
+            productoId = urlParams.get('id');
+            
+            if (productoId) {
+                isEditMode = true;
+                cargarProducto(productoId);
+            }
+        });
+
+        function cargarProducto(id) {
+            const token = localStorage.getItem('token');
+            console.log('Cargando producto con ID:', id);
+            console.log('Token:', token ? 'Presente' : 'No presente');
+            
+            fetch(`/api/admin/productos/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                return response.text(); // Primero obtenemos el texto para ver qué viene
+            })
+            .then(text => {
+                console.log('Response text:', text);
+                
+                try {
+                    const data = JSON.parse(text);
+                    
+                    if (data.success) {
+                        const producto = data.producto;
+                    
+                    // Actualizar títulos
+                    document.getElementById('page-title').textContent = 'Editar Producto';
+                    document.getElementById('form-title').textContent = 'Editar Producto';
+                    document.getElementById('form-subtitle').textContent = 'Modifica los datos del producto';
+                    document.getElementById('submit-btn').textContent = 'Actualizar Producto';
+                    
+                    // Llenar el formulario
+                    document.getElementById('nombre').value = producto.nombre || '';
+                    document.getElementById('precio').value = producto.precio || '';
+                    document.getElementById('categoria').value = producto.categoria || '';
+                    
+                    // Mostrar imagen actual si existe
+                    if (producto.imagen) {
+                        const currentImageContainer = document.getElementById('current-image-container');
+                        const currentImage = document.getElementById('current-image');
+                        currentImage.src = `/uploads/${producto.imagen}`;
+                        currentImage.alt = producto.nombre;
+                        currentImageContainer.style.display = 'block';
+                        document.getElementById('file-label').textContent = 'Cambiar imagen';
+                    }
+                } else {
+                    mostrarAlerta('Error al cargar el producto: ' + data.message, 'error');
+                }
+                } catch (parseError) {
+                    console.error('Error parsing JSON:', parseError);
+                    console.error('Response was:', text);
+                    mostrarAlerta('Error: El servidor devolvió una respuesta inválida', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarAlerta('Error al cargar el producto: ' + error.message, 'error');
+            });
+        }
+
+        // Manejar el formulario
+        document.getElementById('producto-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const token = localStorage.getItem('token');
+            
+            // Deshabilitar botón durante el envío
+            const submitBtn = document.getElementById('submit-btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Procesando...';
+            submitBtn.disabled = true;
+            document.querySelector('.form-container').classList.add('loading');
+            
+            const url = isEditMode ? `/api/admin/productos/${productoId}` : '/api/admin/productos';
+            const method = isEditMode ? 'PUT' : 'POST';
+            
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    mostrarAlerta(
+                        isEditMode ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente', 
+                        'success'
+                    );
+                    
+                    // Redirigir después de 2 segundos
+                    setTimeout(() => {
+                        window.location.href = '/html/admin-productos.html';
+                    }, 2000);
+                } else {
+                    mostrarAlerta('Error: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarAlerta('Error al procesar la solicitud', 'error');
+            })
+            .finally(() => {
+                // Rehabilitar botón
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                document.querySelector('.form-container').classList.remove('loading');
+            });
+        });
+
+        // Mejorar la experiencia de subida de archivos
+        document.getElementById('imagen').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name;
+            const fileLabel = document.getElementById('file-label');
+            
+            if (fileName) {
+                fileLabel.textContent = fileName;
+            } else {
+                fileLabel.textContent = isEditMode ? 'Cambiar imagen' : 'Seleccionar imagen';
+            }
+        });
+
+        function mostrarAlerta(mensaje, tipo) {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${tipo}`;
+            alert.textContent = mensaje;
+            alert.style.display = 'block';
+            
+            // Auto-ocultar después de 5 segundos
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        function volverAlDashboard() {
+            window.location.href = '/html/admin-productos.html';
+        }
+    </script>
+</body>
+</html>

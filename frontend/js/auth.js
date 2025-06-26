@@ -38,14 +38,14 @@ const AuthController = {
 
         if (token && user){
             // Solo redirigir si estamos en la página de login
-            if (currentPage.includes('adminLogin.html') || currentPage === '/') {
+            if (currentPage.includes('/admin/login') || currentPage === '/') {
                 window.location.href = './adminCenter.html';
             }
             // Si ya estamos en adminCenter.html, no hacer nada
         } else {
             // Si no hay token/user y estamos en adminCenter, redirigir a login
             if (currentPage.includes('adminCenter.html')) {
-                window.location.href = './adminLogin.html';
+                window.location.href = '/admin/login';
             }
         }
     },
@@ -79,7 +79,7 @@ const AuthController = {
         localStorage.removeItem('user');
         
         // Redirigir al login
-        window.location.href = './adminLogin.html';
+        window.location.href = '/admin/login';
     }
 }
 
