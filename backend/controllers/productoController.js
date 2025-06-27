@@ -105,13 +105,17 @@ exports.borrarProducto = async (req, res) => {
     console.log('🗑️ INICIANDO BORRADO SUAVE DE PRODUCTO');
     console.log('ID del producto:', req.params.id);
     console.log('Usuario:', req.user ? req.user.email : 'No identificado');
+    console.log('Usuario completo:', req.user);
     
     const { id } = req.params;
+    console.log('🔍 Buscando producto con ID:', id);
+    
     const producto = await Producto.findByIdAndUpdate(id, { activo: false }, { new: true });
 
     console.log('Producto encontrado:', producto ? 'SÍ' : 'NO');
     if (producto) {
       console.log('Estado del producto después del update:', producto.activo);
+      console.log('Nombre del producto:', producto.nombre);
     }
 
     if (!producto) {
@@ -122,13 +126,28 @@ exports.borrarProducto = async (req, res) => {
       });
     }
 
+    console.log('📝 Registrando acción de auditoría...');
+    console.log('Usuario ID:', req.user.id);
+    console.log('Usuario nombre:', req.user.nombre);
+    
     // Registrar acción de auditoría
-    const Acciones = require('../models/Acciones');
-    await Acciones.create({
-      usuario: req.user.id,
-      accion: 'DESACTIVAR_PRODUCTO',
-      detalles: `Usuario ${req.user.nombre} desactivó producto: ${producto.nombre}`
-    });
+    try {
+      const Acciones = require('../models/Acciones');
+      const accionData = {
+        usuario: req.user.id,
+        accion: 'DESACTIVAR_PRODUCTO',
+        detalles: `Usuario ${req.user.nombre} desactivó producto: ${producto.nombre}`
+      };
+      console.log('Datos de acción a crear:', accionData);
+      
+      const accionCreada = await Acciones.create(accionData);
+      console.log('✅ Acción de auditoría creada exitosamente:', accionCreada._id);
+    } catch (auditError) {
+      console.error('❌ Error al crear acción de auditoría:', auditError);
+      console.error('Stack trace:', auditError.stack);
+      // No fallar la operación principal por un error de auditoría
+      console.log('⚠️ Continuando sin registrar auditoría...');
+    }
 
     console.log('✅ Producto desactivado exitosamente');
     return res.status(200).json({ 
@@ -138,6 +157,7 @@ exports.borrarProducto = async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Error al desactivar producto:', error);
+    console.error('Stack trace completo:', error.stack);
     return res.status(500).json({ 
       success: false, 
       message: 'Error al desactivar producto' 
@@ -148,31 +168,62 @@ exports.borrarProducto = async (req, res) => {
 //  Recuperar producto (marcar como activo) - Solo admin
 exports.recuperarProducto = async (req, res) => {
   try {
+    console.log('🔄 INICIANDO RECUPERACIÓN DE PRODUCTO');
+    console.log('ID del producto:', req.params.id);
+    console.log('Usuario:', req.user ? req.user.email : 'No identificado');
+    console.log('Usuario completo:', req.user);
+    
     const { id } = req.params;
+    console.log('🔍 Buscando producto con ID:', id);
+    
     const producto = await Producto.findByIdAndUpdate(id, { activo: true }, { new: true });
 
+    console.log('Producto encontrado:', producto ? 'SÍ' : 'NO');
+    if (producto) {
+      console.log('Estado del producto después del update:', producto.activo);
+      console.log('Nombre del producto:', producto.nombre);
+    }
+
     if (!producto) {
+      console.log('❌ Producto no encontrado');
       return res.status(404).json({ 
         success: false, 
         message: 'Producto no encontrado' 
       });
     }
 
-    // Registrar acción de auditoría
-    const Acciones = require('../models/Acciones');
-    await Acciones.create({
-      usuario: req.user.id,
-      accion: 'REACTIVAR_PRODUCTO',
-      detalles: `Usuario ${req.user.nombre} reactivó producto: ${producto.nombre}`
-    });
+    console.log('📝 Registrando acción de auditoría...');
+    console.log('Usuario ID:', req.user.id);
+    console.log('Usuario nombre:', req.user.nombre);
 
+    // Registrar acción de auditoría
+    try {
+      const Acciones = require('../models/Acciones');
+      const accionData = {
+        usuario: req.user.id,
+        accion: 'REACTIVAR_PRODUCTO',
+        detalles: `Usuario ${req.user.nombre} reactivó producto: ${producto.nombre}`
+      };
+      console.log('Datos de acción a crear:', accionData);
+      
+      const accionCreada = await Acciones.create(accionData);
+      console.log('✅ Acción de auditoría creada exitosamente:', accionCreada._id);
+    } catch (auditError) {
+      console.error('❌ Error al crear acción de auditoría:', auditError);
+      console.error('Stack trace:', auditError.stack);
+      // No fallar la operación principal por un error de auditoría
+      console.log('⚠️ Continuando sin registrar auditoría...');
+    }
+
+    console.log('✅ Producto reactivado exitosamente');
     return res.status(200).json({ 
       success: true,
       message: 'Producto reactivado exitosamente',
       data: producto 
     });
   } catch (error) {
-    console.error('Error al reactivar producto:', error);
+    console.error('❌ Error al reactivar producto:', error);
+    console.error('Stack trace completo:', error.stack);
     return res.status(500).json({ 
       success: false, 
       message: 'Error al reactivar producto' 

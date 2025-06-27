@@ -35,74 +35,89 @@ const categoriaSeparadores = {
   'otoño': 'otonio'       // otoño -> separador-otonio.png
 };
 
+// Lista de archivos conocidos en /img/
+const imagenesDisponibles = [
+  'civil-war-must-have.png',
+  'demon-slayer-vol-8.png',
+  'el-hobbit.png',
+  'el-senior-de-los-anillos-la-comunidad-del-anillo.png',
+  'harry-potter-y-el-prisionero-de-askaban.png',
+  'harry-potter-y-la-piedra-filosofal.png',
+  'HP_LOGO.png',
+  'hunter-x-hunter-vol-17.png',
+  'jojos-bizarre-adventure-steel-ball-run-vol-2.png',
+  'naruto-vol-19.png',
+  'separador-amor.png',
+  'separador-animales.png',
+  'separador-arte.png',
+  'separador-deportes.png',
+  'separador-flores.png',
+  'separador-invierno.png',
+  'separador-motivacion.png',
+  'separador-musica.png',
+  'separador-otono.png',
+  'separador-primavera.png',
+  'separador-verano.png',
+  'separador-viajes.png',
+  'spider-man-la-ultima-caceria-de-kraven-60.png',
+  'superior-iron-man-infamous.png',
+  'x-men-dias-del-futuro-pasado-must-have.png'
+];
+
 // Función para obtener la URL correcta de la imagen con fallbacks inteligentes
 function getImageUrl(producto) {
-  // Si tiene imagen subida por el usuario, priorizarla
-  if (producto.imagen && producto.imagen !== 'null') {
+  // Si tiene imagen definida
+  if (producto.imagen && producto.imagen !== 'null' && producto.imagen.trim() !== '') {
+    // Normalizar barras invertidas a barras normales (Windows → Web)
+    let imagenNormalizada = producto.imagen.replace(/\\/g, '/');
+    
     // Si ya tiene la ruta completa, devolverla
-    if (producto.imagen.startsWith('/uploads/') || producto.imagen.startsWith('http')) {
-      return producto.imagen;
+    if (imagenNormalizada.startsWith('/uploads/') || imagenNormalizada.startsWith('/img/') || imagenNormalizada.startsWith('http')) {
+      return imagenNormalizada;
     }
-    // Si solo tiene el nombre del archivo, agregar la ruta /uploads/
-    return `/uploads/${producto.imagen}`;
+    
+    // Extraer solo el nombre del archivo si viene con ruta
+    let nombreArchivo = imagenNormalizada;
+    if (imagenNormalizada.includes('/')) {
+      nombreArchivo = imagenNormalizada.split('/').pop();
+    }
+    
+    // Verificar si es un archivo conocido que existe en /img/
+    if (imagenesDisponibles.includes(nombreArchivo)) {
+      return `/img/${nombreArchivo}`;
+    }
+    
+    // Si no está en la lista de archivos conocidos, asumir que es un archivo subido
+    return `/uploads/${nombreArchivo}`;
   }
   
-  // Si no tiene imagen subida, buscar imagen por defecto basada en el nombre del producto
+  // Si no tiene imagen definida, buscar por nombre del producto
   const nombreArchivo = normalizeFileName(producto.nombre);
-  return `/img/${nombreArchivo}.png`;
+  const archivoGenerado = `${nombreArchivo}.png`;
+  
+  // Verificar si existe el archivo generado en /img/
+  if (imagenesDisponibles.includes(archivoGenerado)) {
+    return `/img/${archivoGenerado}`;
+  }
+  
+  // Si no existe archivo específico, usar separador por categoría
+  const separadorCategoria = categoriaSeparadores[producto.categoria?.toLowerCase()] || 'arte';
+  return `/img/separador-${separadorCategoria}.png`;
 }
 
-// Función para manejar fallback de separadores
-function handleSeparadorFallback(imgElement, categoria) {
-  const categoriaLower = categoria.toLowerCase();
-  
-  // Buscar separador específico o usar mapeo
-  const separadorNombre = categoriaSeparadores[categoriaLower] || categoriaLower;
-  
-  imgElement.src = `/img/separador-${separadorNombre}.png`;
-  
-  imgElement.onerror = function() {
-    // Si falla el separador mapeado, probar con separador genérico "arte"
-    if (separadorNombre !== 'arte') {
-      this.src = '/img/separador-arte.png';
-      this.onerror = function() {
-        this.src = '/img/HP_LOGO.png';
-        this.onerror = null;
-      };
-    } else {
-      this.src = '/img/HP_LOGO.png';
-      this.onerror = null;
-    }
-  };
-}
-
-// Función mejorada para manejar errores de carga de imágenes
+// Función simplificada para manejar errores de carga de imágenes
 function handleImageError(imgElement, producto) {
   const srcActual = imgElement.src;
   
-  // Si falló una imagen de uploads, probar con imagen específica del producto
-  if (srcActual.includes('/uploads/')) {
-    const nombreArchivo = normalizeFileName(producto.nombre);
-    imgElement.src = `/img/${nombreArchivo}.png`;
-    imgElement.onerror = function() {
-      // Si también falla, probar con separador de categoría
-      handleSeparadorFallback(this, producto.categoria);
-    };
+  // Evitar bucles infinitos - si ya usamos el logo genérico, no hacer nada más
+  if (srcActual.includes('HP_LOGO.png')) {
+    return;
   }
-  // Si falló una imagen específica del producto, probar separador
-  else if (srcActual.includes('/img/') && !srcActual.includes('separador-') && !srcActual.includes('HP_LOGO')) {
-    handleSeparadorFallback(imgElement, producto.categoria);
-  }
-  // Si falló un separador, usar logo genérico
-  else if (srcActual.includes('separador-')) {
-    imgElement.src = '/img/HP_LOGO.png';
-    imgElement.onerror = null;
-  }
-  // Último recurso
-  else {
-    imgElement.src = '/img/HP_LOGO.png';
-    imgElement.onerror = null;
-  }
+  
+  // Si falló cualquier imagen, usar directamente el logo genérico
+  // Esto evita múltiples intentos y errores en consola
+  imgElement.src = '/img/HP_LOGO.png';
+  imgElement.onerror = null; // Evitar más intentos
 }
 
 document.addEventListener('DOMContentLoaded', () => {

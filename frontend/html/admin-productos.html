@@ -379,20 +379,12 @@
             
             let productosFiltrados = todosLosProductos;
             
-            console.log('🔍 Renderizando productos:');
-            console.log('Total productos:', todosLosProductos.length);
-            console.log('Filtro actual:', filtroActual);
-            
             // Aplicar filtro
             if (filtroActual === 'activos') {
                 productosFiltrados = todosLosProductos.filter(p => p.activo);
             } else if (filtroActual === 'inactivos') {
                 productosFiltrados = todosLosProductos.filter(p => !p.activo);
             }
-            
-            console.log('Productos filtrados:', productosFiltrados.length);
-            console.log('Productos activos:', todosLosProductos.filter(p => p.activo).length);
-            console.log('Productos inactivos:', todosLosProductos.filter(p => !p.activo).length);
             
             if (productosFiltrados.length === 0) {
                 let mensaje = '';
@@ -478,22 +470,35 @@
                     }
                 });
                 
+                const rawText = await response.text();
+                
+                let data;
+                try {
+                    data = JSON.parse(rawText);
+                } catch (parseError) {
+                    console.error('Error parsing JSON:', parseError);
+                    throw new Error('Respuesta del servidor no es JSON válido: ' + rawText.substring(0, 100));
+                }
+                
                 if (response.ok) {
-                    showAlert('Producto desactivado exitosamente', 'success');
-                    
-                    // Si estamos viendo solo productos activos, cambiar a "todos" para mostrar el producto desactivado
-                    if (filtroActual === 'activos') {
-                        // Cambiar el filtro a "todos"
-                        document.querySelector('.filter-btn[data-filter="todos"]').click();
+                    if (data.success === true || data.success === 'true') {
+                        showAlert(data.message || 'Producto desactivado exitosamente', 'success');
+                        
+                        // Si estamos viendo solo productos activos, cambiar a "todos" para mostrar el producto desactivado
+                        if (filtroActual === 'activos') {
+                            // Cambiar el filtro a "todos"
+                            document.querySelector('.filter-btn[data-filter="todos"]').click();
+                        }
+                        
+                        loadProducts(); // Recargar lista
+                    } else {
+                        throw new Error(data.message || 'Error al desactivar producto');
                     }
-                    
-                    loadProducts(); // Recargar lista
                 } else {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Error al desactivar producto');
+                    throw new Error(data.message || 'Error al desactivar producto');
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error al desactivar producto:', error);
                 showAlert('Error al desactivar el producto: ' + error.message, 'error');
             }
         }
@@ -515,15 +520,28 @@
                     }
                 });
                 
+                const rawText = await response.text();
+                
+                let data;
+                try {
+                    data = JSON.parse(rawText);
+                } catch (parseError) {
+                    console.error('Error parsing JSON:', parseError);
+                    throw new Error('Respuesta del servidor no es JSON válido: ' + rawText.substring(0, 100));
+                }
+                
                 if (response.ok) {
-                    showAlert('Producto reactivado exitosamente', 'success');
-                    loadProducts(); // Recargar lista
+                    if (data.success === true || data.success === 'true') {
+                        showAlert(data.message || 'Producto reactivado exitosamente', 'success');
+                        loadProducts(); // Recargar lista
+                    } else {
+                        throw new Error(data.message || 'Error al reactivar producto');
+                    }
                 } else {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Error al reactivar producto');
+                    throw new Error(data.message || 'Error al reactivar producto');
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error al reactivar producto:', error);
                 showAlert('Error al reactivar el producto: ' + error.message, 'error');
             }
         }
@@ -586,63 +604,113 @@
             'otoño': 'otonio'       // otoño -> separador-otonio.png
         };
 
+        // Lista de archivos conocidos en /img/
+        const imagenesDisponibles = [
+            'civil-war-must-have.png',
+            'demon-slayer-vol-8.png',
+            'el-hobbit.png',
+            'el-senior-de-los-anillos-la-comunidad-del-anillo.png',
+            'harry-potter-y-el-prisionero-de-askaban.png',
+            'harry-potter-y-la-piedra-filosofal.png',
+            'HP_LOGO.png',
+            'hunter-x-hunter-vol-17.png',
+            'jojos-bizarre-adventure-steel-ball-run-vol-2.png',
+            'naruto-vol-19.png',
+            'separador-amor.png',
+            'separador-animales.png',
+            'separador-arte.png',
+            'separador-deportes.png',
+            'separador-flores.png',
+            'separador-invierno.png',
+            'separador-motivacion.png',
+            'separador-musica.png',
+            'separador-otono.png',
+            'separador-primavera.png',
+            'separador-verano.png',
+            'separador-viajes.png',
+            'spider-man-la-ultima-caceria-de-kraven-60.png',
+            'superior-iron-man-infamous.png',
+            'x-men-dias-del-futuro-pasado-must-have.png'
+        ];
+
         // Función para obtener la URL correcta de la imagen con fallbacks inteligentes
         function getImageUrl(producto) {
-            // Si tiene imagen subida por el usuario, priorizarla
-            if (producto.imagen && producto.imagen !== 'null') {
+            // Si tiene imagen definida
+            if (producto.imagen && producto.imagen !== 'null' && producto.imagen.trim() !== '') {
+                // Normalizar barras invertidas a barras normales (Windows → Web)
+                let imagenNormalizada = producto.imagen.replace(/\\/g, '/');
+                
                 // Si ya tiene la ruta completa, devolverla
-                if (producto.imagen.startsWith('/uploads/') || producto.imagen.startsWith('http')) {
-                    console.log(`📷 Usando imagen subida: ${producto.imagen}`);
-                    return producto.imagen;
+                if (imagenNormalizada.startsWith('/uploads/') || imagenNormalizada.startsWith('/img/') || imagenNormalizada.startsWith('http')) {
+                    return imagenNormalizada;
                 }
-                // Si solo tiene el nombre del archivo, agregar la ruta /uploads/
-                const urlCompleta = `/uploads/${producto.imagen}`;
-                console.log(`📷 Usando imagen subida (ruta completa): ${urlCompleta}`);
-                return urlCompleta;
+                
+                // Extraer solo el nombre del archivo si viene con ruta
+                let nombreArchivo = imagenNormalizada;
+                if (imagenNormalizada.includes('/')) {
+                    nombreArchivo = imagenNormalizada.split('/').pop();
+                }
+                
+                // Verificar si es un archivo conocido que existe en /img/
+                if (imagenesDisponibles.includes(nombreArchivo)) {
+                    return `/img/${nombreArchivo}`;
+                }
+                
+                // Si no está en la lista de archivos conocidos, asumir que es un archivo subido
+                return `/uploads/${nombreArchivo}`;
             }
             
-            // Si no tiene imagen subida, buscar imagen por defecto basada en el nombre del producto
+            // Si no tiene imagen definida, buscar por nombre del producto
             const nombreArchivo = normalizeFileName(producto.nombre);
-            const urlImagen = `/img/${nombreArchivo}.png`;
-            console.log(`📷 Producto: "${producto.nombre}" → archivo: "${nombreArchivo}.png"`);
-            console.log(`📷 URL generada: ${urlImagen}`);
-            return urlImagen;
+            const archivoGenerado = `${nombreArchivo}.png`;
+            
+            // Verificar si existe el archivo generado en /img/
+            if (imagenesDisponibles.includes(archivoGenerado)) {
+                return `/img/${archivoGenerado}`;
+            }
+            
+            // Si no existe archivo específico, usar separador por categoría
+            const separadorCategoria = categoriaSeparadores[producto.categoria?.toLowerCase()] || 'arte';
+            return `/img/separador-${separadorCategoria}.png`;
+            return `/img/separador-${separadorCategoria}.png`;
         }
         
         // Función mejorada para manejar errores de carga de imágenes
         function handleImageError(imgElement, producto) {
             const srcActual = imgElement.src;
-            console.log('Error cargando imagen:', srcActual);
-            console.log('Producto:', producto.nombre, 'Categoría:', producto.categoria);
+            
+            // Evitar bucles infinitos - si ya intentamos el logo genérico, no hacer nada más
+            if (srcActual.includes('HP_LOGO.png')) {
+                return;
+            }
             
             // Si falló una imagen de uploads, probar con imagen específica del producto
             if (srcActual.includes('/uploads/')) {
-                console.log('Imagen de uploads falló, probando imagen específica del producto');
                 const nombreArchivo = normalizeFileName(producto.nombre);
                 imgElement.src = `/img/${nombreArchivo}.png`;
                 imgElement.onerror = function() {
                     // Si también falla, probar con separador de categoría
-                    console.log('Imagen específica falló, probando separador de categoría');
                     handleSeparadorFallback(this, producto.categoria);
                 };
+                return;
             }
+            
             // Si falló una imagen específica del producto, probar separador
-            else if (srcActual.includes('/img/') && !srcActual.includes('separador-') && !srcActual.includes('HP_LOGO')) {
-                console.log('Imagen específica falló, probando separador');
+            if (srcActual.includes('/img/') && !srcActual.includes('separador-') && !srcActual.includes('HP_LOGO')) {
                 handleSeparadorFallback(imgElement, producto.categoria);
+                return;
             }
+            
             // Si falló un separador, usar logo genérico
-            else if (srcActual.includes('separador-')) {
-                console.log('Separador falló, usando logo genérico');
+            if (srcActual.includes('separador-')) {
                 imgElement.src = '/img/HP_LOGO.png';
-                imgElement.onerror = null;
+                imgElement.onerror = null; // Evitar más intentos
+                return;
             }
+            
             // Último recurso
-            else {
-                console.log('Usando logo genérico como último recurso');
-                imgElement.src = '/img/HP_LOGO.png';
-                imgElement.onerror = null;
-            }
+            imgElement.src = '/img/HP_LOGO.png';
+            imgElement.onerror = null; // Evitar más intentos
         }
 
         // Función para manejar fallback de separadores
@@ -652,23 +720,19 @@
             // Buscar separador específico o usar mapeo
             const separadorNombre = categoriaSeparadores[categoriaLower] || categoriaLower;
             
-            console.log(`Probando separador: separador-${separadorNombre}.png`);
             imgElement.src = `/img/separador-${separadorNombre}.png`;
             
             imgElement.onerror = function() {
                 // Si falla el separador mapeado, probar con separador genérico "arte"
                 if (separadorNombre !== 'arte') {
-                    console.log('Separador específico falló, probando separador-arte.png');
                     this.src = '/img/separador-arte.png';
                     this.onerror = function() {
-                        console.log('Separador-arte falló, usando logo genérico');
                         this.src = '/img/HP_LOGO.png';
-                        this.onerror = null;
+                        this.onerror = null; // Evitar más intentos
                     };
                 } else {
-                    console.log('Separador-arte falló, usando logo genérico');
                     this.src = '/img/HP_LOGO.png';
-                    this.onerror = null;
+                    this.onerror = null; // Evitar más intentos
                 }
             };
         }
