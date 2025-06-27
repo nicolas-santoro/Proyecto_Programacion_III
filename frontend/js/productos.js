@@ -1,3 +1,110 @@
+// Mapeo específico de productos que tienen nombres de archivo diferentes
+const productosEspeciales = {
+  'spider-man-la-ultima-caceria-de-kraven': 'spider-man-la-ultima-caceria-de-kraven-60',
+  'jojos-bizarre-adventure-steel-ball-run-vol-2': 'jojos-bizarre-adventure-steel-ball-run-vol-2',
+  'el-senor-de-los-anillos-la-comunidad-del-anillo': 'el-senior-de-los-anillos-la-comunidad-del-anillo',
+  'harry-potter-y-el-prisionero-de-azkaban': 'harry-potter-y-el-prisionero-de-askaban'
+};
+
+// Función para normalizar nombres de archivos
+function normalizeFileName(text) {
+  const normalized = text.toLowerCase()
+    .replace(/:/g, '')              // quitar dos puntos
+    .replace(/'/g, '')              // quitar apóstrofes
+    .replace(/\./g, '')             // quitar puntos
+    .replace(/\s+/g, '-')           // espacios por guiones
+    .replace(/[áàäâ]/g, 'a')        // normalizar acentos
+    .replace(/[éèëê]/g, 'e')
+    .replace(/[íìïî]/g, 'i')
+    .replace(/[óòöô]/g, 'o')
+    .replace(/[úùüû]/g, 'u')
+    .replace(/[ñ]/g, 'n')
+    .replace(/[^a-z0-9\-]/g, '');   // quitar caracteres especiales
+  
+  // Verificar si hay un mapeo específico para este producto
+  return productosEspeciales[normalized] || normalized;
+}
+
+// Mapeo de categorías a separadores disponibles
+const categoriaSeparadores = {
+  'libro': 'arte',        // libro -> separador-arte.png
+  'comic': 'arte',        // comic -> separador-arte.png
+  'manga': 'arte',        // manga -> separador-arte.png
+  'separador': 'arte',    // separador -> separador-arte.png
+  'otono': 'otonio',      // otono -> separador-otonio.png (nombre correcto del archivo)
+  'otoño': 'otonio'       // otoño -> separador-otonio.png
+};
+
+// Función para obtener la URL correcta de la imagen con fallbacks inteligentes
+function getImageUrl(producto) {
+  // Si tiene imagen subida por el usuario, priorizarla
+  if (producto.imagen && producto.imagen !== 'null') {
+    // Si ya tiene la ruta completa, devolverla
+    if (producto.imagen.startsWith('/uploads/') || producto.imagen.startsWith('http')) {
+      return producto.imagen;
+    }
+    // Si solo tiene el nombre del archivo, agregar la ruta /uploads/
+    return `/uploads/${producto.imagen}`;
+  }
+  
+  // Si no tiene imagen subida, buscar imagen por defecto basada en el nombre del producto
+  const nombreArchivo = normalizeFileName(producto.nombre);
+  return `/img/${nombreArchivo}.png`;
+}
+
+// Función para manejar fallback de separadores
+function handleSeparadorFallback(imgElement, categoria) {
+  const categoriaLower = categoria.toLowerCase();
+  
+  // Buscar separador específico o usar mapeo
+  const separadorNombre = categoriaSeparadores[categoriaLower] || categoriaLower;
+  
+  imgElement.src = `/img/separador-${separadorNombre}.png`;
+  
+  imgElement.onerror = function() {
+    // Si falla el separador mapeado, probar con separador genérico "arte"
+    if (separadorNombre !== 'arte') {
+      this.src = '/img/separador-arte.png';
+      this.onerror = function() {
+        this.src = '/img/HP_LOGO.png';
+        this.onerror = null;
+      };
+    } else {
+      this.src = '/img/HP_LOGO.png';
+      this.onerror = null;
+    }
+  };
+}
+
+// Función mejorada para manejar errores de carga de imágenes
+function handleImageError(imgElement, producto) {
+  const srcActual = imgElement.src;
+  
+  // Si falló una imagen de uploads, probar con imagen específica del producto
+  if (srcActual.includes('/uploads/')) {
+    const nombreArchivo = normalizeFileName(producto.nombre);
+    imgElement.src = `/img/${nombreArchivo}.png`;
+    imgElement.onerror = function() {
+      // Si también falla, probar con separador de categoría
+      handleSeparadorFallback(this, producto.categoria);
+    };
+  }
+  // Si falló una imagen específica del producto, probar separador
+  else if (srcActual.includes('/img/') && !srcActual.includes('separador-') && !srcActual.includes('HP_LOGO')) {
+    handleSeparadorFallback(imgElement, producto.categoria);
+  }
+  // Si falló un separador, usar logo genérico
+  else if (srcActual.includes('separador-')) {
+    imgElement.src = '/img/HP_LOGO.png';
+    imgElement.onerror = null;
+  }
+  // Último recurso
+  else {
+    imgElement.src = '/img/HP_LOGO.png';
+    imgElement.onerror = null;
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   ApiClient.fetchApi('/productos/obtener', 
     { method: 'GET' }) // Trae los productos desde la API 
@@ -36,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           div.innerHTML = ` 
             <div class="card-body position-relative">
-              <img src="${prod.imagen || '/img/placeholder.png'}" class="card-img-top mb-2" alt="${prod.nombre}">
+              <img src="${getImageUrl(prod)}" class="card-img-top mb-2" alt="${prod.nombre}">
               <h5 class="card-title">${prod.nombre}</h5>
               <p class="card-text">Precio: $${prod.precio}</p>
 
@@ -56,6 +163,14 @@ document.addEventListener('DOMContentLoaded', () => {
               ${cantidad > 0 ? `<span class="badge bg-gradient position-absolute top-0 end-0 cantidad-badge">${cantidad}</span>` : ''}
             </div>
           `;
+
+          // Agregar el manejador de errores de imagen después de crear el HTML
+          const imgElement = div.querySelector('img');
+          if (imgElement) {
+            imgElement.onerror = function() {
+              handleImageError(this, prod);
+            };
+          }
 
           // toma el div de la cantidad de productos y el container del boton agregar
           const controlDiv = div.querySelector('.control-cantidad');

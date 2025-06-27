@@ -57,7 +57,7 @@ exports.crearProducto = async (req, res) => {
     // Manejar la imagen si se sube
     const datosProducto = { ...req.body, activo: true };
     if (req.file) {
-      datosProducto.imagen = req.file.filename;
+      datosProducto.imagen = `/uploads/${req.file.filename}`;
     }
 
     const nuevo = new Producto(datosProducto); 
@@ -99,31 +99,84 @@ exports.modificarProducto = async (req, res) => {
   }
 };
 
-//  Borrar producto (marcar como inactivo)
+//  Borrar producto (marcar como inactivo) - Solo admin
 exports.borrarProducto = async (req, res) => {
   try {
+    console.log('🗑️ INICIANDO BORRADO SUAVE DE PRODUCTO');
+    console.log('ID del producto:', req.params.id);
+    console.log('Usuario:', req.user ? req.user.email : 'No identificado');
+    
     const { id } = req.params;
     const producto = await Producto.findByIdAndUpdate(id, { activo: false }, { new: true });
 
-    if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
+    console.log('Producto encontrado:', producto ? 'SÍ' : 'NO');
+    if (producto) {
+      console.log('Estado del producto después del update:', producto.activo);
+    }
 
-    return res.status(200).json({ mensaje: 'Producto marcado como inactivo', data: producto });
+    if (!producto) {
+      console.log('❌ Producto no encontrado');
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Producto no encontrado' 
+      });
+    }
+
+    // Registrar acción de auditoría
+    const Acciones = require('../models/Acciones');
+    await Acciones.create({
+      usuario: req.user.id,
+      accion: 'DESACTIVAR_PRODUCTO',
+      detalles: `Usuario ${req.user.nombre} desactivó producto: ${producto.nombre}`
+    });
+
+    console.log('✅ Producto desactivado exitosamente');
+    return res.status(200).json({ 
+      success: true,
+      message: 'Producto desactivado exitosamente',
+      data: producto 
+    });
   } catch (error) {
-    return res.status(500).json({ error: 'Error al borrar producto' });
+    console.error('❌ Error al desactivar producto:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Error al desactivar producto' 
+    });
   }
 };
 
-//  Recuperar producto (marcar como activo)
+//  Recuperar producto (marcar como activo) - Solo admin
 exports.recuperarProducto = async (req, res) => {
   try {
     const { id } = req.params;
     const producto = await Producto.findByIdAndUpdate(id, { activo: true }, { new: true });
 
-    if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
+    if (!producto) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Producto no encontrado' 
+      });
+    }
 
-    return res.status(200).json({ mensaje: 'Producto restaurado', data: producto });
+    // Registrar acción de auditoría
+    const Acciones = require('../models/Acciones');
+    await Acciones.create({
+      usuario: req.user.id,
+      accion: 'REACTIVAR_PRODUCTO',
+      detalles: `Usuario ${req.user.nombre} reactivó producto: ${producto.nombre}`
+    });
+
+    return res.status(200).json({ 
+      success: true,
+      message: 'Producto reactivado exitosamente',
+      data: producto 
+    });
   } catch (error) {
-    return res.status(500).json({ error: 'Error al restaurar producto' });
+    console.error('Error al reactivar producto:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Error al reactivar producto' 
+    });
   }
 };
 
@@ -211,7 +264,7 @@ exports.actualizarProducto = async (req, res) => {
 
     // Manejar la imagen si se sube una nueva
     if (req.file) {
-      actualizaciones.imagen = req.file.filename;
+      actualizaciones.imagen = `/uploads/${req.file.filename}`;
     }
 
     const producto = await Producto.findByIdAndUpdate(id, actualizaciones, { 
@@ -245,32 +298,6 @@ exports.actualizarProducto = async (req, res) => {
       success: false, 
       message: 'Error al actualizar producto' 
     });
-  }
-};
-
-//  Eliminar producto permanentemente - Solo admin
-exports.eliminarProducto = async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    const producto = await Producto.findById(id);
-    if (!producto) {
-      return res.status(404).json({ error: 'Producto no encontrado' });
-    }
-
-    await Producto.findByIdAndDelete(id);
-
-    // Registrar acción de auditoría
-    const Acciones = require('../models/Acciones');
-    await Acciones.create({
-      usuario: req.user.id,
-      accion: 'ELIMINAR_PRODUCTO',
-      detalles: `Usuario ${req.user.nombre} eliminó permanentemente producto: ${producto.nombre}`
-    });
-
-    return res.status(200).json({ mensaje: 'Producto eliminado permanentemente' });
-  } catch (error) {
-    return res.status(500).json({ error: 'Error al eliminar producto' });
   }
 };
 

@@ -64,10 +64,6 @@
         }
         
         .page-header h2 {
-            color: #333;
-        }
-        
-        .page-header h2 {
             color: #a020f0;
             text-shadow: 0 0 10px rgba(160, 32, 240, 0.5);
         }
@@ -108,6 +104,11 @@
             box-shadow: 0 6px 20px rgba(160, 32, 240, 0.4);
         }
         
+        .product-card.inactive {
+            opacity: 0.6;
+            border-color: #666;
+        }
+        
         .product-image {
             width: 100%;
             height: 200px;
@@ -138,6 +139,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
         .product-price {
@@ -155,19 +158,27 @@
             text-transform: capitalize;
         }
         
-        .product-stock {
-            font-size: 0.9rem;
-            color: #bbb;
+        .product-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
         }
         
-        .product-stock.low {
+        .product-status.active {
+            background: #1a4a1a;
+            color: #4ade80;
+        }
+        
+        .product-status.inactive {
+            background: #4a1a1a;
             color: #ff6b6b;
-            font-weight: bold;
         }
         
         .product-actions {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
         
         .btn {
@@ -178,6 +189,9 @@
             border: none;
             cursor: pointer;
             transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
         
         .btn:hover {
@@ -194,6 +208,12 @@
             background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
             color: white;
             box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+        }
+        
+        .btn-recover {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
         }
         
         .empty-state {
@@ -228,6 +248,32 @@
             border: 1px solid #8b0000;
         }
         
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #6a0dad;
+            background: transparent;
+            color: #a020f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(135deg, #6a0dad 0%, #a020f0 100%);
+            color: white;
+        }
+        
+        .filter-btn:hover {
+            background: rgba(160, 32, 240, 0.2);
+        }
+        
         @media (max-width: 768px) {
             .page-header {
                 flex-direction: column;
@@ -237,6 +283,10 @@
             
             .products-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .filter-buttons {
+                justify-content: center;
             }
         }
     </style>
@@ -251,11 +301,17 @@
 
     <div class="container">
         <div class="page-header">
-            <h2>Todos los Productos</h2>
+            <h2>Gestión de Productos</h2>
             <a href="/html/admin-form-producto.html" class="btn-add">➕ Agregar Producto</a>
         </div>
         
         <div id="alert" class="alert"></div>
+
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="todos">📦 Todos los Productos</button>
+            <button class="filter-btn" data-filter="activos">✅ Productos Activos</button>
+            <button class="filter-btn" data-filter="inactivos">❌ Productos Inactivos</button>
+        </div>
 
         <div id="productsContainer">
             <!-- Los productos se cargarán aquí -->
@@ -264,6 +320,8 @@
 
     <script>
         const API_BASE = '/api';
+        let todosLosProductos = [];
+        let filtroActual = 'todos';
         
         // Verificar autenticación
         function checkAuth() {
@@ -287,10 +345,9 @@
             }, 5000);
         }
         
-        // Cargar productos
+        // Cargar productos desde la API
         async function loadProducts() {
             const token = localStorage.getItem('token');
-            const container = document.getElementById('productsContainer');
             
             try {
                 const response = await fetch(`${API_BASE}/admin/productos`, {
@@ -301,46 +358,12 @@
                 
                 if (response.ok) {
                     const data = await response.json();
-                    const productos = data.data || [];
-                    
-                    if (productos.length === 0) {
-                        container.innerHTML = `
-                            <div class="empty-state">
-                                <div class="icon">📚</div>
-                                <h3>No hay productos registrados</h3>
-                                <p>Comienza agregando tu primer producto al catálogo</p>
-                                <br>
-                                <a href="/html/admin-form-producto.html" class="btn-add">Agregar Primer Producto</a>
-                            </div>
-                        `;
-                    } else {
-                        container.innerHTML = `
-                            <div class="products-grid">
-                                ${productos.map(producto => `
-                                    <div class="product-card">
-                                        ${producto.imagen ? 
-                                            `<img src="/uploads/${producto.imagen}" alt="${producto.nombre}" class="product-image">` :
-                                            `<div class="product-image" style="display: flex; align-items: center; justify-content: center; font-size: 3rem; color: #ccc;">📚</div>`
-                                        }
-                                        
-                                        <div class="product-content">
-                                            <h3 class="product-title">${producto.nombre}</h3>
-                                            
-                                            <div class="product-meta">
-                                                <span class="product-price">$${producto.precio}</span>
-                                                <span class="product-category">${producto.categoria}</span>
-                                            </div>
-                                            
-                                            <div class="product-actions">
-                                                <button class="btn btn-edit" onclick="editProduct('${producto._id}')">✏️ Editar</button>
-                                                <button class="btn btn-delete" onclick="deleteProduct('${producto._id}', '${producto.nombre}')">🗑️ Eliminar</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        `;
-                    }
+                    todosLosProductos = data.data || [];
+                    renderProducts();
+                } else if (response.status === 401) {
+                    // Token inválido, redirigir al login
+                    localStorage.removeItem('token');
+                    window.location.href = '/html/admin-login.html';
                 } else {
                     throw new Error('Error al cargar productos');
                 }
@@ -350,14 +373,98 @@
             }
         }
         
+        // Renderizar productos según el filtro actual
+        function renderProducts() {
+            const container = document.getElementById('productsContainer');
+            
+            let productosFiltrados = todosLosProductos;
+            
+            console.log('🔍 Renderizando productos:');
+            console.log('Total productos:', todosLosProductos.length);
+            console.log('Filtro actual:', filtroActual);
+            
+            // Aplicar filtro
+            if (filtroActual === 'activos') {
+                productosFiltrados = todosLosProductos.filter(p => p.activo);
+            } else if (filtroActual === 'inactivos') {
+                productosFiltrados = todosLosProductos.filter(p => !p.activo);
+            }
+            
+            console.log('Productos filtrados:', productosFiltrados.length);
+            console.log('Productos activos:', todosLosProductos.filter(p => p.activo).length);
+            console.log('Productos inactivos:', todosLosProductos.filter(p => !p.activo).length);
+            
+            if (productosFiltrados.length === 0) {
+                let mensaje = '';
+                if (filtroActual === 'todos') {
+                    mensaje = 'No hay productos registrados';
+                } else if (filtroActual === 'activos') {
+                    mensaje = 'No hay productos activos';
+                } else {
+                    mensaje = 'No hay productos inactivos';
+                }
+                
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📚</div>
+                        <h3>${mensaje}</h3>
+                        ${filtroActual === 'todos' ? 
+                            '<p>Comienza agregando tu primer producto al catálogo</p><br><a href="/html/admin-form-producto.html" class="btn-add">Agregar Primer Producto</a>' :
+                            '<p>Cambia el filtro para ver otros productos</p>'
+                        }
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="products-grid">
+                        ${productosFiltrados.map(producto => `
+                            <div class="product-card ${!producto.activo ? 'inactive' : ''}">
+                            <img src="${getImageUrl(producto)}"  
+                                alt="${producto.nombre}" 
+                                class="product-image"
+                                onerror="handleImageError(this, ${JSON.stringify(producto).replace(/"/g, '&quot;')})">
+                                
+                                <div class="product-content">
+                                    <h3 class="product-title">${producto.nombre}</h3>
+                                    
+                                    <div class="product-meta">
+                                        <span class="product-price">$${producto.precio}</span>
+                                        <span class="product-category">${producto.categoria}</span>
+                                        <span class="product-status ${producto.activo ? 'active' : 'inactive'}">
+                                            ${producto.activo ? '✅ Activo' : '❌ Inactivo'}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="product-actions">
+                                        ${producto.activo ? `
+                                            <button class="btn btn-edit" onclick="editProduct('${producto._id}')">
+                                                ✏️ Editar
+                                            </button>
+                                            <button class="btn btn-delete" onclick="deleteProduct('${producto._id}', '${producto.nombre}')">
+                                                🗑️ Desactivar
+                                            </button>
+                                        ` : `
+                                            <button class="btn btn-recover" onclick="recoverProduct('${producto._id}', '${producto.nombre}')">
+                                                🔄 Recuperar
+                                            </button>
+                                        `}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+        }
+        
         // Editar producto
         function editProduct(id) {
             window.location.href = `/html/admin-form-producto.html?id=${id}`;
         }
         
-        // Eliminar producto
+        // Desactivar producto (marcarlo como activo: false)
         async function deleteProduct(id, nombre) {
-            if (!confirm(`¿Estás seguro de eliminar el producto "${nombre}"?`)) {
+            if (!confirm(`¿Estás seguro de desactivar el producto "${nombre}"?\n\nNota: El producto será marcado como inactivo pero NO se eliminará permanentemente. Podrás recuperarlo después.`)) {
                 return;
             }
             
@@ -372,27 +479,213 @@
                 });
                 
                 if (response.ok) {
-                    showAlert('Producto eliminado exitosamente', 'success');
+                    showAlert('Producto desactivado exitosamente', 'success');
+                    
+                    // Si estamos viendo solo productos activos, cambiar a "todos" para mostrar el producto desactivado
+                    if (filtroActual === 'activos') {
+                        // Cambiar el filtro a "todos"
+                        document.querySelector('.filter-btn[data-filter="todos"]').click();
+                    }
+                    
                     loadProducts(); // Recargar lista
                 } else {
-                    throw new Error('Error al eliminar producto');
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error al desactivar producto');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showAlert('Error al eliminar el producto');
+                showAlert('Error al desactivar el producto: ' + error.message, 'error');
             }
+        }
+        
+        // Recuperar producto (marcarlo como activo: true)
+        async function recoverProduct(id, nombre) {
+            if (!confirm(`¿Estás seguro de reactivar el producto "${nombre}"?`)) {
+                return;
+            }
+            
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/productos/${id}/recuperar`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    showAlert('Producto reactivado exitosamente', 'success');
+                    loadProducts(); // Recargar lista
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error al reactivar producto');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error al reactivar el producto: ' + error.message, 'error');
+            }
+        }
+        
+        // Manejar filtros
+        function setupFilters() {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remover clase active de todos los botones
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    
+                    // Agregar clase active al botón clickeado
+                    btn.classList.add('active');
+                    
+                    // Actualizar filtro actual
+                    filtroActual = btn.dataset.filter;
+                    
+                    // Renderizar productos con el nuevo filtro
+                    renderProducts();
+                });
+            });
+        }
+        
+        // Mapeo específico de productos que tienen nombres de archivo diferentes
+        const productosEspeciales = {
+            'spider-man-la-ultima-caceria-de-kraven': 'spider-man-la-ultima-caceria-de-kraven-60',
+            'jojos-bizarre-adventure-steel-ball-run-vol-2': 'jojos-bizarre-adventure-steel-ball-run-vol-2',
+            'el-senor-de-los-anillos-la-comunidad-del-anillo': 'el-senior-de-los-anillos-la-comunidad-del-anillo',
+            'harry-potter-y-el-prisionero-de-azkaban': 'harry-potter-y-el-prisionero-de-askaban'
+        };
+
+        // Función para normalizar nombres de archivos
+        function normalizeFileName(text) {
+            const normalized = text.toLowerCase()
+                .replace(/:/g, '')              // quitar dos puntos
+                .replace(/'/g, '')              // quitar apóstrofes
+                .replace(/\./g, '')             // quitar puntos
+                .replace(/\s+/g, '-')           // espacios por guiones
+                .replace(/[áàäâ]/g, 'a')        // normalizar acentos
+                .replace(/[éèëê]/g, 'e')
+                .replace(/[íìïî]/g, 'i')
+                .replace(/[óòöô]/g, 'o')
+                .replace(/[úùüû]/g, 'u')
+                .replace(/[ñ]/g, 'n')
+                .replace(/[^a-z0-9\-]/g, '');   // quitar caracteres especiales
+            
+            // Verificar si hay un mapeo específico para este producto
+            return productosEspeciales[normalized] || normalized;
+        }
+
+        // Mapeo de categorías a separadores disponibles
+        const categoriaSeparadores = {
+            'libro': 'arte',        // libro -> separador-arte.png
+            'comic': 'arte',        // comic -> separador-arte.png
+            'manga': 'arte',        // manga -> separador-arte.png
+            'separador': 'arte',    // separador -> separador-arte.png
+            'otono': 'otonio',      // otono -> separador-otonio.png (nombre correcto del archivo)
+            'otoño': 'otonio'       // otoño -> separador-otonio.png
+        };
+
+        // Función para obtener la URL correcta de la imagen con fallbacks inteligentes
+        function getImageUrl(producto) {
+            // Si tiene imagen subida por el usuario, priorizarla
+            if (producto.imagen && producto.imagen !== 'null') {
+                // Si ya tiene la ruta completa, devolverla
+                if (producto.imagen.startsWith('/uploads/') || producto.imagen.startsWith('http')) {
+                    console.log(`📷 Usando imagen subida: ${producto.imagen}`);
+                    return producto.imagen;
+                }
+                // Si solo tiene el nombre del archivo, agregar la ruta /uploads/
+                const urlCompleta = `/uploads/${producto.imagen}`;
+                console.log(`📷 Usando imagen subida (ruta completa): ${urlCompleta}`);
+                return urlCompleta;
+            }
+            
+            // Si no tiene imagen subida, buscar imagen por defecto basada en el nombre del producto
+            const nombreArchivo = normalizeFileName(producto.nombre);
+            const urlImagen = `/img/${nombreArchivo}.png`;
+            console.log(`📷 Producto: "${producto.nombre}" → archivo: "${nombreArchivo}.png"`);
+            console.log(`📷 URL generada: ${urlImagen}`);
+            return urlImagen;
+        }
+        
+        // Función mejorada para manejar errores de carga de imágenes
+        function handleImageError(imgElement, producto) {
+            const srcActual = imgElement.src;
+            console.log('Error cargando imagen:', srcActual);
+            console.log('Producto:', producto.nombre, 'Categoría:', producto.categoria);
+            
+            // Si falló una imagen de uploads, probar con imagen específica del producto
+            if (srcActual.includes('/uploads/')) {
+                console.log('Imagen de uploads falló, probando imagen específica del producto');
+                const nombreArchivo = normalizeFileName(producto.nombre);
+                imgElement.src = `/img/${nombreArchivo}.png`;
+                imgElement.onerror = function() {
+                    // Si también falla, probar con separador de categoría
+                    console.log('Imagen específica falló, probando separador de categoría');
+                    handleSeparadorFallback(this, producto.categoria);
+                };
+            }
+            // Si falló una imagen específica del producto, probar separador
+            else if (srcActual.includes('/img/') && !srcActual.includes('separador-') && !srcActual.includes('HP_LOGO')) {
+                console.log('Imagen específica falló, probando separador');
+                handleSeparadorFallback(imgElement, producto.categoria);
+            }
+            // Si falló un separador, usar logo genérico
+            else if (srcActual.includes('separador-')) {
+                console.log('Separador falló, usando logo genérico');
+                imgElement.src = '/img/HP_LOGO.png';
+                imgElement.onerror = null;
+            }
+            // Último recurso
+            else {
+                console.log('Usando logo genérico como último recurso');
+                imgElement.src = '/img/HP_LOGO.png';
+                imgElement.onerror = null;
+            }
+        }
+
+        // Función para manejar fallback de separadores
+        function handleSeparadorFallback(imgElement, categoria) {
+            const categoriaLower = categoria.toLowerCase();
+            
+            // Buscar separador específico o usar mapeo
+            const separadorNombre = categoriaSeparadores[categoriaLower] || categoriaLower;
+            
+            console.log(`Probando separador: separador-${separadorNombre}.png`);
+            imgElement.src = `/img/separador-${separadorNombre}.png`;
+            
+            imgElement.onerror = function() {
+                // Si falla el separador mapeado, probar con separador genérico "arte"
+                if (separadorNombre !== 'arte') {
+                    console.log('Separador específico falló, probando separador-arte.png');
+                    this.src = '/img/separador-arte.png';
+                    this.onerror = function() {
+                        console.log('Separador-arte falló, usando logo genérico');
+                        this.src = '/img/HP_LOGO.png';
+                        this.onerror = null;
+                    };
+                } else {
+                    console.log('Separador-arte falló, usando logo genérico');
+                    this.src = '/img/HP_LOGO.png';
+                    this.onerror = null;
+                }
+            };
         }
         
         // Inicializar página
         window.addEventListener('DOMContentLoaded', function() {
             if (checkAuth()) {
+                setupFilters();
                 loadProducts();
                 
                 // Verificar si hay mensaje de éxito en la URL
                 const urlParams = new URLSearchParams(window.location.search);
                 const success = urlParams.get('success');
                 if (success) {
-                    showAlert(success, 'success');
+                    showAlert(decodeURIComponent(success), 'success');
+                    // Limpiar la URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
                 }
             }
         });

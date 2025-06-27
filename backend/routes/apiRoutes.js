@@ -51,7 +51,8 @@ router.get('/admin/productos', verifyToken, productoController.obtenerTodosProdu
 router.get('/admin/productos/:id', verifyToken, productoController.obtenerProductoPorId);
 router.post('/admin/productos', verifyToken, upload.single('imagen'), productoController.crearProducto);
 router.put('/admin/productos/:id', verifyToken, upload.single('imagen'), productoController.actualizarProducto);
-router.delete('/admin/productos/:id', verifyToken, productoController.eliminarProducto);
+router.delete('/admin/productos/:id', verifyToken, productoController.borrarProducto);
+router.patch('/admin/productos/:id/recuperar', verifyToken, productoController.recuperarProducto);
 
 router.get('/admin/ventas', verifyToken, ventaController.obtenerVentas);
 router.get('/admin/ventas/:id', verifyToken, ventaController.obtenerVentaPorId);
