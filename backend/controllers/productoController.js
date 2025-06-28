@@ -258,6 +258,7 @@ exports.obtenerProductoPorId = async (req, res) => {
     console.log('=== OBTENIENDO PRODUCTO POR ID ===');
     console.log('ID recibido:', req.params.id);
     console.log('Usuario autenticado:', req.user ? req.user.email : 'No autenticado');
+    console.log('Headers de la petición:', req.headers);
     
     const { id } = req.params;
     
@@ -285,13 +286,18 @@ exports.obtenerProductoPorId = async (req, res) => {
 
     console.log('Producto encontrado:', producto.nombre);
 
-    // Registrar la acción
-    const Acciones = require('../models/Acciones');
-    await Acciones.create({
-      usuario: req.user.id,
-      accion: 'CONSULTAR_PRODUCTO',
-      detalles: `Usuario ${req.user.nombre} consultó producto ${producto.nombre}`
-    });
+    // Registrar la acción (con manejo de errores para evitar que falle la respuesta principal)
+    try {
+      const Acciones = require('../models/Acciones');
+      await Acciones.create({
+        usuario: req.user.id,
+        accion: 'CONSULTAR_PRODUCTO',
+        detalles: `Usuario ${req.user.nombre} consultó producto ${producto.nombre}`
+      });
+    } catch (auditoriaError) {
+      console.log('Error al guardar acción de auditoría:', auditoriaError);
+      // No interrumpir la respuesta principal por un error de auditoría
+    }
 
     console.log('Enviando respuesta exitosa');
     return res.status(200).json({ 

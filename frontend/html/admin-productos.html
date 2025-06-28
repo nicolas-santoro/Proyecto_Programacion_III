@@ -274,6 +274,115 @@
             background: rgba(160, 32, 240, 0.2);
         }
         
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+        
+        .modal-content {
+            background: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            color: #333;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #6a0dad;
+        }
+        
+        .modal-header h3 {
+            color: #6a0dad;
+            margin: 0;
+        }
+        
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+        
+        .close:hover {
+            color: #6a0dad;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #6a0dad;
+        }
+        
+        .current-image {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: block;
+        }
+        
+        .btn-modal {
+            background: linear-gradient(135deg, #6a0dad 0%, #a020f0 100%);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn-modal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(160, 32, 240, 0.4);
+        }
+        
+        .btn-cancel {
+            background: #666;
+        }
+        
+        .btn-cancel:hover {
+            background: #555;
+        }
+        
         @media (max-width: 768px) {
             .page-header {
                 flex-direction: column;
@@ -318,10 +427,55 @@
         </div>
     </div>
 
+    <!-- Modal para edición de productos -->
+    <div id="editProductModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Editar Producto</h3>
+                <span class="close" id="closeModal">&times;</span>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="productName">Nombre del Producto</label>
+                    <input type="text" id="productName" placeholder="Ingrese el nombre del producto">
+                </div>
+                
+                <div class="form-group">
+                    <label for="productPrice">Precio</label>
+                    <input type="number" id="productPrice" placeholder="Ingrese el precio del producto">
+                </div>
+                
+                <div class="form-group">
+                    <label for="productCategory">Categoría</label>
+                    <select id="productCategory">
+                        <option value="">Seleccione una categoría</option>
+                        <option value="libro">Libro</option>
+                        <option value="comic">Cómic</option>
+                        <option value="manga">Manga</option>
+                        <option value="separador">Separador</option>
+                        <option value="otono">Otoño</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="productImage">Imagen</label>
+                    <input type="text" id="productImage" placeholder="URL de la imagen">
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn-modal" id="saveChanges">Guardar Cambios</button>
+                <button class="btn-modal btn-cancel" id="cancelEdit">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_BASE = '/api';
         let todosLosProductos = [];
         let filtroActual = 'todos';
+        let productoEditando = null;
         
         // Verificar autenticación
         function checkAuth() {
@@ -368,7 +522,6 @@
                     throw new Error('Error al cargar productos');
                 }
             } catch (error) {
-                console.error('Error:', error);
                 showAlert('Error al cargar los productos');
             }
         }
@@ -451,7 +604,154 @@
         
         // Editar producto
         function editProduct(id) {
-            window.location.href = `/html/admin-form-producto.html?id=${id}`;
+            // Validar que el ID no esté vacío
+            if (!id || id.trim() === '') {
+                showAlert('Error: ID de producto inválido', 'error');
+                return;
+            }
+            
+            // Buscar el producto por ID en la lista actual
+            productoEditando = todosLosProductos.find(p => p._id === id);
+            
+            if (productoEditando) {
+                // Llenar el formulario del modal con los datos del producto
+                document.getElementById('productName').value = productoEditando.nombre || '';
+                document.getElementById('productPrice').value = productoEditando.precio || '';
+                document.getElementById('productCategory').value = productoEditando.categoria || '';
+                document.getElementById('productImage').value = productoEditando.imagen || '';
+                
+                // Mostrar el modal
+                document.getElementById('editProductModal').style.display = 'block';
+            } else {
+                loadProductFromAPI(id);
+            }
+        }
+        
+        // Cargar producto desde la API si no está en cache
+        async function loadProductFromAPI(id) {
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/productos/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('Producto no encontrado');
+                    } else if (response.status === 401) {
+                        localStorage.removeItem('token');
+                        window.location.href = '/html/admin-login.html';
+                        return;
+                    } else {
+                        throw new Error(`Error HTTP ${response.status}`);
+                    }
+                }
+                
+                const data = await response.json();
+                
+                if (data.data) {
+                    productoEditando = data.data;
+                    
+                    // Llenar el formulario del modal
+                    document.getElementById('productName').value = productoEditando.nombre || '';
+                    document.getElementById('productPrice').value = productoEditando.precio || '';
+                    document.getElementById('productCategory').value = productoEditando.categoria || '';
+                    document.getElementById('productImage').value = productoEditando.imagen || '';
+                    
+                    // Mostrar el modal
+                    document.getElementById('editProductModal').style.display = 'block';
+                } else {
+                    throw new Error('Datos del producto no válidos');
+                }
+            } catch (error) {
+                showAlert('Error al cargar el producto: ' + error.message, 'error');
+            }
+        }
+        
+        // Cerrar el modal
+        document.getElementById('closeModal').onclick = function() {
+            document.getElementById('editProductModal').style.display = 'none';
+        }
+        
+        // Cancelar edición
+        document.getElementById('cancelEdit').onclick = function() {
+            document.getElementById('editProductModal').style.display = 'none';
+        }
+        
+        // Cerrar modal al hacer clic fuera de él
+        window.onclick = function(event) {
+            const modal = document.getElementById('editProductModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // Guardar cambios del producto editado
+        document.getElementById('saveChanges').onclick = async function() {
+            if (!productoEditando) return;
+            
+            // Obtener los nuevos valores del formulario
+            const nombre = document.getElementById('productName').value.trim();
+            const precio = parseFloat(document.getElementById('productPrice').value);
+            const categoria = document.getElementById('productCategory').value;
+            const imagen = document.getElementById('productImage').value.trim();
+            
+            // Validar campos requeridos
+            if (!nombre || !precio || !categoria) {
+                return showAlert('Por favor, complete todos los campos requeridos', 'error');
+            }
+            
+            if (precio <= 0) {
+                return showAlert('El precio debe ser mayor a 0', 'error');
+            }
+            
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/productos/${productoEditando._id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        nombre,
+                        precio,
+                        categoria,
+                        imagen
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showAlert(data.message || 'Producto actualizado exitosamente', 'success');
+                    
+                    // Actualizar el producto en la lista local
+                    const index = todosLosProductos.findIndex(p => p._id === productoEditando._id);
+                    if (index !== -1) {
+                        todosLosProductos[index] = { ...todosLosProductos[index], nombre, precio, categoria, imagen };
+                    }
+                    
+                    // Volver a renderizar los productos
+                    renderProducts();
+                    
+                    // Cerrar el modal
+                    document.getElementById('editProductModal').style.display = 'none';
+                } else if (response.status === 401) {
+                    localStorage.removeItem('token');
+                    window.location.href = '/html/admin-login.html';
+                } else {
+                    throw new Error(data.message || 'Error al actualizar producto');
+                }
+            } catch (error) {
+                showAlert('Error al actualizar el producto: ' + error.message, 'error');
+            }
         }
         
         // Desactivar producto (marcarlo como activo: false)
@@ -498,7 +798,6 @@
                     throw new Error(data.message || 'Error al desactivar producto');
                 }
             } catch (error) {
-                console.error('Error al desactivar producto:', error);
                 showAlert('Error al desactivar el producto: ' + error.message, 'error');
             }
         }
@@ -526,7 +825,6 @@
                 try {
                     data = JSON.parse(rawText);
                 } catch (parseError) {
-                    console.error('Error parsing JSON:', parseError);
                     throw new Error('Respuesta del servidor no es JSON válido: ' + rawText.substring(0, 100));
                 }
                 
@@ -541,7 +839,6 @@
                     throw new Error(data.message || 'Error al reactivar producto');
                 }
             } catch (error) {
-                console.error('Error al reactivar producto:', error);
                 showAlert('Error al reactivar el producto: ' + error.message, 'error');
             }
         }

@@ -195,7 +195,6 @@
         <div class="navbar-content">
             <h1>Panel Administrador</h1>
             <div class="user-info">
-                <span id="userName">Cargando...</span>
                 <span class="rol-badge" id="userRole">ADMIN</span>
                 <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
             </div>
@@ -268,10 +267,7 @@
                     window.location.href = '/html/admin-login.html';
                     return false;
                 }
-                
-                // Mostrar información del usuario
-                document.getElementById('userName').textContent = `Hola, ${user.nombre || user.email || 'Admin'}`;
-                
+
                 return true;
             } catch (error) {
                 console.error('Error validating token:', error);
