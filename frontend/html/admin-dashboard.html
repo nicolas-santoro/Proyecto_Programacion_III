@@ -3,8 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../img/HP_LOGO.png">
     <title>Dashboard Admin - Hachis Parmentier</title>
     <style>
+        :root {
+            --bg-primary-light: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 50%, #ddd6fe 100%);
+            --bg-primary-dark: linear-gradient(135deg, #1a1a1a 0%, #4b0082 50%, #000000 100%);
+            --bg-card-light: #ffffff;
+            --bg-card-dark: #222;
+            --text-primary-light: #4c1d95;
+            --text-primary-dark: #f0f0f0;
+            --text-secondary-light: #6b7280;
+            --text-secondary-dark: #d8b0ff;
+            --border-light: #e5e7eb;
+            --border-dark: #6a0dad;
+            --accent-color: #6a0dad;
+            --accent-gradient: linear-gradient(135deg, #6a0dad 0%, #a020f0 100%);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: var(--bg-primary-light);
+            --bg-card: var(--bg-card-light);
+            --text-primary: var(--text-primary-light);
+            --text-secondary: var(--text-secondary-light);
+            --border-color: var(--border-light);
+            --shadow: 0 4px 15px rgba(106, 13, 173, 0.1);
+            --shadow-hover: 0 6px 20px rgba(106, 13, 173, 0.2);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: var(--bg-primary-dark);
+            --bg-card: var(--bg-card-dark);
+            --text-primary: var(--text-primary-dark);
+            --text-secondary: var(--text-secondary-dark);
+            --border-color: var(--border-dark);
+            --shadow: 0 4px 15px rgba(160, 32, 240, 0.3);
+            --shadow-hover: 0 6px 20px rgba(160, 32, 240, 0.4);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,16 +49,17 @@
         
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #4b0082 50%, #000000 100%);
-            color: #f0f0f0;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
+            transition: all 0.3s ease;
         }
         
         .navbar {
-            background: linear-gradient(135deg, #6a0dad 0%, #a020f0 100%);
+            background: var(--accent-gradient);
             color: white;
             padding: 1rem 0;
-            box-shadow: 0 4px 15px rgba(160, 32, 240, 0.3);
+            box-shadow: var(--shadow);
         }
         
         .navbar-content {
@@ -49,6 +86,21 @@
             padding: 4px 12px;
             border-radius: 15px;
             font-size: 0.8rem;
+        }
+        
+        .theme-toggle {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.3);
         }
         
         .btn-logout {
@@ -78,13 +130,13 @@
         }
         
         .dashboard-header h2 {
-            color: #a020f0;
+            color: var(--accent-color);
             margin-bottom: 0.5rem;
-            text-shadow: 0 0 10px rgba(160, 32, 240, 0.5);
+            text-shadow: 0 0 10px rgba(160, 32, 240, 0.3);
         }
         
         .dashboard-header p {
-            color: #d8b0ff;
+            color: var(--text-secondary);
         }
         
         .actions-grid {
@@ -95,39 +147,39 @@
         }
         
         .action-card {
-            background: #222;
+            background: var(--bg-card);
             padding: 1.5rem;
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(160, 32, 240, 0.3);
+            box-shadow: var(--shadow);
             text-align: center;
             transition: all 0.3s;
-            border: 1px solid #6a0dad;
+            border: 1px solid var(--border-color);
         }
         
         .action-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 6px 20px rgba(160, 32, 240, 0.4);
+            box-shadow: var(--shadow-hover);
         }
         
         .action-card .icon {
             font-size: 2.5rem;
             margin-bottom: 1rem;
-            color: #a020f0;
+            color: var(--accent-color);
         }
         
         .action-card h3 {
-            color: #d8b0ff;
+            color: var(--text-primary);
             margin-bottom: 0.5rem;
         }
         
         .action-card p {
-            color: #bbb;
+            color: var(--text-secondary);
             font-size: 0.9rem;
             margin-bottom: 1rem;
         }
         
         .btn-action {
-            background: linear-gradient(135deg, #6a0dad 0%, #a020f0 100%);
+            background: var(--accent-gradient);
             color: white;
             padding: 10px 20px;
             border: none;
@@ -136,16 +188,16 @@
             display: inline-block;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(160, 32, 240, 0.3);
+            box-shadow: var(--shadow);
         }
         
         .btn-action:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(160, 32, 240, 0.4);
+            box-shadow: var(--shadow-hover);
         }
         
         .btn-action.disabled {
-            background: #555;
+            background: var(--text-secondary);
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
@@ -159,22 +211,23 @@
         }
         
         .stat-card {
-            background: white;
+            background: var(--bg-card);
             padding: 1.5rem;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
             text-align: center;
+            border: 1px solid var(--border-color);
         }
         
         .stat-card .number {
             font-size: 2rem;
             font-weight: bold;
-            color: #667eea;
+            color: var(--accent-color);
             margin-bottom: 0.5rem;
         }
         
         .stat-card .label {
-            color: #666;
+            color: var(--text-secondary);
             font-size: 0.9rem;
         }
         
@@ -184,18 +237,26 @@
                 gap: 10px;
             }
             
+            .user-info {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
             .actions-grid {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
-<body>
+<body data-theme="dark">
     <nav class="navbar">
         <div class="navbar-content">
             <h1>Panel Administrador</h1>
             <div class="user-info">
                 <span class="rol-badge" id="userRole">ADMIN</span>
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    🌙
+                </button>
                 <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
             </div>
         </div>
@@ -219,26 +280,45 @@
                 <div class="icon">💵</div>
                 <h3>Ventas</h3>
                 <p>Ver y gestionar las ventas realizadas</p>
-                <a href="#" class="btn-action disabled">Ver Ventas (Próximamente)</a>
-            </div>
-            
-            <div class="action-card">
-                <div class="icon">👥</div>
-                <h3>Usuarios</h3>
-                <p>Administrar usuarios del sistema</p>
-                <a href="#" class="btn-action disabled">Gestionar Usuarios (Próximamente)</a>
+                <a href="/html/admin-ventas.html" class="btn-action">Ver Ventas</a>
             </div>
             
             <div class="action-card">
                 <div class="icon">📊</div>
                 <h3>Auditoría</h3>
                 <p>Revisar logs y estadísticas del sistema</p>
-                <a href="#" class="btn-action disabled">Ver Auditoría (Próximamente)</a>
+                <a href="/html/admin-auditoria.html" class="btn-action">Ver Auditoría</a>
             </div>
         </div>
 
     <script>
         const API_BASE = '/api';
+        
+        // Toggle tema
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.setAttribute('data-theme', 'light');
+                themeToggle.innerHTML = '☀️';
+                localStorage.setItem('admin-theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeToggle.innerHTML = '🌙';
+                localStorage.setItem('admin-theme', 'dark');
+            }
+        }
+        
+        // Cargar tema guardado
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('admin-theme') || 'dark';
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            body.setAttribute('data-theme', savedTheme);
+            themeToggle.innerHTML = savedTheme === 'dark' ? '🌙' : '☀️';
+        }
         
         // Verificar autenticación
         async function checkAuth() {
@@ -287,6 +367,7 @@
         
         // Inicializar página
         window.addEventListener('DOMContentLoaded', async function() {
+            loadTheme();
             const isAuthenticated = await checkAuth();
             if (isAuthenticated) {
                 await loadStats();

@@ -3,8 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../img/HP_LOGO.png">
     <title>Login Administrador - Hachis Parmentier</title>
     <style>
+        :root {
+            --bg-primary-light: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 50%, #ddd6fe 100%);
+            --bg-primary-dark: linear-gradient(135deg, #1a1a1a 0%, #4b0082 50%, #000000 100%);
+            --bg-card-light: #ffffff;
+            --bg-card-dark: #222;
+            --text-primary-light: #4c1d95;
+            --text-primary-dark: #f0f0f0;
+            --text-secondary-light: #6b7280;
+            --text-secondary-dark: #d8b0ff;
+            --border-light: #e5e7eb;
+            --border-dark: #6a0dad;
+            --accent-color: #6a0dad;
+            --accent-gradient: linear-gradient(135deg, #6a0dad 0%, #a020f0 100%);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: var(--bg-primary-light);
+            --bg-card: var(--bg-card-light);
+            --text-primary: var(--text-primary-light);
+            --text-secondary: var(--text-secondary-light);
+            --border-color: var(--border-light);
+            --shadow: 0 10px 25px rgba(106, 13, 173, 0.1);
+            --input-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: var(--bg-primary-dark);
+            --bg-card: var(--bg-card-dark);
+            --text-primary: var(--text-primary-dark);
+            --text-secondary: var(--text-secondary-dark);
+            --border-color: var(--border-dark);
+            --shadow: 0 10px 25px rgba(160, 32, 240, 0.3);
+            --input-bg: #333;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,37 +49,58 @@
         
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #4b0082 50%, #000000 100%);
+            background: var(--bg-primary);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            transition: all 0.3s ease;
         }
         
         .login-container {
-            background: #222;
+            background: var(--bg-card);
             padding: 2rem;
             border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(160, 32, 240, 0.3);
+            box-shadow: var(--shadow);
             width: 100%;
             max-width: 400px;
-            border: 1px solid #6a0dad;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        .theme-toggle {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: transform 0.2s;
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.05);
         }
         
         .logo {
             text-align: center;
             margin-bottom: 2rem;
+            margin-top: 1rem;
         }
         
         .logo h1 {
-            color: #a020f0;
+            color: var(--accent-color);
             font-size: 1.8rem;
             margin-bottom: 0.5rem;
-            text-shadow: 0 0 10px rgba(160, 32, 240, 0.5);
+            text-shadow: 0 0 10px rgba(160, 32, 240, 0.3);
         }
         
         .logo p {
-            color: #d8b0ff;
+            color: var(--text-secondary);
             font-size: 0.9rem;
         }
         
@@ -54,35 +111,36 @@
         label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #d8b0ff;
+            color: var(--text-secondary);
             font-weight: bold;
         }
         
         input[type="email"], input[type="password"] {
             width: 100%;
             padding: 12px;
-            border: 2px solid #6a0dad;
+            border: 2px solid var(--border-color);
             border-radius: 8px;
             font-size: 1rem;
             transition: all 0.3s;
-            background-color: #333;
-            color: #f0f0f0;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
         }
         
         input[type="email"]:focus, input[type="password"]:focus {
             outline: none;
-            border-color: #a020f0;
+            border-color: var(--accent-color);
             box-shadow: 0 0 10px rgba(160, 32, 240, 0.3);
         }
         
         input[type="email"]::placeholder, input[type="password"]::placeholder {
-            color: #bbb;
+            color: var(--text-secondary);
+            opacity: 0.7;
         }
         
         .btn-login {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(135deg, #6a0dad 0%, #a020f0 100%);
+            background: var(--accent-gradient);
             color: white;
             border: none;
             border-radius: 8px;
@@ -90,7 +148,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(160, 32, 240, 0.3);
+            box-shadow: var(--shadow);
         }
         
         .btn-login:hover:not(:disabled) {
@@ -113,15 +171,15 @@
         }
         
         .alert-error {
-            background-color: #4a1a1a;
-            color: #ff6b6b;
-            border: 1px solid #8b0000;
+            background-color: rgba(248, 215, 218, 0.3);
+            color: #721c24;
+            border: 1px solid rgba(245, 198, 203, 0.5);
         }
         
         .alert-success {
-            background-color: #1a4a1a;
-            color: #4ade80;
-            border: 1px solid #006400;
+            background-color: rgba(212, 237, 218, 0.3);
+            color: #155724;
+            border: 1px solid rgba(195, 230, 203, 0.5);
         }
         
         .back-link {
@@ -130,20 +188,24 @@
         }
         
         .back-link a {
-            color: #a020f0;
+            color: var(--accent-color);
             text-decoration: none;
             font-size: 0.9rem;
             transition: color 0.3s;
         }
         
         .back-link a:hover {
-            color: #d020d0;
+            color: var(--text-primary);
             text-decoration: underline;
         }
     </style>
 </head>
-<body>
+<body data-theme="dark">
     <div class="login-container">
+        <button class="theme-toggle" onclick="toggleTheme()">
+            🌙
+        </button>
+        
         <div class="logo">
             <h1>Panel Admin</h1>
             <p>Hachis Parmentier</p>
@@ -172,6 +234,32 @@
 
     <script>
         const API_BASE = '/api';
+        
+        // Toggle tema
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.setAttribute('data-theme', 'light');
+                themeToggle.innerHTML = '☀️';
+                localStorage.setItem('admin-theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeToggle.innerHTML = '🌙';
+                localStorage.setItem('admin-theme', 'dark');
+            }
+        }
+        
+        // Cargar tema guardado
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('admin-theme') || 'dark';
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            body.setAttribute('data-theme', savedTheme);
+            themeToggle.innerHTML = savedTheme === 'dark' ? '🌙' : '☀️';
+        }
         
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -270,6 +358,8 @@
         
         // Verificar si ya está logueado
         window.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            
             const token = localStorage.getItem('token');
             if (token) {
                 // Validar token antes de redirigir

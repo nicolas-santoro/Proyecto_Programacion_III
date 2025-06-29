@@ -3,8 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../img/HP_LOGO.png">
     <title>Producto - Hachis Parmentier</title>
     <style>
+        :root {
+            --bg-primary-light: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 50%, #ddd6fe 100%);
+            --bg-primary-dark: linear-gradient(135deg, #1a1a1a 0%, #4b0082 50%, #000000 100%);
+            --bg-card-light: #ffffff;
+            --bg-card-dark: #222;
+            --text-primary-light: #4c1d95;
+            --text-primary-dark: #f0f0f0;
+            --text-secondary-light: #6b7280;
+            --text-secondary-dark: #d8b0ff;
+            --border-light: #e5e7eb;
+            --border-dark: #6a0dad;
+            --accent-color: #6a0dad;
+            --accent-gradient: linear-gradient(135deg, #6a0dad 0%, #a020f0 100%);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: var(--bg-primary-light);
+            --bg-card: var(--bg-card-light);
+            --text-primary: var(--text-primary-light);
+            --text-secondary: var(--text-secondary-light);
+            --border-color: var(--border-light);
+            --shadow: 0 2px 10px rgba(106, 13, 173, 0.1);
+            --input-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: var(--bg-primary-dark);
+            --bg-card: var(--bg-card-dark);
+            --text-primary: var(--text-primary-dark);
+            --text-secondary: var(--text-secondary-dark);
+            --border-color: var(--border-dark);
+            --shadow: 0 2px 10px rgba(160, 32, 240, 0.2);
+            --input-bg: #333;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,16 +49,17 @@
         
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #4b0082 50%, #000000 100%);
-            color: #f0f0f0;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
+            transition: all 0.3s ease;
         }
         
         .navbar {
-            background: linear-gradient(135deg, #6a0dad 0%, #a020f0 100%);
+            background: var(--accent-gradient);
             color: white;
             padding: 1rem 0;
-            box-shadow: 0 4px 15px rgba(160, 32, 240, 0.3);
+            box-shadow: var(--shadow);
         }
         
         .navbar-content {
@@ -36,6 +73,27 @@
         
         .navbar h1 {
             font-size: 1.5rem;
+        }
+        
+        .navbar-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .theme-toggle {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.3);
         }
         
         .back-link {
@@ -58,10 +116,11 @@
         }
         
         .form-container {
-            background: white;
+            background: var(--bg-card);
             padding: 2rem;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
         }
         
         .form-header {
@@ -70,12 +129,12 @@
         }
         
         .form-header h2 {
-            color: #333;
+            color: var(--text-primary);
             margin-bottom: 0.5rem;
         }
         
         .form-header p {
-            color: #666;
+            color: var(--text-secondary);
         }
         
         .form-group {
@@ -85,7 +144,7 @@
         label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #333;
+            color: var(--text-primary);
             font-weight: bold;
         }
         
@@ -95,17 +154,19 @@
         select {
             width: 100%;
             padding: 12px;
-            border: 2px solid #ddd;
+            border: 2px solid var(--border-color);
             border-radius: 5px;
             font-size: 1rem;
             transition: border-color 0.3s;
+            background: var(--input-bg);
+            color: var(--text-primary);
         }
         
         input:focus, 
         textarea:focus, 
         select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--accent-color);
         }
         
         textarea {
@@ -130,17 +191,19 @@
         .file-input-label {
             display: block;
             padding: 12px;
-            border: 2px dashed #ddd;
+            border: 2px dashed var(--border-color);
             border-radius: 5px;
             text-align: center;
             cursor: pointer;
             transition: border-color 0.3s;
-            background-color: #f9f9f9;
+            background-color: var(--bg-card);
+            color: var(--text-secondary);
         }
         
         .file-input-label:hover {
-            border-color: #667eea;
-            background-color: #f0f0f0;
+            border-color: var(--accent-color);
+            background-color: var(--border-color);
+            opacity: 0.1;
         }
         
         .current-image {
@@ -148,7 +211,7 @@
             max-height: 200px;
             border-radius: 10px;
             margin-bottom: 1rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
         }
         
         .form-actions {
@@ -174,12 +237,12 @@
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #6a0dad 0%, #a020f0 100%);
+            background: var(--accent-gradient);
             color: white;
         }
         
         .btn-secondary {
-            background: #6c757d;
+            background: var(--text-secondary);
             color: white;
         }
         
@@ -192,15 +255,15 @@
         }
         
         .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background-color: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+            border: 1px solid rgba(74, 222, 128, 0.3);
         }
         
         .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
         
         .loading {
@@ -209,6 +272,11 @@
         }
         
         @media (max-width: 768px) {
+            .navbar-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
             .form-actions {
                 flex-direction: column;
             }
@@ -219,11 +287,16 @@
         }
     </style>
 </head>
-<body>
+<body data-theme="dark">
     <nav class="navbar">
         <div class="navbar-content">
             <h1 id="page-title">Nuevo Producto</h1>
-            <a href="#" class="back-link" onclick="volverAlDashboard()">← Volver al Dashboard</a>
+            <div class="navbar-controls">
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    🌙
+                </button>
+                <a href="#" class="back-link" onclick="volverAlDashboard()">← Volver al Dashboard</a>
+            </div>
         </div>
     </nav>
 
@@ -286,8 +359,36 @@
         let isEditMode = false;
         let productoId = null;
 
+        // Toggle tema
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.setAttribute('data-theme', 'light');
+                themeToggle.innerHTML = '☀️';
+                localStorage.setItem('admin-theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeToggle.innerHTML = '🌙';
+                localStorage.setItem('admin-theme', 'dark');
+            }
+        }
+        
+        // Cargar tema guardado
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('admin-theme') || 'dark';
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            body.setAttribute('data-theme', savedTheme);
+            themeToggle.innerHTML = savedTheme === 'dark' ? '🌙' : '☀️';
+        }
+
         // Verificar autenticación al cargar la página
         window.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            
             const token = localStorage.getItem('token');
             if (!token) {
                 window.location.href = '/html/admin-login.html';

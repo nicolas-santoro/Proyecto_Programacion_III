@@ -3,8 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../img/HP_LOGO.png">
     <title>Gestión de Productos - Hachis Parmentier</title>
     <style>
+        :root {
+            --bg-primary-light: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 50%, #ddd6fe 100%);
+            --bg-primary-dark: linear-gradient(135deg, #1a1a1a 0%, #4b0082 50%, #000000 100%);
+            --bg-card-light: #ffffff;
+            --bg-card-dark: #222;
+            --text-primary-light: #4c1d95;
+            --text-primary-dark: #f0f0f0;
+            --text-secondary-light: #6b7280;
+            --text-secondary-dark: #d8b0ff;
+            --border-light: #e5e7eb;
+            --border-dark: #6a0dad;
+            --accent-color: #6a0dad;
+            --accent-gradient: linear-gradient(135deg, #6a0dad 0%, #a020f0 100%);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: var(--bg-primary-light);
+            --bg-card: var(--bg-card-light);
+            --text-primary: var(--text-primary-light);
+            --text-secondary: var(--text-secondary-light);
+            --border-color: var(--border-light);
+            --shadow: 0 4px 15px rgba(106, 13, 173, 0.1);
+            --shadow-hover: 0 6px 20px rgba(106, 13, 173, 0.2);
+            --input-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: var(--bg-primary-dark);
+            --bg-card: var(--bg-card-dark);
+            --text-primary: var(--text-primary-dark);
+            --text-secondary: var(--text-secondary-dark);
+            --border-color: var(--border-dark);
+            --shadow: 0 4px 15px rgba(160, 32, 240, 0.3);
+            --shadow-hover: 0 6px 20px rgba(160, 32, 240, 0.4);
+            --input-bg: #333;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,16 +51,17 @@
         
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #4b0082 50%, #000000 100%);
-            color: #f0f0f0;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
+            transition: all 0.3s ease;
         }
         
         .navbar {
-            background: linear-gradient(135deg, #6a0dad 0%, #a020f0 100%);
+            background: var(--accent-gradient);
             color: white;
             padding: 1rem 0;
-            box-shadow: 0 4px 15px rgba(160, 32, 240, 0.3);
+            box-shadow: var(--shadow);
         }
         
         .navbar-content {
@@ -36,6 +75,27 @@
         
         .navbar h1 {
             font-size: 1.5rem;
+        }
+        
+        .navbar-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .theme-toggle {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.3);
         }
         
         .back-link {
@@ -64,24 +124,24 @@
         }
         
         .page-header h2 {
-            color: #a020f0;
-            text-shadow: 0 0 10px rgba(160, 32, 240, 0.5);
+            color: var(--accent-color);
+            text-shadow: 0 0 10px rgba(160, 32, 240, 0.3);
         }
         
         .btn-add {
-            background: linear-gradient(135deg, #6a0dad 0%, #a020f0 100%);
+            background: var(--accent-gradient);
             color: white;
             padding: 12px 20px;
             border-radius: 8px;
             text-decoration: none;
             font-weight: bold;
             transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(160, 32, 240, 0.3);
+            box-shadow: var(--shadow);
         }
         
         .btn-add:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(160, 32, 240, 0.4);
+            box-shadow: var(--shadow-hover);
         }
         
         .products-grid {
@@ -91,29 +151,29 @@
         }
         
         .product-card {
-            background: #222;
+            background: var(--bg-card);
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(160, 32, 240, 0.3);
+            box-shadow: var(--shadow);
             overflow: hidden;
             transition: all 0.3s;
-            border: 1px solid #6a0dad;
+            border: 1px solid var(--border-color);
         }
         
         .product-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 6px 20px rgba(160, 32, 240, 0.4);
+            box-shadow: var(--shadow-hover);
         }
         
         .product-card.inactive {
             opacity: 0.6;
-            border-color: #666;
+            border-color: var(--text-secondary);
         }
         
         .product-image {
             width: 100%;
             height: 200px;
             object-fit: cover;
-            background: #333;
+            background: var(--border-color);
         }
         
         .product-content {
@@ -123,12 +183,12 @@
         .product-title {
             font-size: 1.2rem;
             font-weight: bold;
-            color: #d8b0ff;
+            color: var(--text-primary);
             margin-bottom: 0.5rem;
         }
         
         .product-description {
-            color: #bbb;
+            color: var(--text-secondary);
             font-size: 0.9rem;
             margin-bottom: 1rem;
             line-height: 1.4;
@@ -150,7 +210,7 @@
         }
         
         .product-category {
-            background: linear-gradient(135deg, #6a0dad 0%, #a020f0 100%);
+            background: var(--accent-gradient);
             color: white;
             padding: 4px 8px;
             border-radius: 12px;
@@ -166,13 +226,13 @@
         }
         
         .product-status.active {
-            background: #1a4a1a;
+            background: rgba(74, 222, 128, 0.2);
             color: #4ade80;
         }
         
         .product-status.inactive {
-            background: #4a1a1a;
-            color: #ff6b6b;
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
         }
         
         .product-actions {
@@ -219,13 +279,13 @@
         .empty-state {
             text-align: center;
             padding: 3rem;
-            color: #bbb;
+            color: var(--text-secondary);
         }
         
         .empty-state .icon {
             font-size: 4rem;
             margin-bottom: 1rem;
-            color: #6a0dad;
+            color: var(--accent-color);
         }
         
         .alert {
@@ -237,15 +297,15 @@
         }
         
         .alert-success {
-            background-color: #1a4a1a;
+            background-color: rgba(74, 222, 128, 0.2);
             color: #4ade80;
-            border: 1px solid #006400;
+            border: 1px solid rgba(74, 222, 128, 0.3);
         }
         
         .alert-error {
-            background-color: #4a1a1a;
-            color: #ff6b6b;
-            border: 1px solid #8b0000;
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
         
         .filter-buttons {
@@ -257,21 +317,22 @@
         
         .filter-btn {
             padding: 8px 16px;
-            border: 2px solid #6a0dad;
-            background: transparent;
-            color: #a020f0;
+            border: 2px solid var(--accent-color);
+            background: var(--bg-card);
+            color: var(--accent-color);
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
         }
         
         .filter-btn.active {
-            background: linear-gradient(135deg, #6a0dad 0%, #a020f0 100%);
+            background: var(--accent-gradient);
             color: white;
         }
         
         .filter-btn:hover {
-            background: rgba(160, 32, 240, 0.2);
+            background: var(--accent-color);
+            color: white;
         }
         
         .modal {
@@ -286,16 +347,17 @@
         }
         
         .modal-content {
-            background: #fff;
+            background: var(--bg-card);
             margin: 5% auto;
             padding: 20px;
             border-radius: 10px;
             width: 90%;
             max-width: 500px;
-            color: #333;
+            color: var(--text-primary);
             position: relative;
             max-height: 80vh;
             overflow-y: auto;
+            border: 1px solid var(--border-color);
         }
         
         .modal-header {
@@ -304,16 +366,16 @@
             align-items: center;
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #6a0dad;
+            border-bottom: 2px solid var(--accent-color);
         }
         
         .modal-header h3 {
-            color: #6a0dad;
+            color: var(--accent-color);
             margin: 0;
         }
         
         .close {
-            color: #aaa;
+            color: var(--text-secondary);
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
@@ -321,7 +383,7 @@
         }
         
         .close:hover {
-            color: #6a0dad;
+            color: var(--accent-color);
         }
         
         .form-group {
@@ -332,22 +394,24 @@
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
-            color: #333;
+            color: var(--text-primary);
         }
         
         .form-group input,
         .form-group select {
             width: 100%;
             padding: 10px;
-            border: 2px solid #ddd;
+            border: 2px solid var(--border-color);
             border-radius: 5px;
             font-size: 16px;
+            background: var(--input-bg);
+            color: var(--text-primary);
         }
         
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
-            border-color: #6a0dad;
+            border-color: var(--accent-color);
         }
         
         .current-image {
@@ -359,7 +423,7 @@
         }
         
         .btn-modal {
-            background: linear-gradient(135deg, #6a0dad 0%, #a020f0 100%);
+            background: var(--accent-gradient);
             color: white;
             padding: 12px 20px;
             border: none;
@@ -372,18 +436,24 @@
         
         .btn-modal:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(160, 32, 240, 0.4);
+            box-shadow: var(--shadow-hover);
         }
         
         .btn-cancel {
-            background: #666;
+            background: var(--text-secondary);
         }
         
         .btn-cancel:hover {
-            background: #555;
+            background: var(--text-primary);
+            opacity: 0.8;
         }
         
         @media (max-width: 768px) {
+            .navbar-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
             .page-header {
                 flex-direction: column;
                 gap: 15px;
@@ -400,11 +470,16 @@
         }
     </style>
 </head>
-<body>
+<body data-theme="dark">
     <nav class="navbar">
         <div class="navbar-content">
-            <h1>📚 Gestión de Productos</h1>
-            <a href="/html/admin-dashboard.html" class="back-link">← Volver al Dashboard</a>
+            <h1>Gestión de Productos</h1>
+            <div class="navbar-controls">
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    🌙
+                </button>
+                <a href="/html/admin-dashboard.html" class="back-link">← Volver al Dashboard</a>
+            </div>
         </div>
     </nav>
 
@@ -427,15 +502,16 @@
         </div>
     </div>
 
-    <!-- Modal para edición de productos -->
-    <div id="editProductModal" class="modal">
+    <!-- Modal reutilizable para edición, desactivación y reactivación -->
+    <div id="productModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Editar Producto</h3>
+                <h3 id="modalTitle">Editar Producto</h3>
                 <span class="close" id="closeModal">&times;</span>
             </div>
             
-            <div class="modal-body">
+            <!-- Formulario para edición -->
+            <div class="modal-body" id="editForm">
                 <div class="form-group">
                     <label for="productName">Nombre del Producto</label>
                     <input type="text" id="productName" placeholder="Ingrese el nombre del producto">
@@ -464,9 +540,18 @@
                 </div>
             </div>
             
+            <!-- Mensaje de confirmación para desactivar/reactivar -->
+            <div class="modal-body" id="confirmMessage" style="display: none;">
+                <div style="text-align: center; padding: 20px;">
+                    <div id="confirmIcon" style="font-size: 3rem; margin-bottom: 15px;">⚠️</div>
+                    <h4 id="confirmTitle" style="margin-bottom: 15px; color: #333;">¿Estás seguro?</h4>
+                    <p id="confirmText" style="color: #666; line-height: 1.5;"></p>
+                </div>
+            </div>
+            
             <div class="modal-footer">
-                <button class="btn-modal" id="saveChanges">Guardar Cambios</button>
-                <button class="btn-modal btn-cancel" id="cancelEdit">Cancelar</button>
+                <button class="btn-modal" id="modalActionBtn">Guardar Cambios</button>
+                <button class="btn-modal btn-cancel" id="modalCancelBtn">Cancelar</button>
             </div>
         </div>
     </div>
@@ -476,6 +561,33 @@
         let todosLosProductos = [];
         let filtroActual = 'todos';
         let productoEditando = null;
+        let modalMode = 'edit'; // 'edit', 'deactivate', 'reactivate'
+        
+        // Toggle tema
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.setAttribute('data-theme', 'light');
+                themeToggle.innerHTML = '☀️';
+                localStorage.setItem('admin-theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeToggle.innerHTML = '🌙';
+                localStorage.setItem('admin-theme', 'dark');
+            }
+        }
+        
+        // Cargar tema guardado
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('admin-theme') || 'dark';
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            body.setAttribute('data-theme', savedTheme);
+            themeToggle.innerHTML = savedTheme === 'dark' ? '🌙' : '☀️';
+        }
         
         // Verificar autenticación
         function checkAuth() {
@@ -602,216 +714,241 @@
             }
         }
         
+        // Configurar modal según el modo
+        function configureModal(mode, producto) {
+            modalMode = mode;
+            productoEditando = producto;
+            
+            const modal = document.getElementById('productModal');
+            const tituloModal = document.getElementById('modalTitle');
+            const formularioEdicion = document.getElementById('editForm');
+            const mensajeConfirmacion = document.getElementById('confirmMessage');
+            const iconoConfirmacion = document.getElementById('confirmIcon');
+            const tituloConfirmacion = document.getElementById('confirmTitle');
+            const textoConfirmacion = document.getElementById('confirmText');
+            const botonAccion = document.getElementById('modalActionBtn');
+            
+            // Restablecer estilos del botón
+            botonAccion.className = 'btn-modal';
+            
+            if (mode === 'edit') {
+                // Modo edición
+                tituloModal.textContent = 'Editar Producto';
+                formularioEdicion.style.display = 'block';
+                mensajeConfirmacion.style.display = 'none';
+                botonAccion.textContent = '💾 Guardar Cambios';
+                
+                // Llenar formulario
+                document.getElementById('productName').value = producto.nombre || '';
+                document.getElementById('productPrice').value = producto.precio || '';
+                document.getElementById('productCategory').value = producto.categoria || '';
+                document.getElementById('productImage').value = producto.imagen || '';
+                
+            } else if (mode === 'deactivate') {
+                // Modo desactivación
+                tituloModal.textContent = 'Desactivar Producto';
+                formularioEdicion.style.display = 'none';
+                mensajeConfirmacion.style.display = 'block';
+                
+                iconoConfirmacion.textContent = '❌';
+                iconoConfirmacion.style.color = '#dc3545';
+                tituloConfirmacion.textContent = '¿Desactivar producto?';
+                tituloConfirmacion.style.color = '#dc3545';
+                textoConfirmacion.innerHTML = `
+                    Estás a punto de desactivar el producto <strong>"${producto.nombre}"</strong>.<br><br>
+                    <em>Nota: El producto será marcado como inactivo pero NO se eliminará permanentemente. 
+                    Podrás recuperarlo después desde la sección de productos inactivos.</em>
+                `;
+                
+                botonAccion.textContent = 'Sí, desactivarlo';
+                botonAccion.classList.add('btn-delete');
+                
+            } else if (mode === 'reactivate') {
+                // Modo reactivación
+                tituloModal.textContent = 'Reactivar Producto';
+                formularioEdicion.style.display = 'none';
+                mensajeConfirmacion.style.display = 'block';
+                
+                iconoConfirmacion.textContent = '✅';
+                iconoConfirmacion.style.color = '#28a745';
+                tituloConfirmacion.textContent = '¿Reactivar producto?';
+                tituloConfirmacion.style.color = '#28a745';
+                textoConfirmacion.innerHTML = `
+                    Estás a punto de reactivar el producto <strong>"${producto.nombre}"</strong>.<br><br>
+                    <em>El producto volverá a estar disponible y visible para los clientes.</em>
+                `;
+                
+                botonAccion.textContent = 'Sí, reactivarlo';
+                botonAccion.classList.add('btn-recover');
+            }
+            
+            modal.style.display = 'block';
+        }
+        
         // Editar producto
         function editProduct(id) {
-            // Validar que el ID no esté vacío
             if (!id || id.trim() === '') {
                 showAlert('Error: ID de producto inválido', 'error');
                 return;
             }
             
-            // Buscar el producto por ID en la lista actual
-            productoEditando = todosLosProductos.find(p => p._id === id);
+            const producto = todosLosProductos.find(p => p._id === id);
             
-            if (productoEditando) {
-                // Llenar el formulario del modal con los datos del producto
-                document.getElementById('productName').value = productoEditando.nombre || '';
-                document.getElementById('productPrice').value = productoEditando.precio || '';
-                document.getElementById('productCategory').value = productoEditando.categoria || '';
-                document.getElementById('productImage').value = productoEditando.imagen || '';
-                
-                // Mostrar el modal
-                document.getElementById('editProductModal').style.display = 'block';
+            if (producto) {
+                configureModal('edit', producto);
             } else {
                 loadProductFromAPI(id);
             }
         }
         
-        // Cargar producto desde la API si no está en cache
-        async function loadProductFromAPI(id) {
-            const token = localStorage.getItem('token');
-            
-            try {
-                const response = await fetch(`${API_BASE}/admin/productos/${id}`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        throw new Error('Producto no encontrado');
-                    } else if (response.status === 401) {
-                        localStorage.removeItem('token');
-                        window.location.href = '/html/admin-login.html';
-                        return;
-                    } else {
-                        throw new Error(`Error HTTP ${response.status}`);
-                    }
-                }
-                
-                const data = await response.json();
-                
-                if (data.data) {
-                    productoEditando = data.data;
-                    
-                    // Llenar el formulario del modal
-                    document.getElementById('productName').value = productoEditando.nombre || '';
-                    document.getElementById('productPrice').value = productoEditando.precio || '';
-                    document.getElementById('productCategory').value = productoEditando.categoria || '';
-                    document.getElementById('productImage').value = productoEditando.imagen || '';
-                    
-                    // Mostrar el modal
-                    document.getElementById('editProductModal').style.display = 'block';
-                } else {
-                    throw new Error('Datos del producto no válidos');
-                }
-            } catch (error) {
-                showAlert('Error al cargar el producto: ' + error.message, 'error');
+        // Desactivar producto
+        function deleteProduct(id, nombre) {
+            const producto = todosLosProductos.find(p => p._id === id);
+            if (producto) {
+                configureModal('deactivate', producto);
+            } else {
+                showAlert('Producto no encontrado', 'error');
+            }
+        }
+        
+        // Reactivar producto
+        function recoverProduct(id, nombre) {
+            const producto = todosLosProductos.find(p => p._id === id);
+            if (producto) {
+                configureModal('reactivate', producto);
+            } else {
+                showAlert('Producto no encontrado', 'error');
             }
         }
         
         // Cerrar el modal
         document.getElementById('closeModal').onclick = function() {
-            document.getElementById('editProductModal').style.display = 'none';
+            document.getElementById('productModal').style.display = 'none';
         }
         
-        // Cancelar edición
-        document.getElementById('cancelEdit').onclick = function() {
-            document.getElementById('editProductModal').style.display = 'none';
+        // Cancelar acción
+        document.getElementById('modalCancelBtn').onclick = function() {
+            document.getElementById('productModal').style.display = 'none';
         }
         
         // Cerrar modal al hacer clic fuera de él
         window.onclick = function(event) {
-            const modal = document.getElementById('editProductModal');
+            const modal = document.getElementById('productModal');
             if (event.target === modal) {
                 modal.style.display = 'none';
             }
         }
         
-        // Guardar cambios del producto editado
-        document.getElementById('saveChanges').onclick = async function() {
+        // Manejar acción del botón principal del modal
+        document.getElementById('modalActionBtn').onclick = async function() {
             if (!productoEditando) return;
             
-            // Obtener los nuevos valores del formulario
+            if (modalMode === 'edit') {
+                await handleEditProduct();
+            } else if (modalMode === 'deactivate') {
+                await handleDeactivateProduct();
+            } else if (modalMode === 'reactivate') {
+                await handleReactivateProduct();
+            }
+        }
+        
+        // Manejar edición de producto
+        async function handleEditProduct() {
             const nombre = document.getElementById('productName').value.trim();
             const precio = parseFloat(document.getElementById('productPrice').value);
             const categoria = document.getElementById('productCategory').value;
             const imagen = document.getElementById('productImage').value.trim();
             
-            // Validar campos requeridos
             if (!nombre || !precio || !categoria) {
-                return showAlert('Por favor, complete todos los campos requeridos', 'error');
+                return showAlert('Por favor, completa todos los campos obligatorios', 'error');
             }
             
             if (precio <= 0) {
-                return showAlert('El precio debe ser mayor a 0', 'error');
+                return showAlert('El precio debe ser mayor a cero', 'error');
             }
             
             const token = localStorage.getItem('token');
             
             try {
-                const response = await fetch(`${API_BASE}/admin/productos/${productoEditando._id}`, {
+                const respuesta = await fetch(`${API_BASE}/admin/productos/${productoEditando._id}`, {
                     method: 'PUT',
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        nombre,
-                        precio,
-                        categoria,
-                        imagen
-                    })
+                    body: JSON.stringify({ nombre, precio, categoria, imagen })
                 });
                 
-                const data = await response.json();
+                const datos = await respuesta.json();
                 
-                if (response.ok && data.success) {
-                    showAlert(data.message || 'Producto actualizado exitosamente', 'success');
+                if (respuesta.ok && datos.success) {
+                    showAlert(datos.message || 'El producto se actualizó correctamente', 'success');
                     
-                    // Actualizar el producto en la lista local
-                    const index = todosLosProductos.findIndex(p => p._id === productoEditando._id);
-                    if (index !== -1) {
-                        todosLosProductos[index] = { ...todosLosProductos[index], nombre, precio, categoria, imagen };
+                    const indice = todosLosProductos.findIndex(p => p._id === productoEditando._id);
+                    if (indice !== -1) {
+                        todosLosProductos[indice] = { ...todosLosProductos[indice], nombre, precio, categoria, imagen };
                     }
                     
-                    // Volver a renderizar los productos
                     renderProducts();
-                    
-                    // Cerrar el modal
-                    document.getElementById('editProductModal').style.display = 'none';
-                } else if (response.status === 401) {
+                    document.getElementById('productModal').style.display = 'none';
+                } else if (respuesta.status === 401) {
                     localStorage.removeItem('token');
                     window.location.href = '/html/admin-login.html';
                 } else {
-                    throw new Error(data.message || 'Error al actualizar producto');
+                    throw new Error(datos.message || 'Error al actualizar el producto');
                 }
             } catch (error) {
                 showAlert('Error al actualizar el producto: ' + error.message, 'error');
             }
         }
         
-        // Desactivar producto (marcarlo como activo: false)
-        async function deleteProduct(id, nombre) {
-            if (!confirm(`¿Estás seguro de desactivar el producto "${nombre}"?\n\nNota: El producto será marcado como inactivo pero NO se eliminará permanentemente. Podrás recuperarlo después.`)) {
-                return;
-            }
-            
+        // Manejar desactivación de producto
+        async function handleDeactivateProduct() {
             const token = localStorage.getItem('token');
             
             try {
-                const response = await fetch(`${API_BASE}/admin/productos/${id}`, {
+                const respuesta = await fetch(`${API_BASE}/admin/productos/${productoEditando._id}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
                 
-                const rawText = await response.text();
-                
-                let data;
+                const textoRespuesta = await respuesta.text();
+                let datos;
                 try {
-                    data = JSON.parse(rawText);
-                } catch (parseError) {
-                    console.error('Error parsing JSON:', parseError);
-                    throw new Error('Respuesta del servidor no es JSON válido: ' + rawText.substring(0, 100));
+                    datos = JSON.parse(textoRespuesta);
+                } catch (errorParseo) {
+                    throw new Error('La respuesta del servidor no es válida: ' + textoRespuesta.substring(0, 100));
                 }
                 
-                if (response.ok) {
-                    if (data.success === true || data.success === 'true') {
-                        showAlert(data.message || 'Producto desactivado exitosamente', 'success');
+                if (respuesta.ok) {
+                    if (datos.success === true || datos.success === 'true') {
+                        showAlert(datos.message || 'El producto se desactivó correctamente', 'success');
                         
-                        // Si estamos viendo solo productos activos, cambiar a "todos" para mostrar el producto desactivado
                         if (filtroActual === 'activos') {
-                            // Cambiar el filtro a "todos"
                             document.querySelector('.filter-btn[data-filter="todos"]').click();
                         }
                         
-                        loadProducts(); // Recargar lista
+                        loadProducts();
+                        document.getElementById('productModal').style.display = 'none';
                     } else {
-                        throw new Error(data.message || 'Error al desactivar producto');
+                        throw new Error(datos.message || 'Error al desactivar el producto');
                     }
                 } else {
-                    throw new Error(data.message || 'Error al desactivar producto');
+                    throw new Error(datos.message || 'Error al desactivar el producto');
                 }
             } catch (error) {
                 showAlert('Error al desactivar el producto: ' + error.message, 'error');
             }
         }
         
-        // Recuperar producto (marcarlo como activo: true)
-        async function recoverProduct(id, nombre) {
-            if (!confirm(`¿Estás seguro de reactivar el producto "${nombre}"?`)) {
-                return;
-            }
-            
+        // Manejar reactivación de producto
+        async function handleReactivateProduct() {
             const token = localStorage.getItem('token');
             
             try {
-                const response = await fetch(`${API_BASE}/admin/productos/${id}/recuperar`, {
+                const respuesta = await fetch(`${API_BASE}/admin/productos/${productoEditando._id}/recuperar`, {
                     method: 'PATCH',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -819,24 +956,24 @@
                     }
                 });
                 
-                const rawText = await response.text();
-                
-                let data;
+                const textoRespuesta = await respuesta.text();
+                let datos;
                 try {
-                    data = JSON.parse(rawText);
-                } catch (parseError) {
-                    throw new Error('Respuesta del servidor no es JSON válido: ' + rawText.substring(0, 100));
+                    datos = JSON.parse(textoRespuesta);
+                } catch (errorParseo) {
+                    throw new Error('La respuesta del servidor no es válida: ' + textoRespuesta.substring(0, 100));
                 }
                 
-                if (response.ok) {
-                    if (data.success === true || data.success === 'true') {
-                        showAlert(data.message || 'Producto reactivado exitosamente', 'success');
-                        loadProducts(); // Recargar lista
+                if (respuesta.ok) {
+                    if (datos.success === true || datos.success === 'true') {
+                        showAlert(datos.message || 'El producto se reactivó correctamente', 'success');
+                        loadProducts();
+                        document.getElementById('productModal').style.display = 'none';
                     } else {
-                        throw new Error(data.message || 'Error al reactivar producto');
+                        throw new Error(datos.message || 'Error al reactivar el producto');
                     }
                 } else {
-                    throw new Error(data.message || 'Error al reactivar producto');
+                    throw new Error(datos.message || 'Error al reactivar el producto');
                 }
             } catch (error) {
                 showAlert('Error al reactivar el producto: ' + error.message, 'error');
@@ -845,23 +982,69 @@
         
         // Manejar filtros
         function setupFilters() {
-            const filterButtons = document.querySelectorAll('.filter-btn');
+            const botonesFilter = document.querySelectorAll('.filter-btn');
             
-            filterButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
+            botonesFilter.forEach(boton => {
+                boton.addEventListener('click', () => {
                     // Remover clase active de todos los botones
-                    filterButtons.forEach(b => b.classList.remove('active'));
+                    botonesFilter.forEach(b => b.classList.remove('active'));
                     
                     // Agregar clase active al botón clickeado
-                    btn.classList.add('active');
+                    boton.classList.add('active');
                     
                     // Actualizar filtro actual
-                    filtroActual = btn.dataset.filter;
+                    filtroActual = boton.dataset.filter;
                     
                     // Renderizar productos con el nuevo filtro
                     renderProducts();
                 });
             });
+        }
+        
+        // Cargar producto desde la API si no está en cache
+        async function loadProductFromAPI(id) {
+            const token = localStorage.getItem('token');
+            
+            try {
+                const respuesta = await fetch(`${API_BASE}/admin/productos/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!respuesta.ok) {
+                    if (respuesta.status === 404) {
+                        throw new Error('Producto no encontrado');
+                    } else if (respuesta.status === 401) {
+                        localStorage.removeItem('token');
+                        window.location.href = '/html/admin-login.html';
+                        return;
+                    } else {
+                        throw new Error(`Error HTTP ${respuesta.status}`);
+                    }
+                }
+                
+                const datos = await respuesta.json();
+                
+                if (datos.data) {
+                    productoEditando = datos.data;
+                    
+                    // Llenar el formulario del modal
+                    document.getElementById('productName').value = productoEditando.nombre || '';
+                    document.getElementById('productPrice').value = productoEditando.precio || '';
+                    document.getElementById('productCategory').value = productoEditando.categoria || '';
+                    document.getElementById('productImage').value = productoEditando.imagen || '';
+                    
+                    // Mostrar el modal
+                    document.getElementById('productModal').style.display = 'block';
+                } else {
+                    throw new Error('Datos del producto no válidos');
+                }
+            } catch (error) {
+                showAlert('Error al cargar el producto: ' + error.message, 'error');
+            }
         }
         
         // Mapeo específico de productos que tienen nombres de archivo diferentes
@@ -1037,6 +1220,7 @@
         // Inicializar página
         window.addEventListener('DOMContentLoaded', function() {
             if (checkAuth()) {
+                loadTheme();
                 setupFilters();
                 loadProducts();
                 
@@ -1052,4 +1236,5 @@
         });
     </script>
 </body>
+</html>
 </html>
