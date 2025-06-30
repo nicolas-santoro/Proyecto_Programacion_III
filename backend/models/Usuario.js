@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+// Modelo para crear usuarios
 const usuarioSchema = new mongoose.Schema({
   nombre: String,
   email: {
@@ -21,7 +22,7 @@ const usuarioSchema = new mongoose.Schema({
   }
 });
 
-// anntes de guardar la contraseña, se la encripta la contraseña si fue modificada
+// Antes de guardar la contraseña, se la encripta solo si fue modificada
 usuarioSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(10);
@@ -29,12 +30,12 @@ usuarioSchema.pre('save', async function (next) {
   next();
 });
 
-//Método para validad la contraseña
+// Método para validad la contraseña (comparando los datos de la BD con los ingresados)
 usuarioSchema.methods.validPassword = async function (passwordIngresada) {
   return await bcrypt.compare(passwordIngresada, this.password);
 };
 
-// Método para generar JWT
+// Método para generar Tóken JWT
 usuarioSchema.methods.generarJWT = function() {
   return jwt.sign(
     { id: this._id, email: this.email, rol: this.rol },

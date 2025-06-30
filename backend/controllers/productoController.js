@@ -1,6 +1,6 @@
 const Producto = require('../models/Producto');
 
-// Obtener productos activos
+// Obtener todos los productos activos (disponibles para venta)
 exports.obtenerProductos = async (req, res) => {
   try {
     const productos = await Producto.find({ activo: true });
@@ -10,7 +10,7 @@ exports.obtenerProductos = async (req, res) => {
   }
 };
 
-//  Buscar productos por nombre (/search?nombre=xxx)
+// Buscar productos activos por nombre (consulta tipo /search?nombre=xxx)
 exports.buscarProducto = async (req, res) => {
   try {
     const { nombre } = req.query;
@@ -18,6 +18,7 @@ exports.buscarProducto = async (req, res) => {
       return res.status(400).json({ error: 'Debes proporcionar un nombre para buscar' });
     }
 
+    // Busca con expresión regular insensible a mayúsculas
     const productos = await Producto.find({ 
       nombre: { $regex: nombre, $options: 'i' }, 
       activo: true 
@@ -29,7 +30,7 @@ exports.buscarProducto = async (req, res) => {
   }
 };
 
-//  Buscar producto por ID
+// Buscar producto por su ID
 exports.buscarProductoPorId = async (req, res) => {
   try {
     const { id } = req.params;
@@ -43,7 +44,7 @@ exports.buscarProductoPorId = async (req, res) => {
   }
 };
 
-//  Crear producto nuevo
+// Crear un nuevo producto (requiere nombre, precio y categoría)
 exports.crearProducto = async (req, res) => {
   try {
     const { nombre, precio, categoria } = req.body;
@@ -54,7 +55,7 @@ exports.crearProducto = async (req, res) => {
       });
     }
 
-    // Manejar la imagen si se sube
+    // Si se sube una imagen, guardarla con la ruta correspondiente
     const datosProducto = { ...req.body, activo: true };
     if (req.file) {
       datosProducto.imagen = `/uploads/${req.file.filename}`;
@@ -63,7 +64,7 @@ exports.crearProducto = async (req, res) => {
     const nuevo = new Producto(datosProducto); 
     await nuevo.save();
 
-    // Registrar la acción
+    // Registrar la acción en auditoría
     const Acciones = require('../models/Acciones');
     await Acciones.create({
       usuario: req.user.id,
@@ -85,7 +86,7 @@ exports.crearProducto = async (req, res) => {
   }
 };
 
-//  Actualizar producto
+// Actualizar datos de un producto por su ID
 exports.modificarProducto = async (req, res) => {
   try {
     const { id } = req.params;
@@ -99,146 +100,70 @@ exports.modificarProducto = async (req, res) => {
   }
 };
 
-//  Borrar producto (marcar como inactivo) - Solo admin
+// "Borrado suave" de producto: marcar como inactivo sin eliminar (solo admin)
+// Incluye logs de auditoría con manejo de errores para no interrumpir el flujo
 exports.borrarProducto = async (req, res) => {
   try {
-    console.log('🗑️ INICIANDO BORRADO SUAVE DE PRODUCTO');
-    console.log('ID del producto:', req.params.id);
-    console.log('Usuario:', req.user ? req.user.email : 'No identificado');
-    console.log('Usuario completo:', req.user);
-    
     const { id } = req.params;
-    console.log('🔍 Buscando producto con ID:', id);
-    
     const producto = await Producto.findByIdAndUpdate(id, { activo: false }, { new: true });
 
-    console.log('Producto encontrado:', producto ? 'SÍ' : 'NO');
-    if (producto) {
-      console.log('Estado del producto después del update:', producto.activo);
-      console.log('Nombre del producto:', producto.nombre);
-    }
-
     if (!producto) {
-      console.log('❌ Producto no encontrado');
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Producto no encontrado' 
-      });
+      return res.status(404).json({ success: false, message: 'Producto no encontrado' });
     }
 
-    console.log('📝 Registrando acción de auditoría...');
-    console.log('Usuario ID:', req.user.id);
-    console.log('Usuario nombre:', req.user.nombre);
-    
-    // Registrar acción de auditoría
     try {
       const Acciones = require('../models/Acciones');
-      const accionData = {
+      await Acciones.create({
         usuario: req.user.id,
         accion: 'DESACTIVAR_PRODUCTO',
         detalles: `Usuario ${req.user.nombre} desactivó producto: ${producto.nombre}`
-      };
-      console.log('Datos de acción a crear:', accionData);
-      
-      const accionCreada = await Acciones.create(accionData);
-      console.log('✅ Acción de auditoría creada exitosamente:', accionCreada._id);
+      });
     } catch (auditError) {
-      console.error('❌ Error al crear acción de auditoría:', auditError);
-      console.error('Stack trace:', auditError.stack);
-      // No fallar la operación principal por un error de auditoría
-      console.log('⚠️ Continuando sin registrar auditoría...');
+      console.error('Error al registrar auditoría:', auditError);
+      // Continuar sin bloquear la respuesta principal
     }
 
-    console.log('✅ Producto desactivado exitosamente');
-    return res.status(200).json({ 
-      success: true,
-      message: 'Producto desactivado exitosamente',
-      data: producto 
-    });
+    return res.status(200).json({ success: true, message: 'Producto desactivado exitosamente', data: producto });
   } catch (error) {
-    console.error('❌ Error al desactivar producto:', error);
-    console.error('Stack trace completo:', error.stack);
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Error al desactivar producto' 
-    });
+    console.error('Error al desactivar producto:', error);
+    return res.status(500).json({ success: false, message: 'Error al desactivar producto' });
   }
 };
 
-//  Recuperar producto (marcar como activo) - Solo admin
+// Recuperar producto marcado como inactivo (solo admin)
 exports.recuperarProducto = async (req, res) => {
   try {
-    console.log('🔄 INICIANDO RECUPERACIÓN DE PRODUCTO');
-    console.log('ID del producto:', req.params.id);
-    console.log('Usuario:', req.user ? req.user.email : 'No identificado');
-    console.log('Usuario completo:', req.user);
-    
     const { id } = req.params;
-    console.log('🔍 Buscando producto con ID:', id);
-    
     const producto = await Producto.findByIdAndUpdate(id, { activo: true }, { new: true });
 
-    console.log('Producto encontrado:', producto ? 'SÍ' : 'NO');
-    if (producto) {
-      console.log('Estado del producto después del update:', producto.activo);
-      console.log('Nombre del producto:', producto.nombre);
-    }
-
     if (!producto) {
-      console.log('❌ Producto no encontrado');
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Producto no encontrado' 
-      });
+      return res.status(404).json({ success: false, message: 'Producto no encontrado' });
     }
 
-    console.log('📝 Registrando acción de auditoría...');
-    console.log('Usuario ID:', req.user.id);
-    console.log('Usuario nombre:', req.user.nombre);
-
-    // Registrar acción de auditoría
     try {
       const Acciones = require('../models/Acciones');
-      const accionData = {
+      await Acciones.create({
         usuario: req.user.id,
         accion: 'REACTIVAR_PRODUCTO',
         detalles: `Usuario ${req.user.nombre} reactivó producto: ${producto.nombre}`
-      };
-      console.log('Datos de acción a crear:', accionData);
-      
-      const accionCreada = await Acciones.create(accionData);
-      console.log('✅ Acción de auditoría creada exitosamente:', accionCreada._id);
+      });
     } catch (auditError) {
-      console.error('❌ Error al crear acción de auditoría:', auditError);
-      console.error('Stack trace:', auditError.stack);
-      // No fallar la operación principal por un error de auditoría
-      console.log('⚠️ Continuando sin registrar auditoría...');
+      console.error('Error al registrar auditoría:', auditError);
     }
 
-    console.log('✅ Producto reactivado exitosamente');
-    return res.status(200).json({ 
-      success: true,
-      message: 'Producto reactivado exitosamente',
-      data: producto 
-    });
+    return res.status(200).json({ success: true, message: 'Producto reactivado exitosamente', data: producto });
   } catch (error) {
-    console.error('❌ Error al reactivar producto:', error);
-    console.error('Stack trace completo:', error.stack);
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Error al reactivar producto' 
-    });
+    console.error('Error al reactivar producto:', error);
+    return res.status(500).json({ success: false, message: 'Error al reactivar producto' });
   }
 };
 
-// === MÉTODOS ADMINISTRATIVOS ===
-
-// Obtener todos los productos (incluyendo inactivos) - Solo admin/editor
+// Obtener todos los productos, incluyendo inactivos (solo admin/editor)
+// Registra la acción en auditoría
 exports.obtenerTodosProductos = async (req, res) => {
   try {
-    const productos = await Producto.find(); // Incluye activos e inactivos
-    
-    // Registrar la acción
+    const productos = await Producto.find();
+
     const Acciones = require('../models/Acciones');
     await Acciones.create({
       usuario: req.user.id,
@@ -252,41 +177,23 @@ exports.obtenerTodosProductos = async (req, res) => {
   }
 };
 
-// Obtener producto específico por ID - Solo admin/editor
+// Obtener producto por ID para admin/editor, validando ID y auditando consulta
 exports.obtenerProductoPorId = async (req, res) => {
   try {
-    console.log('=== OBTENIENDO PRODUCTO POR ID ===');
-    console.log('ID recibido:', req.params.id);
-    console.log('Usuario autenticado:', req.user ? req.user.email : 'No autenticado');
-    console.log('Headers de la petición:', req.headers);
-    
     const { id } = req.params;
-    
-    // Validar que el ID sea un ObjectId válido de MongoDB
+
+    // Validar que sea un ObjectId válido de MongoDB
     const mongoose = require('mongoose');
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      console.log('ID inválido:', id);
-      return res.status(400).json({ 
-        success: false, 
-        message: 'ID de producto inválido' 
-      });
+      return res.status(400).json({ success: false, message: 'ID de producto inválido' });
     }
-    
-    console.log('Buscando producto en la base de datos...');
+
     const producto = await Producto.findById(id);
-    console.log('Producto encontrado:', producto ? 'SÍ' : 'NO');
-
     if (!producto) {
-      console.log('Producto no encontrado para ID:', id);
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Producto no encontrado' 
-      });
+      return res.status(404).json({ success: false, message: 'Producto no encontrado' });
     }
 
-    console.log('Producto encontrado:', producto.nombre);
-
-    // Registrar la acción (con manejo de errores para evitar que falle la respuesta principal)
+    // Registrar auditoría (sin interrumpir la respuesta si falla)
     try {
       const Acciones = require('../models/Acciones');
       await Acciones.create({
@@ -295,48 +202,32 @@ exports.obtenerProductoPorId = async (req, res) => {
         detalles: `Usuario ${req.user.nombre} consultó producto ${producto.nombre}`
       });
     } catch (auditoriaError) {
-      console.log('Error al guardar acción de auditoría:', auditoriaError);
-      // No interrumpir la respuesta principal por un error de auditoría
+      console.error('Error al guardar acción de auditoría:', auditoriaError);
     }
 
-    console.log('Enviando respuesta exitosa');
-    return res.status(200).json({ 
-      success: true, 
-      producto: producto 
-    });
+    return res.status(200).json({ success: true, producto });
   } catch (error) {
     console.error('Error al obtener producto:', error);
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Error al obtener producto: ' + error.message 
-    });
+    return res.status(500).json({ success: false, message: 'Error al obtener producto: ' + error.message });
   }
 };
 
-// Actualizar producto completamente - Solo admin/editor
+// Actualizar producto completamente (admin/editor), incluye manejo de imagen
 exports.actualizarProducto = async (req, res) => {
   try {
     const { id } = req.params;
     const actualizaciones = { ...req.body };
 
-    // Manejar la imagen si se sube una nueva
     if (req.file) {
       actualizaciones.imagen = `/uploads/${req.file.filename}`;
     }
 
-    const producto = await Producto.findByIdAndUpdate(id, actualizaciones, { 
-      new: true, 
-      runValidators: true 
-    });
+    const producto = await Producto.findByIdAndUpdate(id, actualizaciones, { new: true, runValidators: true });
 
     if (!producto) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Producto no encontrado' 
-      });
+      return res.status(404).json({ success: false, message: 'Producto no encontrado' });
     }
 
-    // Registrar acción de auditoría
     const Acciones = require('../models/Acciones');
     await Acciones.create({
       usuario: req.user.id,
@@ -344,28 +235,21 @@ exports.actualizarProducto = async (req, res) => {
       detalles: `Usuario ${req.user.nombre} actualizó producto: ${producto.nombre}`
     });
 
-    return res.status(200).json({ 
-      success: true,
-      message: 'Producto actualizado exitosamente',
-      producto: producto 
-    });
+    return res.status(200).json({ success: true, message: 'Producto actualizado exitosamente', producto });
   } catch (error) {
     console.error('Error al actualizar producto:', error);
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Error al actualizar producto' 
-    });
+    return res.status(500).json({ success: false, message: 'Error al actualizar producto' });
   }
 };
 
-//  Estadísticas de productos - Solo admin/auditor
+// Obtener estadísticas generales de productos (solo admin/auditor)
 exports.obtenerEstadisticasProductos = async (req, res) => {
   try {
     const totalProductos = await Producto.countDocuments();
     const productosActivos = await Producto.countDocuments({ activo: true });
     const productosInactivos = await Producto.countDocuments({ activo: false });
-    
-    // Productos más caros y más baratos
+
+    // Encontrar el producto más caro y más barato activos
     const productoMasCaro = await Producto.findOne({ activo: true }).sort({ precio: -1 });
     const productoMasBarato = await Producto.findOne({ activo: true }).sort({ precio: 1 });
 

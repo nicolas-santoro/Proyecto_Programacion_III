@@ -1,12 +1,16 @@
+// URL base para las solicitudes a la API
 const API_BASE = '/api';
 
+// Arreglo donde se guardarán los datos de auditoría
 let auditoriaData = [];
 
+// Evento que se ejecuta cuando el DOM está completamente cargado
 document.addEventListener('DOMContentLoaded', function() {
-    verificarAutenticacion();
-    cargarAuditoria();
+    verificarAutenticacion();  // Verifica si el usuario está autenticado
+    cargarAuditoria();         // Carga los datos de auditoría desde el servidor
 });
 
+// Verifica si hay un token en el almacenamiento local; si no, redirige al login
 function verificarAutenticacion() {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -15,6 +19,7 @@ function verificarAutenticacion() {
     }
 }
 
+// Carga los datos de auditoría desde la API
 async function cargarAuditoria() {
     try {
         const token = localStorage.getItem('token');
@@ -27,11 +32,14 @@ async function cargarAuditoria() {
         if (response.ok) {
             const data = await response.json();
             auditoriaData = data.data || [];
-            // Ordenar por fecha descendente (más reciente primero)
+
+            // Ordena las acciones por fecha descendente
             auditoriaData.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-            mostrarAuditoria(auditoriaData);
-            // Eliminamos actualizarEstadisticas(auditoriaData);
+
+            mostrarAuditoria(auditoriaData);  // Muestra los datos en la tabla
+
         } else if (response.status === 401) {
+            // Token inválido: se elimina y redirige al login
             localStorage.removeItem('token');
             window.location.href = '/html/admin-login.html';
         } else {
@@ -44,9 +52,11 @@ async function cargarAuditoria() {
     }
 }
 
+// Muestra las acciones de auditoría en una tabla HTML
 function mostrarAuditoria(acciones) {
     const tbody = document.getElementById('auditoriaTableBody');
-    
+
+    // Si no hay acciones, se muestra un mensaje vacío
     if (acciones.length === 0) {
         tbody.innerHTML = `
             <tr>
@@ -63,9 +73,10 @@ function mostrarAuditoria(acciones) {
     }
 
     tbody.innerHTML = '';
-    // Mostrar solo los primeros 50 registros para mejor rendimiento
+
+    // Se muestran solo las primeras 50 acciones para mejorar el rendimiento
     const accionesAMostrar = acciones.slice(0, 50);
-    
+
     accionesAMostrar.forEach(accion => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -87,6 +98,7 @@ function mostrarAuditoria(acciones) {
         tbody.appendChild(tr);
     });
 
+    // Si hay más de 50 registros, se muestra una advertencia informativa
     if (acciones.length > 50) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -98,6 +110,7 @@ function mostrarAuditoria(acciones) {
     }
 }
 
+// Retorna el color del badge según el rol del usuario
 function getRolColor(rol) {
     const colors = {
         'admin': 'danger',
@@ -109,6 +122,7 @@ function getRolColor(rol) {
     return colors[rol] || 'secondary';
 }
 
+// Retorna el color del badge según la acción realizada
 function getAccionColor(accion) {
     const colors = {
         'CREATE': 'success',
@@ -126,12 +140,14 @@ function getAccionColor(accion) {
     return colors[accion] || 'secondary';
 }
 
+// Muestra una alerta temporal en pantalla con un mensaje y un tipo (info, error, etc.)
 function mostrarAlerta(mensaje, tipo) {
     const alert = document.getElementById('alert');
     alert.className = `alert alert-${tipo}`;
     alert.textContent = mensaje;
     alert.style.display = 'block';
-    
+
+    // Oculta la alerta después de 5 segundos
     setTimeout(() => {
         alert.style.display = 'none';
     }, 5000);

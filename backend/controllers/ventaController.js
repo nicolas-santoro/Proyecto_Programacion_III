@@ -1,6 +1,7 @@
 const Venta = require('../models/Venta');
 
-// ✅ Crear venta (pueden usarlo usuarios "pasajeros")
+// ➕ Crear venta (usuarios tipo "pasajero" pueden usarlo)
+// Crea una nueva venta con los datos recibidos, asigna fecha actual si no viene
 exports.crearVenta = async (req, res) => {
   try {
     const nuevaVenta = new Venta({
@@ -17,16 +18,18 @@ exports.crearVenta = async (req, res) => {
 };
 
 // 🔍 Obtener todas las ventas (solo vendedores o admins)
+// Retorna todas las ventas ordenadas por fecha descendente
 exports.obtenerVentas = async (req, res) => {
   try {
-    const ventas = await Venta.find().sort({ fecha: -1 }); // ordena por fecha descendente
+    const ventas = await Venta.find().sort({ fecha: -1 }); 
     res.status(200).json({ data: ventas });
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener las ventas' });
   }
 };
 
-// 📅 Obtener ventas por rango de fechas
+// 📅 Obtener ventas filtradas por rango de fechas
+// Recibe fechaInicio y fechaFin como query params, valida y busca en ese rango
 exports.obtenerVentasPorRango = async (req, res) => {
   try {
     const { fechaInicio, fechaFin } = req.query;
@@ -38,7 +41,6 @@ exports.obtenerVentasPorRango = async (req, res) => {
     const inicio = new Date(fechaInicio);
     const fin = new Date(fechaFin);
 
-    // Validar fechas
     if (isNaN(inicio) || isNaN(fin)) {
       return res.status(400).json({ error: 'Formato de fecha inválido' });
     }
@@ -58,7 +60,8 @@ exports.obtenerVentasPorRango = async (req, res) => {
 
 // === MÉTODOS ADMINISTRATIVOS ===
 
-//  Obtener venta por ID - Admin/Auditor
+// 🔍 Obtener venta por ID (solo admin/auditor)
+// Busca venta por ID y registra la consulta en auditoría
 exports.obtenerVentaPorId = async (req, res) => {
   try {
     const { id } = req.params;
@@ -82,7 +85,8 @@ exports.obtenerVentaPorId = async (req, res) => {
   }
 };
 
-//  Actualizar venta - Solo admin
+// ✏️ Actualizar venta (solo admin)
+// Actualiza campos de venta por ID, valida existencia y registra auditoría
 exports.actualizarVenta = async (req, res) => {
   try {
     const { id } = req.params;
@@ -114,7 +118,8 @@ exports.actualizarVenta = async (req, res) => {
   }
 };
 
-//  Eliminar venta - Solo admin
+// ❌ Eliminar venta (solo admin)
+// Borra la venta por ID y registra auditoría
 exports.eliminarVenta = async (req, res) => {
   try {
     const { id } = req.params;
@@ -140,7 +145,8 @@ exports.eliminarVenta = async (req, res) => {
   }
 };
 
-//  Obtener estadísticas generales - Admin/Auditor
+// 📊 Obtener estadísticas generales de ventas (solo admin/auditor)
+// Devuelve total de ventas, ventas de hoy, monto total y venta más alta
 exports.obtenerEstadisticas = async (req, res) => {
   try {
     const totalVentas = await Venta.countDocuments();
@@ -151,7 +157,7 @@ exports.obtenerEstadisticas = async (req, res) => {
       }
     });
 
-    // Calcular totales
+    // Totales en dinero
     const ventasTotales = await Venta.aggregate([
       { $group: { _id: null, total: { $sum: '$total' } } }
     ]);
@@ -168,7 +174,6 @@ exports.obtenerEstadisticas = async (req, res) => {
       { $group: { _id: null, total: { $sum: '$total' } } }
     ]);
 
-    // Venta más alta
     const ventaMasAlta = await Venta.findOne().sort({ total: -1 });
 
     const estadisticas = {
@@ -193,7 +198,8 @@ exports.obtenerEstadisticas = async (req, res) => {
   }
 };
 
-//  Obtener reporte de ventas - Admin/Auditor
+// 📋 Obtener reporte detallado de ventas (solo admin/auditor)
+// Opcionalmente filtra por rango de fechas, agrupa ventas por día y productos más vendidos
 exports.obtenerReporteVentas = async (req, res) => {
   try {
     const { fechaInicio, fechaFin } = req.query;
@@ -208,7 +214,7 @@ exports.obtenerReporteVentas = async (req, res) => {
       };
     }
 
-    // Ventas por día
+    // Ventas agrupadas por día
     const ventasPorDia = await Venta.aggregate([
       { $match: filtroFecha },
       {
@@ -221,7 +227,7 @@ exports.obtenerReporteVentas = async (req, res) => {
       { $sort: { "_id": 1 } }
     ]);
 
-    // Productos más vendidos
+    // Productos más vendidos en el rango
     const productosMasVendidos = await Venta.aggregate([
       { $match: filtroFecha },
       { $unwind: "$productos" },

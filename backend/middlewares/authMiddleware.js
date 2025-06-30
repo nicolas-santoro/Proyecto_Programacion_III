@@ -2,62 +2,50 @@ const jwt = require('jsonwebtoken');
 const Usuario = require('../models/Usuario');
 require('dotenv').config();
 
-//Middleware para verificar TOKEN JWT (APIs JSON)
+/**
+ * Middleware para verificar el token JWT enviado en la cabecera Authorization
+ * 
+ * - Extrae el token del header `Authorization` en formato "Bearer <token>"
+ * - Verifica que el token sea válido y no haya expirado usando la clave secreta
+ * - Busca el usuario asociado al token en la base de datos
+ * - Verifica que el usuario exista y tenga rol "admin"
+ * - Si todo es correcto, adjunta el usuario a `req.user` para uso posterior
+ * - En caso de error, responde con el código y mensaje HTTP correspondiente:
+ *    - 401: Token no provisto o inválido/expirado
+ *    - 404: Usuario no encontrado
+ *    - 403: Usuario no autorizado (no es admin)
+ */
 exports.verifyToken = async (req, res, next) => {
     try {
+        // Obtener token de Authorization header (formato "Bearer <token>")
         const token = req.headers.authorization?.split(' ')[1];
 
         if (!token){
-            return res.status(401).json({message: 'No se proporcionó TOKEN de autorización'})
+            return res.status(401).json({message: 'No se proporcionó TOKEN de autorización'});
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        // Verificar y decodificar token JWT
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Buscar usuario en DB según ID del token
         const user = await Usuario.findById(decoded.id);
 
         if (!user){
-            return res.status(404).json({message: 'Usuario no encontrado'})
+            return res.status(404).json({message: 'Usuario no encontrado'});
         }
 
-        // Verificar que sea admin
+        // Verificar rol de admin
         if (user.rol !== 'admin') {
-            return res.status(403).json({message: 'Solo los administradores pueden acceder a esta funcionalidad'})
+            return res.status(403).json({message: 'Solo los administradores pueden acceder a esta funcionalidad'});
         }
 
+        // Adjuntar usuario al request para middleware o rutas siguientes
         req.user = user;
         next();
     } catch (error){
-        return res.status(401).json({message: 'TOKEN inválido o expirado'})
+        // Token inválido o expirado
+        return res.status(401).json({message: 'TOKEN inválido o expirado'});
     }
 };
 
-//Middleware para verificar TOKEN JWT desde cookies (vistas EJS)
-const authMiddleware = async (req, res, next) => {
-    try {
-        // Obtener token desde cookie
-        const token = req.cookies.adminToken;
-
-        if (!token){
-            return res.redirect('/admin/login');
-        }
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const usuario = await Usuario.findById(decoded.id);
-
-        if (!usuario){
-            return res.redirect('/admin/login');
-        }
-
-        // Verificar que sea admin
-        if (usuario.rol !== 'admin') {
-            return res.redirect('/admin/login');
-        }
-
-        req.usuario = usuario;
-        next();
-    } catch (error){
-        return res.redirect('/admin/login');
-    }
-};
-
-module.exports = authMiddleware;
 module.exports.verifyToken = exports.verifyToken;

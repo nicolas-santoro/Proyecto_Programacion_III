@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// Modelo para crear productos
 const productoSchema = new mongoose.Schema({ 
   nombre: { type: String, required: true },
   precio: { type: Number, required: true }, 

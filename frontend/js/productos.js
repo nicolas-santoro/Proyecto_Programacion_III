@@ -1,4 +1,5 @@
-// Mapeo específico de productos que tienen nombres de archivo diferentes
+// --- MAPEO DE PRODUCTOS CON NOMBRES DE ARCHIVO ESPECIALES ---
+// Algunos productos tienen nombres de archivo distintos al normal
 const productosEspeciales = {
   'spider-man-la-ultima-caceria-de-kraven': 'spider-man-la-ultima-caceria-de-kraven-60',
   'jojos-bizarre-adventure-steel-ball-run-vol-2': 'jojos-bizarre-adventure-steel-ball-run-vol-2',
@@ -6,7 +7,8 @@ const productosEspeciales = {
   'harry-potter-y-el-prisionero-de-azkaban': 'harry-potter-y-el-prisionero-de-askaban'
 };
 
-// Función para normalizar nombres de archivos
+// --- NORMALIZACIÓN DE NOMBRES PARA ARCHIVOS ---
+// Convierte un texto a formato válido para nombres de archivo y revisa si hay un nombre especial
 function normalizeFileName(text) {
   const normalized = text.toLowerCase()
     .replace(/:/g, '')              // quitar dos puntos
@@ -21,21 +23,23 @@ function normalizeFileName(text) {
     .replace(/[ñ]/g, 'n')
     .replace(/[^a-z0-9\-]/g, '');   // quitar caracteres especiales
   
-  // Verificar si hay un mapeo específico para este producto
+  // Usar nombre especial si existe
   return productosEspeciales[normalized] || normalized;
 }
 
-// Mapeo de categorías a separadores disponibles
+// --- MAPEO DE CATEGORÍAS A TIPOS DE SEPARADORES ---
+// Para mostrar imágenes separadoras según la categoría
 const categoriaSeparadores = {
-  'libro': 'arte',        // libro -> separador-arte.png
-  'comic': 'arte',        // comic -> separador-arte.png
-  'manga': 'arte',        // manga -> separador-arte.png
-  'separador': 'arte',    // separador -> separador-arte.png
-  'otono': 'otonio',      // otono -> separador-otonio.png (nombre correcto del archivo)
-  'otoño': 'otonio'       // otoño -> separador-otonio.png
+  'libro': 'arte',        // libros usan separador-arte.png
+  'comic': 'arte',
+  'manga': 'arte',
+  'separador': 'arte',
+  'otono': 'otonio',      // otono (sin ñ) -> archivo 'separador-otonio.png'
+  'otoño': 'otonio'       // otoño (con ñ) mapeado igual
 };
 
-// Lista de archivos conocidos en /img/
+// --- LISTA DE IMÁGENES DISPONIBLES EN /img/ ---
+// Para validar si la imagen existe y evitar 404
 const imagenesDisponibles = [
   'civil-war-must-have.png',
   'demon-slayer-vol-8.png',
@@ -64,76 +68,70 @@ const imagenesDisponibles = [
   'x-men-dias-del-futuro-pasado-must-have.png'
 ];
 
-// Función para obtener la URL correcta de la imagen con fallbacks inteligentes
+// --- FUNCION PARA OBTENER LA URL CORRECTA DE LA IMAGEN ---
+// Recibe el producto y devuelve la URL adecuada con fallbacks
 function getImageUrl(producto) {
-  // Si tiene imagen definida
   if (producto.imagen && producto.imagen !== 'null' && producto.imagen.trim() !== '') {
-    // Normalizar barras invertidas a barras normales (Windows → Web)
+    // Normalizar barras invertidas a barras normales
     let imagenNormalizada = producto.imagen.replace(/\\/g, '/');
     
-    // Si ya tiene la ruta completa, devolverla
+    // Si ya tiene ruta completa, se devuelve tal cual
     if (imagenNormalizada.startsWith('/uploads/') || imagenNormalizada.startsWith('/img/') || imagenNormalizada.startsWith('http')) {
       return imagenNormalizada;
     }
     
     // Extraer solo el nombre del archivo si viene con ruta
-    let nombreArchivo = imagenNormalizada;
-    if (imagenNormalizada.includes('/')) {
-      nombreArchivo = imagenNormalizada.split('/').pop();
-    }
+    let nombreArchivo = imagenNormalizada.includes('/') ? imagenNormalizada.split('/').pop() : imagenNormalizada;
     
-    // Verificar si es un archivo conocido que existe en /img/
+    // Si el archivo está en la lista conocida, devolver ruta en /img/
     if (imagenesDisponibles.includes(nombreArchivo)) {
       return `/img/${nombreArchivo}`;
     }
     
-    // Si no está en la lista de archivos conocidos, asumir que es un archivo subido
+    // Si no, asumir que es un archivo subido
     return `/uploads/${nombreArchivo}`;
   }
   
-  // Si no tiene imagen definida, buscar por nombre del producto
+  // Si no tiene imagen definida, generar el nombre de archivo a partir del nombre del producto
   const nombreArchivo = normalizeFileName(producto.nombre);
   const archivoGenerado = `${nombreArchivo}.png`;
   
-  // Verificar si existe el archivo generado en /img/
+  // Verificar si ese archivo existe en /img/
   if (imagenesDisponibles.includes(archivoGenerado)) {
     return `/img/${archivoGenerado}`;
   }
   
-  // Si no existe archivo específico, usar separador por categoría
+  // Si no hay imagen específica, usar el separador por categoría (por defecto 'arte')
   const separadorCategoria = categoriaSeparadores[producto.categoria?.toLowerCase()] || 'arte';
   return `/img/separador-${separadorCategoria}.png`;
 }
 
-// Función simplificada para manejar errores de carga de imágenes
+// --- MANEJO DE ERROR DE CARGA DE IMAGENES ---
+// Para reemplazar imágenes rotas con un logo genérico sin generar loops infinitos
 function handleImageError(imgElement, producto) {
   const srcActual = imgElement.src;
-  
-  // Evitar bucles infinitos - si ya usamos el logo genérico, no hacer nada más
   if (srcActual.includes('HP_LOGO.png')) {
-    return;
+    return; // Ya tiene logo genérico, no hacer nada más
   }
-  
-  // Si falló cualquier imagen, usar directamente el logo genérico
-  // Esto evita múltiples intentos y errores en consola
   imgElement.src = '/img/HP_LOGO.png';
   imgElement.onerror = null; // Evitar más intentos
 }
 
+// --- AL CARGAR LA PÁGINA ---
+// Trae productos desde API y renderiza
 document.addEventListener('DOMContentLoaded', () => {
-  ApiClient.fetchApi('/productos/obtener', 
-    { method: 'GET' }) // Trae los productos desde la API 
+  ApiClient.fetchApi('/productos/obtener', { method: 'GET' })
     .then(productos => {
-      const activos = productos.filter(p => p.activo); // filtra solo los productos activos y los ordena alfabéticamente por nombre
-
+      // Filtra solo activos y los ordena alfabéticamente
+      const activos = productos.filter(p => p.activo);
       activos.sort((a, b) => a.nombre.localeCompare(b.nombre));
 
-      // va a agarrar los contenedores de botones y productos por categoría
+      // Referencias a contenedores de botones y productos
       const botonesDiv = document.querySelector('.botones-categorias');
       const contenedorLibros = document.getElementById('libros-container');
       const contenedorSeparadores = document.getElementById('separadores-container');
 
-      // Renderiza los botones de categorías
+      // Renderizar botones de categorías
       if (botonesDiv) {
         botonesDiv.innerHTML = `
           <button class="btn btn-outline-primary me-2" data-categoria="todos">Todos</button>
@@ -143,18 +141,20 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       }
 
-      // Función principal para renderizar productos
+      // --- FUNCIONES PARA RENDERIZAR PRODUCTOS ---
+
+      // Renderiza productos en un contenedor dado
       function renderizarProductos(contenedor, productos) {
-        contenedor.innerHTML = ''; // hay que limpiar el contenedor antes de poder renderizarlo
+        contenedor.innerHTML = ''; // limpiar contenedor
 
         productos.forEach(prod => {
           const div = document.createElement("div");
           div.classList.add("producto", "card", "m-2", "p-2");
 
-          // tiene que saber la cantidad actual del producto que hay en el carrito
+          // Cantidad actual del producto en carrito
           const carrito = getCarrito();
-          const itemEnCarrito = carrito.find(p => p._id === prod._id); // va a buscar dentro del array del carrito si ya existe un producto con el mismo id
-          const cantidad = itemEnCarrito ? itemEnCarrito.cantidad : 0; // si lo encuentra, va a devolver ese producto, sino, su cantidad es 0 
+          const itemEnCarrito = carrito.find(p => p._id === prod._id);
+          const cantidad = itemEnCarrito ? itemEnCarrito.cantidad : 0;
 
           div.innerHTML = ` 
             <div class="card-body position-relative">
@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           `;
 
-          // Agregar el manejador de errores de imagen después de crear el HTML
+          // Manejo de error de imagen
           const imgElement = div.querySelector('img');
           if (imgElement) {
             imgElement.onerror = function() {
@@ -187,59 +187,59 @@ document.addEventListener('DOMContentLoaded', () => {
             };
           }
 
-          // toma el div de la cantidad de productos y el container del boton agregar
+          // Referencias a controles de cantidad y botón agregar
           const controlDiv = div.querySelector('.control-cantidad');
           const agregarDiv = div.querySelector('.boton-agregar-container');
 
-          // Evento del botón sumar [+]
+          // Evento sumar [+]
           controlDiv.querySelector('.btn-sumar').addEventListener('click', () => {
             agregarAlCarrito(prod);
-            const nuevaCantidad = getCantidadEnCarrito(prod._id); // va a obtener una nueva cantidad
-            controlDiv.querySelector('.cantidad-text').textContent = nuevaCantidad; // actualiza el numero que se muestra en la pantalla
-            actualizarCantidadCarrito(); 
-            actualizarBadge(div, nuevaCantidad); // actualiza el badge (circulito) con la cantidad actual del producto
+            const nuevaCantidad = getCantidadEnCarrito(prod._id);
+            controlDiv.querySelector('.cantidad-text').textContent = nuevaCantidad;
+            actualizarCantidadCarrito();
+            actualizarBadge(div, nuevaCantidad);
           });
 
-          // Evento del boton restar [-]
+          // Evento restar [-]
           controlDiv.querySelector('.btn-restar').addEventListener('click', () => {
             restarDelCarrito(prod._id);
             const nuevaCantidad = getCantidadEnCarrito(prod._id);
-            if (nuevaCantidad <= 0) { // si la cantidad llega a 0
-              controlDiv.classList.add('d-none'); // oculta el div de control de cantidad
-              agregarDiv.classList.remove('d-none'); // muestra el div de agregar al carrito
-              actualizarBadge(div, 0); // elimina el badge de cantidad
+            if (nuevaCantidad <= 0) {
+              controlDiv.classList.add('d-none');
+              agregarDiv.classList.remove('d-none');
+              actualizarBadge(div, 0);
             } else {
-              controlDiv.querySelector('.cantidad-text').textContent = nuevaCantidad; // si sigue siendo mayor a 0, actualiza el número
+              controlDiv.querySelector('.cantidad-text').textContent = nuevaCantidad;
               actualizarBadge(div, nuevaCantidad);
             }
             actualizarCantidadCarrito();
           });
 
-          // Evento del botón para eliminar [X]
+          // Evento eliminar [X]
           controlDiv.querySelector('.btn-eliminar').addEventListener('click', () => {
-            quitarDelCarrito(prod._id); // quita el producto
-            controlDiv.classList.add('d-none'); // oculta los controles de cantidad
-            agregarDiv.classList.remove('d-none'); // muestra el botón de agregar al carrito
+            quitarDelCarrito(prod._id);
+            controlDiv.classList.add('d-none');
+            agregarDiv.classList.remove('d-none');
             actualizarBadge(div, 0);
             actualizarCantidadCarrito();
           });
 
-          // Evento del botón para agregar ["Agregar al Carrito"]
+          // Evento agregar al carrito (botón "Agregar al Carrito")
           div.querySelector('.btn-agregar').addEventListener('click', () => {
             agregarAlCarrito(prod);
-            controlDiv.classList.remove('d-none'); 
+            controlDiv.classList.remove('d-none');
             agregarDiv.classList.add('d-none');
             controlDiv.querySelector('.cantidad-text').textContent = getCantidadEnCarrito(prod._id);
             actualizarBadge(div, getCantidadEnCarrito(prod._id));
             actualizarCantidadCarrito();
           });
 
-          // va a tomar el contenedor y agregar la tarjeta del producto al contenedor correspondiente
+          // Agregar producto al contenedor
           contenedor.appendChild(div);
         });
       }
 
-      // Actualiza el badge (circulito) con la cantidad actual de un producto
+      // Actualiza el badge con la cantidad del producto (o lo remueve si es 0)
       function actualizarBadge(div, cantidad) {
         let badge = div.querySelector('.cantidad-badge');
         if (!badge && cantidad > 0) {
@@ -258,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let categoriaActual = 'todos';
 
-      // Renderiza productos según la categoría seleccionada (para separarlos)
+      // Renderiza productos filtrados por categoría (excepto separadores)
       function renderizarProductosPorCategoria(categoria) {
         let filtrados;
         if (categoria === 'todos') {
@@ -269,13 +269,13 @@ document.addEventListener('DOMContentLoaded', () => {
         renderizarProductos(contenedorLibros, filtrados);
       }
 
-      // Renderiza separadores
+      // Renderiza productos que son separadores
       function renderizarSeparadores() {
         const separadores = activos.filter(p => p.categoria === 'separador');
         renderizarProductos(contenedorSeparadores, separadores);
       }
 
-      // Maneja el click en los botones de categorías
+      // Maneja click en botones de categoría
       botonesDiv.addEventListener('click', (e) => {
         if (e.target.tagName === 'BUTTON') {
           botonesDiv.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
@@ -285,34 +285,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      // Inicialización: muestra todos los productos y separadores al cargar la página
+      // Inicialización al cargar la página: muestra todos los productos y separadores
       botonesDiv.querySelector('button[data-categoria="todos"]').classList.add('active');
       renderizarProductosPorCategoria(categoriaActual);
       renderizarSeparadores();
       actualizarCantidadCarrito();
 
-      cancelarCompra(); //Habilita la posibilidad de cancelar la compra
+      cancelarCompra(); // habilita botón de cancelar compra
     })
     .catch(error => console.error('Error al cargar los productos:', error));
 });
 
-// ---------------------
-// Funciones de carrito
-// ---------------------
-function getCarrito() { // así lee el carrito del localStorage y lo devuelve como un array
+// --- FUNCIONES DE CARRITO ---
+// Leer carrito desde localStorage
+function getCarrito() {
   return JSON.parse(localStorage.getItem('carrito')) || [];
 }
 
-function setCarrito(carrito) { // para guardar el array que se tomó arriba en un localStorage
+// Guardar carrito en localStorage
+function setCarrito(carrito) {
   localStorage.setItem('carrito', JSON.stringify(carrito));
 }
 
-function agregarAlCarrito(producto) { // va a sumar un producto al carrito o aumentar la cantidad si ya existe
+// Agregar producto o aumentar cantidad en carrito
+function agregarAlCarrito(producto) {
   let carrito = getCarrito();
   const index = carrito.findIndex(p => p._id === producto._id);
   if (index !== -1) {
     carrito[index].cantidad += 1;
-  } else { // si no existe, lo agrega con cantidad 1
+  } else {
     carrito.push({
       _id: producto._id,
       nombre: producto.nombre,
@@ -320,38 +321,42 @@ function agregarAlCarrito(producto) { // va a sumar un producto al carrito o aum
       cantidad: 1
     });
   }
-  setCarrito(carrito); // actualiza el localStorage con el carrito modificado
+  setCarrito(carrito);
 }
 
-function restarDelCarrito(id) { // resta una unidad
+// Restar cantidad de producto, o eliminar si llega a 0
+function restarDelCarrito(id) {
   let carrito = getCarrito();
-  const index = carrito.findIndex(p => p._id === id); // busca el índice del producto en el carrito por su id -- comparando
-  if (index !== -1) { // si existe en el carrito, le resta 1
+  const index = carrito.findIndex(p => p._id === id);
+  if (index !== -1) {
     if (carrito[index].cantidad > 1) {
       carrito[index].cantidad -= 1;
     } else {
-      carrito.splice(index, 1); // si la cantidad es 1, lo elimina del carrito
+      carrito.splice(index, 1);
     }
   }
   setCarrito(carrito);
 }
 
-function quitarDelCarrito(id) { // lo elimina del carrito 
+// Quitar producto del carrito
+function quitarDelCarrito(id) {
   let carrito = getCarrito();
-  carrito = carrito.filter(p => p._id !== id); // va a filtrar el carrito para eliminar el producto con el id que le pasamos
+  carrito = carrito.filter(p => p._id !== id);
   setCarrito(carrito);
 }
 
-function actualizarCantidadCarrito() { // actualiza el contador de productos en el carrito
+// Actualizar contador total de productos en el carrito
+function actualizarCantidadCarrito() {
   const carrito = getCarrito();
-  const cantidad = carrito.reduce((acc, prod) => acc + prod.cantidad, 0); // usa reduce para sumar todas las cantidades de los productos en el carrito
-  const span = document.getElementById('carrito-cantidad'); // busca el span que muestra la cantidad de productos en el carrito 
-  if (span) span.textContent = cantidad; //   actualiza el texto del span con la cantidad total de productos en el carrito
+  const cantidad = carrito.reduce((acc, prod) => acc + prod.cantidad, 0);
+  const span = document.getElementById('carrito-cantidad');
+  if (span) span.textContent = cantidad;
 }
 
-function getCantidadEnCarrito(id) { // obtiene la cantidad de un producto específico en el carrito, esto se usa para mostrar en la vista de productos cuántas unidades de un producto ya hay
+// Obtener cantidad de un producto en el carrito
+function getCantidadEnCarrito(id) {
   const carrito = getCarrito();
-  const item = carrito.find(p => p._id === id); // busca el producto en el carrito por su id, donde los dos id sean iguales
+  const item = carrito.find(p => p._id === id);
   return item ? item.cantidad : 0;
 }
 

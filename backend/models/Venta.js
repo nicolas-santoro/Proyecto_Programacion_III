@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// Modelo para crear ventas
 const ventaSchema = new mongoose.Schema({
   nombreCliente: { type: String, required: true },
   productos: [{

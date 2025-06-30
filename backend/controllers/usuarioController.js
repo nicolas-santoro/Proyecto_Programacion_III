@@ -2,6 +2,8 @@ const Usuario = require('../models/Usuario');
 const Accion = require('../models/Acciones');
 
 // 📋 Obtener todos los usuarios (solo administrador)
+// Retorna la lista de usuarios excluyendo la contraseña para seguridad
+// Además registra la acción en el log de auditoría
 exports.obtenerUsuarios = async (peticion, respuesta) => {
   try {
     console.log('🔍 Obteniendo lista de usuarios...');
@@ -22,7 +24,9 @@ exports.obtenerUsuarios = async (peticion, respuesta) => {
   }
 };
 
-//  Obtener un usuario por ID
+// 🔎 Obtener un usuario por ID
+// Busca un usuario por su ID y excluye la contraseña en la respuesta
+// Devuelve 404 si no se encuentra el usuario
 exports.obtenerUsuarioPorId = async (req, res) => {
   try {
     const usuario = await Usuario.findById(req.params.id).select('-password');
@@ -37,7 +41,9 @@ exports.obtenerUsuarioPorId = async (req, res) => {
   }
 };
 
-// Crear nuevo usuario (solo admin)
+// ➕ Crear nuevo usuario (solo admin)
+// Valida que el email no esté registrado previamente
+// Guarda el nuevo usuario y registra la acción de creación en auditoría
 exports.crearUsuario = async (req, res) => {
   try {
     const { nombre, email, password, rol } = req.body;
@@ -59,7 +65,7 @@ exports.crearUsuario = async (req, res) => {
     await nuevoUsuario.save();
 
     // Registrar acción de auditoría
-    await Acciones.create({
+    await Accion.create({
       usuario: req.user.id,
       accion: 'CREAR_USUARIO',
       detalles: `Usuario ${req.user.nombre} creó nuevo usuario: ${nombre} (${rol})`
@@ -79,7 +85,9 @@ exports.crearUsuario = async (req, res) => {
   }
 };
 
-//  Actualizar usuario (solo admin)
+// ✏️ Actualizar usuario (solo admin)
+// Valida existencia del usuario y evita duplicados en email
+// Actualiza los campos recibidos y registra la acción
 exports.actualizarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
@@ -90,7 +98,7 @@ exports.actualizarUsuario = async (req, res) => {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
-    // Si se cambió el email, verificar que no exista otro usuario con ese email
+    // Si se cambia el email, validar que no exista en otro usuario
     if (email && email !== usuario.email) {
       const emailExistente = await Usuario.findOne({ email, _id: { $ne: id } });
       if (emailExistente) {
@@ -98,7 +106,7 @@ exports.actualizarUsuario = async (req, res) => {
       }
     }
 
-    // Actualizar campos
+    // Actualizar campos permitidos
     if (nombre) usuario.nombre = nombre;
     if (email) usuario.email = email;
     if (rol) usuario.rol = rol;
@@ -106,7 +114,7 @@ exports.actualizarUsuario = async (req, res) => {
     await usuario.save();
 
     // Registrar acción de auditoría
-    await Acciones.create({
+    await Accion.create({
       usuario: req.user.id,
       accion: 'ACTUALIZAR_USUARIO',
       detalles: `Usuario ${req.user.nombre} actualizó usuario: ${usuario.nombre}`
@@ -126,12 +134,14 @@ exports.actualizarUsuario = async (req, res) => {
   }
 };
 
-//  Eliminar usuario (solo admin)
+// ❌ Eliminar usuario (solo admin)
+// No permite que el usuario se elimine a sí mismo
+// Elimina el usuario y registra la acción de auditoría
 exports.eliminarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // No permitir auto-eliminación
+    // Evitar auto-eliminación
     if (id === req.user.id) {
       return res.status(400).json({ error: 'No puedes eliminar tu propio usuario' });
     }
@@ -144,7 +154,7 @@ exports.eliminarUsuario = async (req, res) => {
     await Usuario.findByIdAndDelete(id);
 
     // Registrar acción de auditoría
-    await Acciones.create({
+    await Accion.create({
       usuario: req.user.id,
       accion: 'ELIMINAR_USUARIO',
       detalles: `Usuario ${req.user.nombre} eliminó usuario: ${usuario.nombre} (${usuario.email})`
@@ -156,7 +166,9 @@ exports.eliminarUsuario = async (req, res) => {
   }
 };
 
-// Cambiar contraseña de usuario
+// 🔐 Cambiar contraseña de usuario
+// Valida longitud mínima de la nueva contraseña
+// Guarda el hash gracias a middleware en el modelo y registra auditoría
 exports.cambiarPassword = async (req, res) => {
   try {
     const { id } = req.params;
@@ -171,11 +183,11 @@ exports.cambiarPassword = async (req, res) => {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
-    usuario.password = password; // El middleware pre('save') se encargará del hash
+    usuario.password = password; // Middleware en el modelo hará el hash
     await usuario.save();
 
     // Registrar acción de auditoría
-    await Acciones.create({
+    await Accion.create({
       usuario: req.user.id,
       accion: 'CAMBIAR_PASSWORD',
       detalles: `Usuario ${req.user.nombre} cambió contraseña del usuario: ${usuario.nombre}`

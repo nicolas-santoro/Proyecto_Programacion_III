@@ -1,86 +1,87 @@
+// Controlador de autenticación para el panel de administrador
 const AuthController = {
+    // Elementos del DOM utilizados por el controlador
     elements: {
-        logoutBtn: document.getElementById('btnAdminLogout'),
-        loginForm: document.getElementById('formAdminLogin')
+        logoutBtn: document.getElementById('btnAdminLogout'), // Botón de cierre de sesión
+        loginForm: document.getElementById('formAdminLogin')  // Formulario de inicio de sesión
     },
 
-    // Inicializar eventos
+    // Inicializa el controlador y configura los eventos al cargar la página
     init() {
         document.addEventListener('DOMContentLoaded', () => {
-            // Verificar si hay un usuario autenticado
-            this.checkAuthStatus();
-
-            // Event listeners
-            this.setupEventListeners();
+            this.checkAuthStatus();     // Verifica si el usuario está autenticado
+            this.setupEventListeners(); // Configura los listeners de eventos
         });
     },
 
-    // Configurar listeners de eventos
+    // Configura los listeners de eventos: login y logout
     setupEventListeners() {
-        // Cerrar sesión
+        // Listener para cerrar sesión
         if (this.elements.logoutBtn) {
             this.elements.logoutBtn.addEventListener('click', () => {
                 this.logout();
             });
         }
 
-        // Enviar formulario de login
-        if (this.elements.loginForm){
+        // Listener para enviar el formulario de login
+        if (this.elements.loginForm) {
             this.elements.loginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.handleLogin();
+                e.preventDefault();     // Previene el envío por defecto
+                this.handleLogin();     // Llama al método de login
             });
         }
-    },    async checkAuthStatus() {
+    },
+
+    // Verifica el estado de autenticación del usuario
+    async checkAuthStatus() {
         const token = localStorage.getItem('token');
         const user = localStorage.getItem('user');
         const currentPage = window.location.pathname;
 
-        if (token && user){
-            // Solo redirigir si estamos en la página de login
+        if (token && user) {
+            // Si está autenticado y está en la página de login, lo redirige al panel
             if (currentPage.includes('/admin/login') || currentPage === '/') {
                 window.location.href = './adminCenter.html';
             }
-            // Si ya estamos en adminCenter.html, no hacer nada
+            // Si ya está en el panel, no hace nada
         } else {
-            // Si no hay token/user y estamos en adminCenter, redirigir a login
+            // Si no está autenticado y está en el panel, lo redirige al login
             if (currentPage.includes('adminCenter.html')) {
                 window.location.href = '/admin/login';
             }
         }
     },
 
-    // Manejar inicio de sesión
+    // Maneja el proceso de login del usuario
     async handleLogin() {
         try {
             const email = document.getElementById('adminMail').value;
             const password = document.getElementById('adminPassword').value;
 
-            // Realizar login
-            const response = await ApiClient.login({email, password});
+            // Realiza la solicitud de login al servidor usando el cliente API
+            const response = await ApiClient.login({ email, password });
 
-            // Guardar token en localStorage
+            // Guarda el token y los datos del usuario en localStorage
             localStorage.setItem('token', response.token);
-
-            // Guardar datos del usuario en localStorage
             localStorage.setItem('user', JSON.stringify(response.user));
 
-            // Redirigir directamente
+            // Redirige al panel de administrador
             window.location.href = './adminCenter.html';
-        } catch (error){
+        } catch (error) {
             console.log('Usuario equivocado:', error);
         }
     },
 
-    // Cerrar sesión
+    // Cierra sesión del usuario
     logout() {
-        // Limpiar localStorage
+        // Limpia el almacenamiento local
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        
-        // Redirigir al login
+
+        // Redirige al login
         window.location.href = '/admin/login';
     }
-}
+};
 
+// Inicia el controlador al cargar la página
 AuthController.init();

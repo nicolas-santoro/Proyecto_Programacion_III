@@ -1,12 +1,16 @@
+// URL base para las solicitudes a la API
 const API_BASE = '/api';
 
+// Arreglo para guardar los datos de ventas obtenidos del servidor
 let ventasData = [];
 
+// Evento que se ejecuta cuando el DOM está completamente cargado
 document.addEventListener('DOMContentLoaded', function() {
-    verificarAutenticacion();
-    cargarVentas();
+    verificarAutenticacion();  // Verifica si el usuario está autenticado
+    cargarVentas();            // Carga las ventas desde el servidor
 });
 
+// Verifica si hay un token válido en el almacenamiento local; si no, redirige al login
 function verificarAutenticacion() {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -15,6 +19,7 @@ function verificarAutenticacion() {
     }
 }
 
+// Carga los datos de ventas desde la API
 async function cargarVentas() {
     try {
         const token = localStorage.getItem('token');
@@ -27,8 +32,9 @@ async function cargarVentas() {
         if (response.ok) {
             const data = await response.json();
             ventasData = data.data || [];
-            mostrarVentas(ventasData);
+            mostrarVentas(ventasData);  // Muestra las ventas en la tabla
         } else if (response.status === 401) {
+            // Token inválido: lo borra y redirige al login
             localStorage.removeItem('token');
             window.location.href = '/html/admin-login.html';
         } else {
@@ -41,9 +47,11 @@ async function cargarVentas() {
     }
 }
 
+// Muestra las ventas en una tabla HTML
 function mostrarVentas(ventas) {
     const tbody = document.getElementById('ventasTableBody');
-    
+
+    // Si no hay ventas, muestra un mensaje vacío
     if (ventas.length === 0) {
         tbody.innerHTML = `
             <tr>
@@ -60,6 +68,7 @@ function mostrarVentas(ventas) {
     }
 
     tbody.innerHTML = '';
+
     ventas.forEach(venta => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -78,19 +87,20 @@ function mostrarVentas(ventas) {
     });
 }
 
-// Eliminamos la función actualizarResumen completa
-
+// Muestra una alerta temporal con un mensaje y tipo visual (ej: error, info)
 function mostrarAlerta(mensaje, tipo) {
     const alert = document.getElementById('alert');
     alert.className = `alert alert-${tipo}`;
     alert.textContent = mensaje;
     alert.style.display = 'block';
-    
+
+    // Oculta la alerta después de 5 segundos
     setTimeout(() => {
         alert.style.display = 'none';
     }, 5000);
 }
 
+// Carga y muestra el detalle de una venta específica en un modal
 async function verDetalle(ventaId) {
     try {
         const token = localStorage.getItem('token');
@@ -103,7 +113,7 @@ async function verDetalle(ventaId) {
         if (response.ok) {
             const data = await response.json();
             const venta = data.data;
-            mostrarDetalleVenta(venta);
+            mostrarDetalleVenta(venta);  // Muestra los datos dentro del modal
         } else {
             mostrarAlerta('Error al cargar el detalle de la venta', 'error');
         }
@@ -113,6 +123,7 @@ async function verDetalle(ventaId) {
     }
 }
 
+// Muestra la información detallada de una venta en el modal
 function mostrarDetalleVenta(venta) {
     const content = document.getElementById('detalleVentaContent');
     content.innerHTML = `
@@ -123,7 +134,7 @@ function mostrarDetalleVenta(venta) {
             <p><strong>Cliente:</strong> ${venta.nombreCliente}</p>
             <p><strong>Total:</strong> $${venta.total.toFixed(2)}</p>
         </div>
-        
+
         <div>
             <h4 style="color: #6a0dad; margin-bottom: 15px;">Productos</h4>
             <table style="width: 100%; border-collapse: collapse;">
@@ -152,13 +163,12 @@ function mostrarDetalleVenta(venta) {
     document.getElementById('detalleVentaModal').style.display = 'block';
 }
 
-
-// Cerrar modal
+// Evento: cierra el modal al hacer clic en el botón de cierre (X)
 document.getElementById('closeModal').onclick = function() {
     document.getElementById('detalleVentaModal').style.display = 'none';
 }
 
-// Cerrar modal al hacer clic fuera
+// Evento: cierra el modal si se hace clic fuera del contenido del modal
 window.onclick = function(event) {
     const modal = document.getElementById('detalleVentaModal');
     if (event.target === modal) {

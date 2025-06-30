@@ -1,30 +1,38 @@
 // URL base de la API
 const API_BASE_URL = 'http://localhost:3000/api';
 
-// Cliente API
+// Cliente API: agrupación de métodos para interactuar con el backend
 const ApiClient = {
-    // Función para obtener el token JWT del localStorage
+    // Obtiene el token JWT almacenado en localStorage
     getToken() {
         return localStorage.getItem('token');
     },
 
-    // Función para realizar peticiones a la API
-    async fetchApi(endpoint, options = {}){
+    // Función genérica para realizar peticiones a la API
+    async fetchApi(endpoint, options = {}) {
         const token = this.getToken();
         const defaultHeaders = {};
 
-        // solo para POST, PUT, etc.
+        // Si hay body (ej: POST o PUT), se agrega Content-Type
         if (options.body) {
             defaultHeaders['Content-Type'] = 'application/json';
-        }        // Añadir token de autorización si existe (excepto para endpoints públicos)
-        const endpointsPublicos = ['/authRoutes/login', '/productos/obtener', '/ventas/crear'];
+        }
+
+        // Lista de endpoints públicos que no requieren autenticación
+        const endpointsPublicos = [
+            '/authRoutes/login',
+            '/productos/obtener',
+            '/ventas/crear'
+        ];
+
+        // Si el token existe y el endpoint no es público, se agrega el Authorization header
         if (token && !endpointsPublicos.includes(endpoint)) {
             defaultHeaders['Authorization'] = `Bearer ${token}`;
         }
 
-        // Configuración por defecto para fetck
+        // Configuración final de la petición
         const config = {
-            headers: {...defaultHeaders, ...options.headers},
+            headers: { ...defaultHeaders, ...options.headers },
             ...options
         };
 
@@ -36,45 +44,50 @@ const ApiClient = {
 
             const data = await response.json();
 
-            if (!response.ok){
-                throw new Error(data.message || 'Error en la petición')
+            if (!response.ok) {
+                throw new Error(data.message || 'Error en la petición');
             }
 
             return data;
-        } catch (error){
+        } catch (error) {
             console.error('Error en la petición API: ', error);
             throw error;
         }
     },
 
-    // Inicio de sesión
-    async login(credentials){
+    // ===== AUTENTICACIÓN =====
+
+    // Realiza login con credenciales (email y password)
+    async login(credentials) {
         return this.fetchApi('/authRoutes/login', {
             method: 'POST',
             body: JSON.stringify(credentials)
         });
     },
 
-    // Cerrar Sesión
+    // Cierra sesión del usuario y limpia localStorage
     async logout() {
         await this.fetchApi('/authRoutes/logout', { method: 'POST' });
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = '/admin/login';
+        window.location.href = '/admin/login'; // Redirige al login
     },
 
-    // Obtener perfil del usuario
-    async getProfile(){
+    // Obtiene el perfil del usuario autenticado
+    async getProfile() {
         return this.fetchApi('/authRoutes/profile');
     },
 
-    // ===== MÉTODOS ADMIN =====
-    
-    // Productos
+    // ===== MÉTODOS ADMINISTRATIVOS =====
+
+    // === Productos ===
+
+    // Obtiene todos los productos para el panel admin
     async obtenerProductosAdmin() {
         return this.fetchApi('/admin/productos');
     },
 
+    // Crea un nuevo producto desde el panel admin
     async crearProductoAdmin(producto) {
         return this.fetchApi('/admin/productos', {
             method: 'POST',
@@ -82,6 +95,7 @@ const ApiClient = {
         });
     },
 
+    // Edita un producto existente (por ID)
     async editarProductoAdmin(id, producto) {
         return this.fetchApi(`/admin/productos/${id}`, {
             method: 'PUT',
@@ -89,26 +103,33 @@ const ApiClient = {
         });
     },
 
+    // Elimina un producto (por ID)
     async eliminarProductoAdmin(id) {
         return this.fetchApi(`/admin/productos/${id}`, {
             method: 'DELETE'
         });
     },
 
-    // Ventas
+    // === Ventas ===
+
+    // Obtiene todas las ventas registradas
     async obtenerVentasAdmin() {
         return this.fetchApi('/admin/ventas');
     },
 
+    // Obtiene ventas filtradas por rango de fechas
     async obtenerVentasPorRangoAdmin(fechaInicio, fechaFin) {
         return this.fetchApi(`/admin/ventas/rango?inicio=${fechaInicio}&fin=${fechaFin}`);
     },
 
-    // Usuarios
+    // === Usuarios ===
+
+    // Obtiene todos los usuarios registrados
     async obtenerUsuariosAdmin() {
         return this.fetchApi('/admin/usuarios');
     },
 
+    // Crea un nuevo usuario (admin, editor, etc.)
     async crearUsuarioAdmin(usuario) {
         return this.fetchApi('/admin/usuarios', {
             method: 'POST',
@@ -116,6 +137,7 @@ const ApiClient = {
         });
     },
 
+    // Edita un usuario existente (por ID)
     async editarUsuarioAdmin(id, usuario) {
         return this.fetchApi(`/admin/usuarios/${id}`, {
             method: 'PUT',
@@ -123,14 +145,17 @@ const ApiClient = {
         });
     },
 
+    // Elimina un usuario (por ID)
     async eliminarUsuarioAdmin(id) {
         return this.fetchApi(`/admin/usuarios/${id}`, {
             method: 'DELETE'
         });
     },
 
-    // Auditoría
+    // === Auditoría ===
+
+    // Obtiene el registro de acciones del sistema
     async obtenerAuditoriaAdmin() {
         return this.fetchApi('/admin/auditoria');
     }
-}
+};

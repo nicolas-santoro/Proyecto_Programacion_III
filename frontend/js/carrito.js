@@ -1,27 +1,36 @@
-function getCarrito() { // Obtiene el carrito del localStorage
+// === FUNCIONES PARA GESTIÓN DEL CARRITO ===
+
+// Obtiene el carrito desde localStorage (o devuelve uno vacío)
+function getCarrito() {
   return JSON.parse(localStorage.getItem('carrito')) || [];
 }
 
-function setCarrito(carrito) { // Guarda el carrito en el localStorage
+// Guarda el carrito en localStorage
+function setCarrito(carrito) {
   localStorage.setItem('carrito', JSON.stringify(carrito));
 }
 
-function renderCarrito() { // Renderiza el carrito en la tabla
+// Renderiza el carrito en la tabla HTML
+function renderCarrito() {
   const carrito = getCarrito();
   const tbody = document.getElementById('carrito-body');
-  tbody.innerHTML = ''; // Limpia el contenido del tbody
+  tbody.innerHTML = ''; // Limpia contenido previo
+
+  // Si el carrito está vacío, se muestra mensaje
   if (carrito.length === 0) {
     tbody.innerHTML = '<tr><td colspan="5">El carrito está vacío</td></tr>';
     document.getElementById('carrito-total').textContent = '$0';
     return;
   }
-  let total = 0; 
 
+  let total = 0;
+
+  // Crea filas por cada producto en el carrito
   carrito.forEach((prod, i) => {
     const subtotal = prod.precio * prod.cantidad;
     total += subtotal;
-    const tr = document.createElement('tr'); // Crea una nueva fila para el producto
-    // Ejemplo para tu función renderCarrito en carrito.js
+
+    const tr = document.createElement('tr');
     tr.innerHTML = `
         <td>${prod.nombre}</td>
         <td>$${prod.precio}</td>
@@ -41,65 +50,82 @@ function renderCarrito() { // Renderiza el carrito en la tabla
             </button>
         </td>
     `;
-    tbody.appendChild(tr); // Agrega la fila al tbody
+    tbody.appendChild(tr);
   });
 
+  // Actualiza el total en el HTML
   document.getElementById('carrito-total').textContent = `$${total}`;
 }
-// Para los clicks dentro del carrito
+
+// === CONFIGURACIÓN INICIAL ===
 document.addEventListener('DOMContentLoaded', () => {
-  renderCarrito(); // Renderiza el carrito al cargar la página
-    document.getElementById('carrito-body').addEventListener('click', (e) => {
-    let btn = e.target; // Si el click fue en un ícono <i>, subí al botón padre <button>
-    if (btn.tagName === 'I') { // tagmame es para saber el nombre de la etiqueta HTML -- es una propiedad de los elementos HTML
-        btn = btn.closest('button'); // busca el botón padre más cercano al "I" usando closest --que busca el padre que coincida con el botón más cercano--
+  renderCarrito(); // Muestra el carrito al cargar
+
+  // Manejo de eventos para botones dentro del carrito
+  document.getElementById('carrito-body').addEventListener('click', (e) => {
+    let btn = e.target;
+
+    // Si se hizo clic en un ícono <i>, busca el botón padre
+    if (btn.tagName === 'I') {
+      btn = btn.closest('button');
     }
-    if (!btn) return; // Si no hay botón, salimos
 
-    const carrito = getCarrito(); // Obtiene el carrito actual del localStorage 
-    const i = btn.dataset.i; // Obtiene el índice del producto en el carrito desde el atributo data-i del botón
+    if (!btn) return;
 
+    const carrito = getCarrito();
+    const i = btn.dataset.i; // Índice del producto
+
+    // Botón para sumar cantidad
     if (btn.classList.contains('btn-sumar')) {
-        carrito[i].cantidad++;
-        setCarrito(carrito);
-        renderCarrito();
+      carrito[i].cantidad++;
+      setCarrito(carrito);
+      renderCarrito();
     }
-    if (btn.classList.contains('btn-restar')) {
-        if (carrito[i].cantidad > 1) carrito[i].cantidad--;
-        setCarrito(carrito);
-        renderCarrito();
-    }
-    if (btn.classList.contains('btn-eliminar')) {
-        carrito.splice(i, 1);
-        setCarrito(carrito);
-        renderCarrito();
-    }
-    });
 
-  cancelarCompra(); //Habilita la posibilidad de cancelar la compra
+    // Botón para restar cantidad (mínimo 1)
+    if (btn.classList.contains('btn-restar')) {
+      if (carrito[i].cantidad > 1) carrito[i].cantidad--;
+      setCarrito(carrito);
+      renderCarrito();
+    }
+
+    // Botón para eliminar producto
+    if (btn.classList.contains('btn-eliminar')) {
+      carrito.splice(i, 1);
+      setCarrito(carrito);
+      renderCarrito();
+    }
+  });
+
+  cancelarCompra(); // Habilita botón de cancelación
 });
 
-// Obtenemos los elementos
+// === CONFIRMACIÓN Y FINALIZACIÓN DE COMPRA ===
+
+// Referencias al formulario y modal
 const formCompra = document.getElementById('formCompra');
 const modalConfirmacion = new bootstrap.Modal(document.getElementById('modalConfirmacion'));
 const btnConfirmarCompra = document.getElementById('btnConfirmarCompra');
 
+// Al enviar el formulario, mostramos el modal (no compramos todavía)
 formCompra.addEventListener('submit', function(e) {
   e.preventDefault();
-  modalConfirmacion.show(); // Mostrar el modal de confirmación
+  modalConfirmacion.show();
 });
 
-// Ahora la lógica de la compra la ejecutamos al presionar el botón "Sí"
+// Al confirmar en el modal, se realiza la compra
 btnConfirmarCompra.addEventListener('click', async function() {
   const nombreCliente = localStorage.getItem('nombreUsuario') || 'Cliente';
   const carrito = getCarrito();
 
+  // Validaciones
   if (!nombreCliente || carrito.length === 0) {
     mostrarAlerta('Debe ingresar su nombre y tener productos en el carrito...', 'danger');
     modalConfirmacion.hide();
     return;
   }
 
+  // Arma el objeto de venta
   const total = carrito.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
   const venta = {
     nombreCliente,
@@ -113,20 +139,23 @@ btnConfirmarCompra.addEventListener('click', async function() {
     fecha: new Date().toISOString()
   };
 
+  // Envía la venta a la API
   try {
     const data = await ApiClient.fetchApi('/ventas/crear', {
       method: 'POST',
       body: JSON.stringify(venta)
     });
 
+    // Si la API devuelve error
     if (!data || data.error) {
       throw new Error(data.error || 'Error al guardar la venta');
     }
 
+    // Guardamos el ticket y limpiamos el carrito
     localStorage.setItem('ticket', JSON.stringify(venta));
     localStorage.removeItem('carrito');
 
-    // Cierra el modal y redirige
+    // Cerramos modal y redirigimos al ticket
     document.activeElement.blur();
     modalConfirmacion.hide();
     window.location.href = '/html/ticket.html';
@@ -136,5 +165,6 @@ btnConfirmarCompra.addEventListener('click', async function() {
   }
 });
 
+// === IMPORTACIONES ===
 import { mostrarAlerta } from './alertas.js';
 import { cancelarCompra } from './cancelar.js';
