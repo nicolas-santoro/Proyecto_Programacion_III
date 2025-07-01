@@ -42,10 +42,11 @@ router.use('/productos', productoRoutes);
 router.use('/ventas', ventaRoutes);
 
 // RUTAS DE ADMINISTRACIÓN (Solo Admin)
+/*
 router.get('/admin/usuarios', verifyToken, usuarioController.obtenerUsuarios);
 router.post('/admin/usuarios', verifyToken, usuarioController.crearUsuario);
 router.put('/admin/usuarios/:id', verifyToken, usuarioController.actualizarUsuario);
-router.delete('/admin/usuarios/:id', verifyToken, usuarioController.eliminarUsuario);
+router.delete('/admin/usuarios/:id', verifyToken, usuarioController.eliminarUsuario); */
 
 router.get('/admin/productos', verifyToken, productoController.obtenerTodosProductos);
 router.get('/admin/productos/:id', verifyToken, productoController.obtenerProductoPorId);

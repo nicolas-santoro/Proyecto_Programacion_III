@@ -1,9 +1,10 @@
 const Usuario = require('../models/Usuario');
 const Accion = require('../models/Acciones');
 
-// 📋 Obtener todos los usuarios (solo administrador)
+// Obtener todos los usuarios (solo administrador)
 // Retorna la lista de usuarios excluyendo la contraseña para seguridad
 // Además registra la acción en el log de auditoría
+/*
 exports.obtenerUsuarios = async (peticion, respuesta) => {
   try {
     console.log('🔍 Obteniendo lista de usuarios...');
@@ -22,11 +23,12 @@ exports.obtenerUsuarios = async (peticion, respuesta) => {
     console.log('💥 Error al obtener usuarios:', error.message);
     return respuesta.status(500).json({ error: 'Error al obtener usuarios: ' + error.message });
   }
-};
+}; */
 
-// 🔎 Obtener un usuario por ID
+// Obtener un usuario por ID
 // Busca un usuario por su ID y excluye la contraseña en la respuesta
 // Devuelve 404 si no se encuentra el usuario
+/*
 exports.obtenerUsuarioPorId = async (req, res) => {
   try {
     const usuario = await Usuario.findById(req.params.id).select('-password');
@@ -39,11 +41,12 @@ exports.obtenerUsuarioPorId = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error: 'Error al obtener usuario' });
   }
-};
+}; */
 
-// ➕ Crear nuevo usuario (solo admin)
+// Crear nuevo usuario (solo admin)
 // Valida que el email no esté registrado previamente
 // Guarda el nuevo usuario y registra la acción de creación en auditoría
+/*
 exports.crearUsuario = async (req, res) => {
   try {
     const { nombre, email, password, rol } = req.body;
@@ -83,11 +86,12 @@ exports.crearUsuario = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error: 'Error al crear usuario' });
   }
-};
+}; */
 
-// ✏️ Actualizar usuario (solo admin)
+// Actualizar usuario (solo admin)
 // Valida existencia del usuario y evita duplicados en email
 // Actualiza los campos recibidos y registra la acción
+/*
 exports.actualizarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
@@ -132,11 +136,12 @@ exports.actualizarUsuario = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error: 'Error al actualizar usuario' });
   }
-};
+}; */
 
-// ❌ Eliminar usuario (solo admin)
+// Eliminar usuario (solo admin)
 // No permite que el usuario se elimine a sí mismo
 // Elimina el usuario y registra la acción de auditoría
+/*
 exports.eliminarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
@@ -164,11 +169,12 @@ exports.eliminarUsuario = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error: 'Error al eliminar usuario' });
   }
-};
+}; */
 
-// 🔐 Cambiar contraseña de usuario
+//  Cambiar contraseña de usuario
 // Valida longitud mínima de la nueva contraseña
 // Guarda el hash gracias a middleware en el modelo y registra auditoría
+/*
 exports.cambiarPassword = async (req, res) => {
   try {
     const { id } = req.params;
@@ -197,4 +203,8 @@ exports.cambiarPassword = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error: 'Error al cambiar contraseña' });
   }
+}; */
+
+module.exports = {
+  // Exportar objeto vacío por ahora para evitar errores x si algún archivo importa este controlador
 };

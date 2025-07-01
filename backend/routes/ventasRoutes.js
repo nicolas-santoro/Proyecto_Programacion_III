@@ -9,3 +9,4 @@ router.post('/crear', ventaController.crearVenta);
 router.get('/obtener', verifyToken, ventaController.obtenerVentas);
 
 module.exports = router;
+

@@ -241,36 +241,3 @@ exports.actualizarProducto = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Error al actualizar producto' });
   }
 };
-
-// Obtener estadísticas generales de productos (solo admin/auditor)
-exports.obtenerEstadisticasProductos = async (req, res) => {
-  try {
-    const totalProductos = await Producto.countDocuments();
-    const productosActivos = await Producto.countDocuments({ activo: true });
-    const productosInactivos = await Producto.countDocuments({ activo: false });
-
-    // Encontrar el producto más caro y más barato activos
-    const productoMasCaro = await Producto.findOne({ activo: true }).sort({ precio: -1 });
-    const productoMasBarato = await Producto.findOne({ activo: true }).sort({ precio: 1 });
-
-    const estadisticas = {
-      totalProductos,
-      productosActivos,
-      productosInactivos,
-      productoMasCaro,
-      productoMasBarato
-    };
-
-    // Registrar acción de auditoría
-    const Acciones = require('../models/Acciones');
-    await Acciones.create({
-      usuario: req.user.id,
-      accion: 'CONSULTAR_ESTADISTICAS_PRODUCTOS',
-      detalles: `Usuario ${req.user.nombre} consultó estadísticas de productos`
-    });
-
-    return res.status(200).json({ data: estadisticas });
-  } catch (error) {
-    return res.status(500).json({ error: 'Error al obtener estadísticas' });
-  }
-};
