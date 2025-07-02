@@ -10,6 +10,5 @@ router.post('/login', authController.login);
 // Rutas protegidas (solo admin)
 router.post('/logout', verifyToken, authController.logout);
 router.get('/profile', verifyToken, authController.getProfile);
-router.get('/profiles', verifyToken, authController.getAllProfiles);
 
 module.exports = router;
