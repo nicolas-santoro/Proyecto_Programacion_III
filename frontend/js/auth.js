@@ -45,7 +45,6 @@ const AuthController = {
             '/html/admin-productos.html',
             '/html/admin-auditoria.html',
             '/html/admin-form-producto.html',
-            '/html/adminCenter.html'
         ];
 
         // Si estamos en la página de login y ya hay token válido, redirigir al dashboard
