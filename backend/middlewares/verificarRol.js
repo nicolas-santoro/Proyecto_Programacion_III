@@ -35,6 +35,7 @@ exports.checkRole = function(...rolesPermitidos) {
 
 // Middlewares específicos para API JSON según nivel de acceso
 exports.soloAdmin = exports.checkRole('admin');
+/*
 exports.adminOEditor = exports.checkRole('admin', 'editor');
 exports.adminOVendedor = exports.checkRole('admin', 'vendedor');
-exports.todosRoles = exports.checkRole('admin', 'editor', 'vendedor', 'auditor');
+exports.todosRoles = exports.checkRole('admin', 'editor', 'vendedor', 'auditor');*/
