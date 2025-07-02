@@ -118,7 +118,7 @@ const AuthController = {
             localStorage.setItem('user', JSON.stringify(response.user));
 
             // Redirige al panel de administrador
-            window.location.href = './adminCenter.html';
+            window.location.href = './admin-dashboard.html';
         } catch (error) {
             console.log('Usuario equivocado:', error);
         }
