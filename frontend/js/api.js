@@ -117,41 +117,7 @@ const ApiClient = {
         return this.fetchApi('/admin/ventas');
     },
 
-    // Obtiene ventas filtradas por rango de fechas
-    async obtenerVentasPorRangoAdmin(fechaInicio, fechaFin) {
-        return this.fetchApi(`/admin/ventas/rango?inicio=${fechaInicio}&fin=${fechaFin}`);
-    },
-
-    // === Usuarios ===
-
-    // Obtiene todos los usuarios registrados
-    async obtenerUsuariosAdmin() {
-        return this.fetchApi('/admin/usuarios');
-    },
-
-    // Crea un nuevo usuario (admin, editor, etc.)
-    async crearUsuarioAdmin(usuario) {
-        return this.fetchApi('/admin/usuarios', {
-            method: 'POST',
-            body: JSON.stringify(usuario)
-        });
-    },
-
-    // Edita un usuario existente (por ID)
-    async editarUsuarioAdmin(id, usuario) {
-        return this.fetchApi(`/admin/usuarios/${id}`, {
-            method: 'PUT',
-            body: JSON.stringify(usuario)
-        });
-    },
-
-    // Elimina un usuario (por ID)
-    async eliminarUsuarioAdmin(id) {
-        return this.fetchApi(`/admin/usuarios/${id}`, {
-            method: 'DELETE'
-        });
-    },
-
+    
     // === Auditoría ===
 
     // Obtiene el registro de acciones del sistema

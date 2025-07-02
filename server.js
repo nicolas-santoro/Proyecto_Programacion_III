@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
 });
 
 // Ruta temporal para crear/verificar usuario administrador (solo para desarrollo)
-// Usar solo una vez o con cuidado, para no crear múltiples admins
+/*
 app.get('/crear-admin', async (req, res) => {
   try {
     const Usuario = require('./backend/models/Usuario'); // Importar modelo Usuario
@@ -64,7 +64,7 @@ app.get('/crear-admin', async (req, res) => {
     // Si hay error, responder con status 500 y mensaje del error
     res.status(500).json({ error: error.message });
   }
-});
+}); */
 
 // Importar middleware de autenticación
 const { verificarTokenAdminHTML } = require('./backend/middlewares/authMiddleware');
