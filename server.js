@@ -13,9 +13,6 @@ app.use(cors());
 app.use(express.json()); // Permite recibir JSON en el body de las peticiones
 app.use(express.urlencoded({ extended: true })); // Permite interpretar datos enviados con formularios (application/x-www-form-urlencoded)
 
-// Servir archivos estáticos (CSS, JS, imágenes) desde la carpeta 'frontend'
-app.use(express.static('frontend'));
-
 // Servir las imágenes subidas que estén en la carpeta 'uploads' bajo la ruta '/uploads'
 app.use('/uploads', express.static('uploads'));
 
@@ -67,6 +64,35 @@ app.get('/crear-admin', async (req, res) => {
     // Si hay error, responder con status 500 y mensaje del error
     res.status(500).json({ error: error.message });
   }
+});
+
+// Importar middleware de autenticación
+const { verificarTokenAdminHTML } = require('./backend/middlewares/authMiddleware');
+
+// Ruta de login NO debe estar protegida
+app.get('/html/admin-login.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'html', 'admin-login.html'));
+});
+
+// Proteger rutas de administración (excepto login)
+app.get('/html/admin-dashboard.html', verificarTokenAdminHTML, (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'html', 'admin-dashboard.html'));
+});
+
+app.get('/html/admin-ventas.html', verificarTokenAdminHTML, (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'html', 'admin-ventas.html'));
+});
+
+app.get('/html/admin-productos.html', verificarTokenAdminHTML, (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'html', 'admin-productos.html'));
+});
+
+app.get('/html/admin-auditoria.html', verificarTokenAdminHTML, (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'html', 'admin-auditoria.html'));
+});
+
+app.get('/html/admin-form-producto.html', verificarTokenAdminHTML, (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'html', 'admin-form-producto.html'));
 });
 
 // Conectar a la base de datos y luego iniciar el servidor en el puerto 3000

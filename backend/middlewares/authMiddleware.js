@@ -48,4 +48,26 @@ exports.verifyToken = async (req, res, next) => {
     }
 };
 
-module.exports.verifyToken = exports.verifyToken;
+// Middleware para verificar autenticación en rutas HTML de administración
+const verificarTokenAdminHTML = (req, res, next) => {
+  // No proteger la ruta de login
+  if (req.path.includes('admin-login.html')) {
+    return next();
+  }
+  
+  const token = req.headers.authorization?.split(' ')[1] || req.cookies.adminToken;
+  
+  if (!token) {
+    return res.redirect('/html/admin-login.html');
+  }
+  
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.redirect('/html/admin-login.html');
+  }
+};
+
+module.exports = { verifyToken, verificarTokenAdminHTML };

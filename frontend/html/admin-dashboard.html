@@ -324,6 +324,15 @@
             themeToggle.innerHTML = savedTheme === 'dark' ? '🌙' : '☀️';
         }
         
+        // Verificar autenticación inmediatamente
+        (function() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/html/admin-login.html';
+                return;
+            }
+        })();
+        
         // Verificar autenticación
         async function checkAuth() {
             const token = localStorage.getItem('token');
@@ -355,9 +364,10 @@
                 return true;
             } catch (error) {
                 console.error('Error validating token:', error);
-                // En caso de error de red, permitir acceso temporal
-                document.getElementById('userName').textContent = `Hola, ${user.nombre || user.email || 'Admin'}`;
-                return true;
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/html/admin-login.html';
+                return false;
             }
         }
         

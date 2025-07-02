@@ -11,11 +11,36 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Verifica si hay un token en el almacenamiento local; si no, redirige al login
-function verificarAutenticacion() {
+async function verificarAutenticacion() {
     const token = localStorage.getItem('token');
     if (!token) {
         window.location.href = '/html/admin-login.html';
-        return;
+        return false;
+    }
+
+    // Verificar token con el servidor
+    try {
+        const response = await fetch(`${API_BASE}/admin/productos`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/html/admin-login.html';
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.error('Error verificando autenticación:', error);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/html/admin-login.html';
+        return false;
     }
 }
 
@@ -140,7 +165,7 @@ function getAccionColor(accion) {
     return colors[accion] || 'secondary';
 }
 
-// Muestra una alerta temporal en pantalla con un mensaje y un tipo (info, error, etc.)
+// Muestra una alerta temporal en pantalla with un mensaje y un tipo (info, error, etc.)
 function mostrarAlerta(mensaje, tipo) {
     const alert = document.getElementById('alert');
     alert.className = `alert alert-${tipo}`;

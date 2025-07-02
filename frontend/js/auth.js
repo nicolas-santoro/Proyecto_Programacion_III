@@ -38,16 +38,69 @@ const AuthController = {
         const user = localStorage.getItem('user');
         const currentPage = window.location.pathname;
 
-        if (token && user) {
-            // Si está autenticado y está en la página de login, lo redirige al panel
-            if (currentPage.includes('/admin/login') || currentPage === '/') {
-                window.location.href = './adminCenter.html';
+        // Lista de páginas que requieren autenticación
+        const paginasProtegidas = [
+            '/html/admin-dashboard.html',
+            '/html/admin-ventas.html', 
+            '/html/admin-productos.html',
+            '/html/admin-auditoria.html',
+            '/html/admin-form-producto.html',
+            '/html/adminCenter.html'
+        ];
+
+        // Si estamos en la página de login y ya hay token válido, redirigir al dashboard
+        if (currentPage.includes('/html/admin-login.html') && token && user) {
+            try {
+                const response = await fetch('/api/admin/productos', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    window.location.href = '/html/admin-dashboard.html';
+                    return;
+                }
+            } catch (error) {
+                // Si falla la verificación, limpiar tokens y permitir acceso al login
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
             }
-            // Si ya está en el panel, no hace nada
-        } else {
-            // Si no está autenticado y está en el panel, lo redirige al login
-            if (currentPage.includes('adminCenter.html')) {
-                window.location.href = '/admin/login';
+        }
+
+        // Verificar si la página actual requiere autenticación
+        const paginaProtegida = paginasProtegidas.some(pagina => currentPage.includes(pagina));
+
+        if (paginaProtegida) {
+            if (!token || !user) {
+                window.location.href = '/html/admin-login.html';
+                return;
+            }
+
+            // Verificar token con el servidor
+            try {
+                const response = await fetch('/api/admin/productos', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = '/html/admin-login.html';
+                    return;
+                }
+            } catch (error) {
+                console.error('Error verificando token:', error);
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/html/admin-login.html';
+                return;
             }
         }
     },

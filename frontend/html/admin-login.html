@@ -364,9 +364,9 @@
         window.addEventListener('DOMContentLoaded', function() {
             loadTheme();
             
+            // Solo limpiar tokens inválidos si existen, pero no redirigir automáticamente
             const token = localStorage.getItem('token');
             if (token) {
-                // Validar token antes de redirigir
                 fetch('/api/admin/productos', {
                     method: 'GET',
                     headers: {
@@ -375,13 +375,12 @@
                     }
                 })
                 .then(response => {
-                    if (response.ok) {
-                        window.location.href = '/html/admin-dashboard.html';
-                    } else {
+                    if (!response.ok) {
                         // Token inválido, limpiar localStorage
                         localStorage.removeItem('token');
                         localStorage.removeItem('user');
                     }
+                    // No redirigir automáticamente, permitir que el usuario haga login manualmente
                 })
                 .catch(error => {
                     console.error('Error validating token:', error);
