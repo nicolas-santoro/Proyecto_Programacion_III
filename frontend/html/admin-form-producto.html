@@ -5,175 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="../img/HP_LOGO.png">
     <title>Producto - Hachis Parmentier</title>
+    <link rel="stylesheet" href="../css/admin.css">
     <style>
-        :root {
-            --bg-primary-light: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 50%, #ddd6fe 100%);
-            --bg-primary-dark: linear-gradient(135deg, #1a1a1a 0%, #4b0082 50%, #000000 100%);
-            --bg-card-light: #ffffff;
-            --bg-card-dark: #222;
-            --text-primary-light: #4c1d95;
-            --text-primary-dark: #f0f0f0;
-            --text-secondary-light: #6b7280;
-            --text-secondary-dark: #d8b0ff;
-            --border-light: #e5e7eb;
-            --border-dark: #6a0dad;
-            --accent-color: #6a0dad;
-            --accent-gradient: linear-gradient(135deg, #6a0dad 0%, #a020f0 100%);
-        }
-
-        [data-theme="light"] {
-            --bg-primary: var(--bg-primary-light);
-            --bg-card: var(--bg-card-light);
-            --text-primary: var(--text-primary-light);
-            --text-secondary: var(--text-secondary-light);
-            --border-color: var(--border-light);
-            --shadow: 0 2px 10px rgba(106, 13, 173, 0.1);
-            --input-bg: #ffffff;
-        }
-
-        [data-theme="dark"] {
-            --bg-primary: var(--bg-primary-dark);
-            --bg-card: var(--bg-card-dark);
-            --text-primary: var(--text-primary-dark);
-            --text-secondary: var(--text-secondary-dark);
-            --border-color: var(--border-dark);
-            --shadow: 0 2px 10px rgba(160, 32, 240, 0.2);
-            --input-bg: #333;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Arial', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            transition: all 0.3s ease;
-        }
-        
-        .navbar {
-            background: var(--accent-gradient);
-            color: white;
-            padding: 1rem 0;
-            box-shadow: var(--shadow);
-        }
-        
-        .navbar-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .navbar h1 {
-            font-size: 1.5rem;
-        }
-        
-        .navbar-controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .theme-toggle {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background 0.3s;
-        }
-        
-        .theme-toggle:hover {
-            background: rgba(255,255,255,0.3);
-        }
-        
-        .back-link {
-            color: white;
-            text-decoration: none;
-            padding: 8px 15px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        
-        .back-link:hover {
-            background: rgba(255,255,255,0.3);
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 0 20px;
-        }
-        
-        .form-container {
-            background: var(--bg-card);
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-        }
-        
-        .form-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        
-        .form-header h2 {
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
-        
-        .form-header p {
-            color: var(--text-secondary);
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-            font-weight: bold;
-        }
-        
-        input[type="text"], 
-        input[type="number"], 
-        textarea, 
-        select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid var(--border-color);
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-            background: var(--input-bg);
-            color: var(--text-primary);
-        }
-        
-        input:focus, 
-        textarea:focus, 
-        select:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-        
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        
+        /* Estilos específicos para formularios de producto */
         .file-input-container {
             position: relative;
             display: inline-block;
@@ -221,69 +55,9 @@
             margin-top: 2rem;
         }
         
-        .btn {
-            padding: 12px 30px;
-            border-radius: 5px;
-            text-decoration: none;
-            display: inline-block;
-            cursor: pointer;
-            font-size: 1rem;
-            border: none;
-            transition: transform 0.2s;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-        
-        .btn-primary {
-            background: var(--accent-gradient);
-            color: white;
-        }
-        
-        .btn-secondary {
-            background: var(--text-secondary);
-            color: white;
-        }
-        
-        .alert {
-            padding: 12px;
-            margin-bottom: 1rem;
-            border-radius: 5px;
-            text-align: center;
-            display: none;
-        }
-        
-        .alert-success {
-            background-color: rgba(74, 222, 128, 0.2);
-            color: #4ade80;
-            border: 1px solid rgba(74, 222, 128, 0.3);
-        }
-        
-        .alert-error {
-            background-color: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-        
         .loading {
             opacity: 0.6;
             pointer-events: none;
-        }
-        
-        @media (max-width: 768px) {
-            .navbar-content {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .form-actions {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-            }
         }
     </style>
 </head>
@@ -359,201 +133,86 @@
         </footer>
     </div>
     
+    <!-- Cargar admin-common.js PRIMERO -->
+    <script src="../js/admin-common.js"></script>
     <script>
-        let isEditMode = false;
-        let productoId = null;
+    // SOLO funciones necesarias para CREAR productos
+    function toggleTheme() {
+        AdminCommon.toggleTheme();
+    }
+    
+    function mostrarAlerta(mensaje, tipo) {
+        AdminCommon.showAlert(mensaje, tipo);
+    }
 
-        // Toggle tema
-        function toggleTheme() {
-            const body = document.body;
-            const themeToggle = document.querySelector('.theme-toggle');
-            
-            if (body.getAttribute('data-theme') === 'dark') {
-                body.setAttribute('data-theme', 'light');
-                themeToggle.innerHTML = '☀️';
-                localStorage.setItem('admin-theme', 'light');
-            } else {
-                body.setAttribute('data-theme', 'dark');
-                themeToggle.innerHTML = '🌙';
-                localStorage.setItem('admin-theme', 'dark');
-            }
-        }
+    // Verificar autenticación al cargar la página
+    window.addEventListener('DOMContentLoaded', async function() {
+        const isAuthenticated = await AdminCommon.init();
+        if (!isAuthenticated) return;
         
-        // Cargar tema guardado
-        function loadTheme() {
-            const savedTheme = localStorage.getItem('admin-theme') || 'dark';
-            const body = document.body;
-            const themeToggle = document.querySelector('.theme-toggle');
-            
-            body.setAttribute('data-theme', savedTheme);
-            themeToggle.innerHTML = savedTheme === 'dark' ? '🌙' : '☀️';
-        }
+        // Esta página SOLO es para CREAR (no tiene la lógica de edición)
+    });
 
-        // Verificar autenticación al cargar la página
-        window.addEventListener('DOMContentLoaded', function() {
-            loadTheme();
-            
-            const token = localStorage.getItem('token');
-            if (!token) {
-                window.location.href = '/html/admin-login.html';
-                return;
-            }
-
-            // Verificar si estamos en modo edición
-            const urlParams = new URLSearchParams(window.location.search);
-            productoId = urlParams.get('id');
-            
-            if (productoId) {
-                isEditMode = true;
-                cargarProducto(productoId);
-            }
-        });
-
-        function cargarProducto(id) {
-            const token = localStorage.getItem('token');
-            console.log('Cargando producto con ID:', id);
-            console.log('Token:', token ? 'Presente' : 'No presente');
-            
-            fetch(`/api/admin/productos/${id}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => {
-                console.log('Response status:', response.status);
-                console.log('Response headers:', response.headers);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                return response.text(); // Primero obtenemos el texto para ver qué viene
-            })
-            .then(text => {
-                console.log('Response text:', text);
-                
-                try {
-                    const data = JSON.parse(text);
-                    
-                    if (data.success) {
-                        const producto = data.producto;
-                    
-                    // Actualizar títulos
-                    document.getElementById('page-title').textContent = 'Editar Producto';
-                    document.getElementById('form-title').textContent = 'Editar Producto';
-                    document.getElementById('form-subtitle').textContent = 'Modifica los datos del producto';
-                    document.getElementById('submit-btn').textContent = 'Actualizar Producto';
-                    
-                    // Llenar el formulario
-                    document.getElementById('nombre').value = producto.nombre || '';
-                    document.getElementById('precio').value = producto.precio || '';
-                    document.getElementById('categoria').value = producto.categoria || '';
-                    
-                    // Mostrar imagen actual si existe
-                    if (producto.imagen) {
-                        const currentImageContainer = document.getElementById('current-image-container');
-                        const currentImage = document.getElementById('current-image');
-                        currentImage.src = `/uploads/${producto.imagen}`;
-                        currentImage.alt = producto.nombre;
-                        currentImageContainer.style.display = 'block';
-                        document.getElementById('file-label').textContent = 'Cambiar imagen';
-                    }
-                } else {
-                    mostrarAlerta('Error al cargar el producto: ' + data.message, 'error');
-                }
-                } catch (parseError) {
-                    console.error('Error parsing JSON:', parseError);
-                    console.error('Response was:', text);
-                    mostrarAlerta('Error: El servidor devolvió una respuesta inválida', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                mostrarAlerta('Error al cargar el producto: ' + error.message, 'error');
-            });
-        }
-
-        // Manejar el formulario
-        document.getElementById('producto-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const token = localStorage.getItem('token');
-            
-            // Deshabilitar botón durante el envío
-            const submitBtn = document.getElementById('submit-btn');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Procesando...';
-            submitBtn.disabled = true;
-            document.querySelector('.form-container').classList.add('loading');
-            
-            const url = isEditMode ? `/api/admin/productos/${productoId}` : '/api/admin/productos';
-            const method = isEditMode ? 'PUT' : 'POST';
-            
-            fetch(url, {
-                method: method,
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    mostrarAlerta(
-                        isEditMode ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente', 
-                        'success'
-                    );
-                    
-                    // Redirigir después de 2 segundos
-                    setTimeout(() => {
-                        window.location.href = '/html/admin-productos.html';
-                    }, 2000);
-                } else {
-                    mostrarAlerta('Error: ' + data.message, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                mostrarAlerta('Error al procesar la solicitud', 'error');
-            })
-            .finally(() => {
-                // Rehabilitar botón
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-                document.querySelector('.form-container').classList.remove('loading');
-            });
-        });
-
-        // Mejorar la experiencia de subida de archivos
-        document.getElementById('imagen').addEventListener('change', function(e) {
-            const fileName = e.target.files[0]?.name;
-            const fileLabel = document.getElementById('file-label');
-            
-            if (fileName) {
-                fileLabel.textContent = fileName;
+    // Manejar SOLO la creación de productos
+    document.getElementById('producto-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const token = localStorage.getItem('token');
+        
+        // Estado de carga
+        const submitBtn = document.getElementById('submit-btn');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Procesando...';
+        submitBtn.disabled = true;
+        document.querySelector('.form-container').classList.add('loading');
+        
+        // SOLO POST para crear (sin condicionales)
+        fetch('/api/admin/productos', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                mostrarAlerta('Producto creado exitosamente', 'success');
+                setTimeout(() => {
+                    window.location.href = '/html/admin-productos.html';
+                }, 2000);
             } else {
-                fileLabel.textContent = isEditMode ? 'Cambiar imagen' : 'Seleccionar imagen';
+                mostrarAlerta('Error: ' + data.message, 'error');
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarAlerta('Error al procesar la solicitud', 'error');
+        })
+        .finally(() => {
+            // Restaurar estado
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+            document.querySelector('.form-container').classList.remove('loading');
         });
+    });
 
-        function mostrarAlerta(mensaje, tipo) {
-            const alert = document.getElementById('alert');
-            alert.className = `alert alert-${tipo}`;
-            alert.textContent = mensaje;
-            alert.style.display = 'block';
-            
-            // Auto-ocultar después de 5 segundos
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 5000);
+    // UX para archivos
+    document.getElementById('imagen').addEventListener('change', function(e) {
+        const fileName = e.target.files[0]?.name;
+        const fileLabel = document.getElementById('file-label');
+        
+        if (fileName) {
+            fileLabel.textContent = fileName;
+        } else {
+            fileLabel.textContent = 'Seleccionar imagen';  // Texto fijo
         }
+    });
 
-        function volverAlDashboard() {
-            window.location.href = '/html/admin-productos.html';
-        }
-    </script>
+    function volverAlDashboard() {
+        window.location.href = '/html/admin-productos.html';
+    }
+</script>
 </body>
 </html>

@@ -5,44 +5,12 @@ const API_BASE = '/api';
 let auditoriaData = [];
 
 // Evento que se ejecuta cuando el DOM está completamente cargado
-document.addEventListener('DOMContentLoaded', function() {
-    verificarAutenticacion();  // Verifica si el usuario está autenticado
-    cargarAuditoria();         // Carga los datos de auditoría desde el servidor
+document.addEventListener('DOMContentLoaded', async function() {
+    const isAuthenticated = await AdminCommon.init();
+    if (isAuthenticated) {
+        cargarAuditoria();
+    }
 });
-
-// Verifica si hay un token en el almacenamiento local; si no, redirige al login
-async function verificarAutenticacion() {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        window.location.href = '/html/admin-login.html';
-        return false;
-    }
-
-    // Verificar token con el servidor
-    try {
-        const response = await fetch(`${API_BASE}/admin/productos`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = '/html/admin-login.html';
-            return false;
-        }
-        return true;
-    } catch (error) {
-        console.error('Error verificando autenticación:', error);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/html/admin-login.html';
-        return false;
-    }
-}
 
 // Carga los datos de auditoría desde la API
 async function cargarAuditoria() {
@@ -167,13 +135,5 @@ function getAccionColor(accion) {
 
 // Muestra una alerta temporal en pantalla with un mensaje y un tipo (info, error, etc.)
 function mostrarAlerta(mensaje, tipo) {
-    const alert = document.getElementById('alert');
-    alert.className = `alert alert-${tipo}`;
-    alert.textContent = mensaje;
-    alert.style.display = 'block';
-
-    // Oculta la alerta después de 5 segundos
-    setTimeout(() => {
-        alert.style.display = 'none';
-    }, 5000);
+    AdminCommon.showAlert(mensaje, tipo);
 }

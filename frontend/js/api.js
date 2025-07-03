@@ -81,6 +81,13 @@ const ApiClient = {
     // ===== MÉTODOS ADMINISTRATIVOS =====
 
     // === Productos ===
+/* 
+// ========================================
+// FUNCIONES NO UTILIZADAS ACTUALMENTE
+// ========================================
+// Estas funciones están listas para usar pero el frontend
+// actualmente utiliza fetch() directo en cada página.
+// Se mantienen para futuras migraciones o nuevas páginas.
 
     // Obtiene todos los productos para el panel admin
     async obtenerProductosAdmin() {
@@ -109,7 +116,7 @@ const ApiClient = {
             method: 'DELETE'
         });
     },
-
+*/
     // === Ventas ===
 
     // Obtiene todas las ventas registradas
