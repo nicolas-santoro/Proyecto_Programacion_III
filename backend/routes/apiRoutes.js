@@ -6,7 +6,6 @@ const path = require('path');
 const productoRoutes = require('./productosRoutes');
 const ventaRoutes = require('./ventasRoutes');
 const { verifyToken } = require('../middlewares/authMiddleware');
-const usuarioController = require('../controllers/usuarioController');
 const productoController = require('../controllers/productoController');
 const ventaController = require('../controllers/ventaController');
 const auditoriaController = require('../controllers/auditoriaController');

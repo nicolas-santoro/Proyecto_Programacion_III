@@ -15,7 +15,7 @@ require('dotenv').config();
  *    - 404: Usuario no encontrado
  *    - 403: Usuario no autorizado (no es admin)
  */
-exports.verifyToken = async (req, res, next) => {
+const verifyToken = async (req, res, next) => {
     try {
         // Obtener token de Authorization header (formato "Bearer <token>")
         const token = req.headers.authorization?.split(' ')[1];
@@ -70,4 +70,4 @@ const verificarTokenAdminHTML = (req, res, next) => {
   }
 };
 
-module.exports = { verifyToken, verificarTokenAdminHTML };
+module.exports = {verifyToken, verificarTokenAdminHTML};

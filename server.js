@@ -13,8 +13,15 @@ app.use(cors());
 app.use(express.json()); // Permite recibir JSON en el body de las peticiones
 app.use(express.urlencoded({ extended: true })); // Permite interpretar datos enviados con formularios (application/x-www-form-urlencoded)
 
-// Servir las imágenes subidas que estén en la carpeta 'uploads' bajo la ruta '/uploads'
+// se Sirven los archivos estáticos antes que las rutas protegidas
+app.use('/css', express.static(path.join(__dirname, 'frontend', 'css')));
+app.use('/js', express.static(path.join(__dirname, 'frontend', 'js')));
+app.use('/img', express.static(path.join(__dirname, 'frontend', 'img')));
 app.use('/uploads', express.static('uploads'));
+
+app.use('/html', express.static(path.join(__dirname, 'frontend', 'html')));
+
+// ...existing code...
 
 // Rutas principales de la API
 app.use('/api', require('./backend/routes/apiRoutes')); // Rutas de recursos generales (productos, ventas, etc)
