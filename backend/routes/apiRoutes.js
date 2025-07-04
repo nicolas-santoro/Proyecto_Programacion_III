@@ -5,6 +5,7 @@ const path = require('path');
 
 const productoRoutes = require('./productosRoutes');
 const ventaRoutes = require('./ventasRoutes');
+const authRoutes = require('./authRoutes');
 const { verifyToken } = require('../middlewares/authMiddleware');
 const productoController = require('../controllers/productoController');
 const ventaController = require('../controllers/ventaController');
@@ -39,6 +40,7 @@ const upload = multer({
 
 router.use('/productos', productoRoutes);
 router.use('/ventas', ventaRoutes);
+router.use('/authRoutes', authRoutes);
 
 // RUTAS DE ADMINISTRACIÓN (Solo Admin)
 /*
@@ -51,6 +53,7 @@ router.get('/admin/productos', verifyToken, productoController.obtenerTodosProdu
 router.get('/admin/productos/:id', verifyToken, productoController.obtenerProductoPorId);
 router.post('/admin/productos', verifyToken, upload.single('imagen'), productoController.crearProducto);
 router.put('/admin/productos/:id', verifyToken, upload.single('imagen'), productoController.actualizarProducto);
+router.delete('/admin/productos/:id/eliminar', verifyToken, productoController.eliminarProductoPermanentemente);
 router.delete('/admin/productos/:id', verifyToken, productoController.borrarProducto);
 router.patch('/admin/productos/:id/recuperar', verifyToken, productoController.recuperarProducto);
 

@@ -129,6 +129,7 @@
 <body data-theme="dark">
     <nav class="navbar">
         <div class="navbar-content">
+            <img src="../img/HP_LOGO.png" alt="Logo de Hachis Parmentier" style="width: 40px; height: 40px;">
             <h1>Hachis Parmentier</h1>
             <div class="navbar-controls">
                 <button class="theme-toggle" onclick="toggleTheme()">
@@ -319,12 +320,18 @@
                                             <button class="btn btn-edit" onclick="editProduct('${producto._id}')">
                                                 ✏️ Editar
                                             </button>
-                                            <button class="btn btn-delete" onclick="deleteProduct('${producto._id}', '${producto.nombre}')">
-                                                🗑️ Desactivar
+                                            <button class="btn btn-recover" onclick="deleteProduct('${producto._id}', '${producto.nombre}')">
+                                                🔄 Desactivar
+                                            </button>
+                                            <button class="btn btn-delete" onclick="permanentDeleteProduct('${producto._id}', '${producto.nombre}')">
+                                                🗑️ ELIMINAR
                                             </button>
                                         ` : `
                                             <button class="btn btn-recover" onclick="recoverProduct('${producto._id}', '${producto.nombre}')">
                                                 🔄 Recuperar
+                                            </button>
+                                            <button class="btn btn-delete" onclick="permanentDeleteProduct('${producto._id}', '${producto.nombre}')">
+                                                🗑️ ELIMINAR
                                             </button>
                                         `}
                                     </div>
@@ -354,17 +361,9 @@
             botonAccion.className = 'btn-modal';
             
             if (mode === 'edit') {
-                // Modo edición
-                tituloModal.textContent = 'Editar Producto';
-                formularioEdicion.style.display = 'block';
-                mensajeConfirmacion.style.display = 'none';
-                botonAccion.textContent = 'Guardar Cambios';
-                
-                // Llenar formulario
-                document.getElementById('productName').value = producto.nombre || '';
-                document.getElementById('productPrice').value = producto.precio || '';
-                document.getElementById('productCategory').value = producto.categoria || '';
-                document.getElementById('productImage').value = producto.imagen || '';
+                // Redirigir directamente en lugar de mostrar modal
+                window.location.href = `/html/admin-editar-producto.html?id=${producto._id}`;
+                return;
                 
             } else if (mode === 'deactivate') {
                 // Modo desactivación
@@ -402,32 +401,61 @@
                 
                 botonAccion.textContent = 'Sí, reactivarlo';
                 botonAccion.classList.add('btn-recover');
+                
+            } else if (mode === 'permanentDelete') {
+                // Modo eliminación permanente
+                tituloModal.textContent = 'Eliminar Producto Permanentemente';
+                formularioEdicion.style.display = 'none';
+                mensajeConfirmacion.style.display = 'block';
+                
+                iconoConfirmacion.textContent = '🗑️';
+                iconoConfirmacion.style.color = '#dc3545';
+                tituloConfirmacion.textContent = '¿ELIMINAR PERMANENTEMENTE?';
+                tituloConfirmacion.style.color = '#dc3545';
+                textoConfirmacion.innerHTML = `
+                    <div style="color: #dc3545; font-weight: bold; margin-bottom: 10px;">
+                        ⚠️ ACCIÓN IRREVERSIBLE ⚠️
+                    </div>
+                    Estás a punto de eliminar <strong>PERMANENTEMENTE</strong> el producto <strong>"${producto.nombre}"</strong>.<br><br>
+                    <em style="color: #dc3545;">
+                        Esta acción NO se puede deshacer. El producto será eliminado completamente de la base de datos.
+                    </em>
+                `;
+                
+                botonAccion.textContent = 'SÍ, ELIMINAR PERMANENTEMENTE';
+                botonAccion.classList.add('btn-permanent-delete');
+                botonAccion.style.backgroundColor = '#dc3545';
+                botonAccion.style.fontWeight = 'bold';
             }
             
             modal.style.display = 'block';
         }
         
-        // Editar producto
+        // Editar producto - ahora redirige a página de edición
         function editProduct(id) {
             if (!id || id.trim() === '') {
                 showAlert('Error: ID de producto inválido', 'error');
                 return;
             }
             
-            const producto = todosLosProductos.find(p => p._id === id);
-            
-            if (producto) {
-                configureModal('edit', producto);
-            } else {
-                loadProductFromAPI(id);
-            }
+            window.location.href = `/html/admin-editar-producto.html?id=${id}`;
         }
         
-        // Desactivar producto
+        // Desactivar producto (borrado suave)
         function deleteProduct(id, nombre) {
             const producto = todosLosProductos.find(p => p._id === id);
             if (producto) {
                 configureModal('deactivate', producto);
+            } else {
+                showAlert('Producto no encontrado', 'error');
+            }
+        }
+
+        // Eliminar producto permanentemente
+        function permanentDeleteProduct(id, nombre) {
+            const producto = todosLosProductos.find(p => p._id === id);
+            if (producto) {
+                configureModal('permanentDelete', producto);
             } else {
                 showAlert('Producto no encontrado', 'error');
             }
@@ -465,12 +493,12 @@
         document.getElementById('modalActionBtn').onclick = async function() {
             if (!productoEditando) return;
             
-            if (modalMode === 'edit') {
-                await handleEditProduct();
-            } else if (modalMode === 'deactivate') {
+            if (modalMode === 'deactivate') {
                 await handleDeactivateProduct();
             } else if (modalMode === 'reactivate') {
                 await handleReactivateProduct();
+            } else if (modalMode === 'permanentDelete') {
+                await handlePermanentDeleteProduct();
             }
         }
         
@@ -599,6 +627,42 @@
                 }
             } catch (error) {
                 showAlert('Error al reactivar el producto: ' + error.message, 'error');
+            }
+        }
+        
+        // Manejar eliminación permanente de producto
+        async function handlePermanentDeleteProduct() {
+            const token = localStorage.getItem('token');
+            
+            try {
+                const respuesta = await fetch(`${API_BASE}/admin/productos/${productoEditando._id}/eliminar`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const textoRespuesta = await respuesta.text();
+                let datos;
+                try {
+                    datos = JSON.parse(textoRespuesta);
+                } catch (errorParseo) {
+                    throw new Error('La respuesta del servidor no es válida: ' + textoRespuesta.substring(0, 100));
+                }
+                
+                if (respuesta.ok) {
+                    if (datos.success === true || datos.success === 'true') {
+                        showAlert(datos.message || 'El producto se eliminó permanentemente', 'success');
+                        loadProducts();
+                        document.getElementById('productModal').style.display = 'none';
+                    } else {
+                        throw new Error(datos.message || 'Error al eliminar el producto');
+                    }
+                } else {
+                    throw new Error(datos.message || 'Error al eliminar el producto');
+                }
+            } catch (error) {
+                showAlert('Error al eliminar el producto: ' + error.message, 'error');
             }
         }
         
@@ -857,8 +921,5 @@
             });
         });
     </script>
-</body>
-</html>
-    <script src="../js/admin-common.js"></script>
 </body>
 </html>

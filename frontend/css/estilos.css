@@ -466,3 +466,19 @@ footer {
   margin-left: 20px;
   padding-left: 0;
 }
+
+/* Estilo para el botón de eliminación permanente */
+.btn-permanent-delete {
+  background-color: #dc3545 !important;
+  color: white !important;
+  border: 2px solid #dc3545;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.btn-permanent-delete:hover {
+  background-color: #c82333 !important;
+  border-color: #c82333;
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}

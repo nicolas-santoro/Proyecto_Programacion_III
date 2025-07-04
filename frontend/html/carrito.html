@@ -102,6 +102,17 @@
     
     <script src="../js/api.js"></script>
     
+    <script>
+        // Verificar si el usuario tiene nombre guardado antes de cargar la página
+        (function() {
+            const nombreUsuario = localStorage.getItem('nombreUsuario');
+            if (!nombreUsuario || nombreUsuario.trim() === '') {
+                window.location.href = '/html/index.html';
+                return;
+            }
+        })();
+    </script>
+    
     <script type="module" src="../js/carrito.js"></script>
     <script src="../js/theme.js"></script>
 </body>

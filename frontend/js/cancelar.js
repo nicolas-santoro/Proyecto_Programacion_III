@@ -19,8 +19,11 @@ export function cancelarCompra() {
   // Si existe el botón de confirmación dentro del modal
   if (btnConfirmarCancelacion) {
     btnConfirmarCancelacion.addEventListener('click', () => {
-      // Elimina el carrito del localStorage (mantiene el nombre del usuario)
+      // Elimina el carrito del localStorage
       localStorage.removeItem('carrito');
+      
+      // Borrar el nombre del usuario al cancelar la compra
+      localStorage.removeItem('nombreUsuario');
 
       // Oculta el modal
       modal.hide();

@@ -1,4 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
+  // Verificar si el usuario tiene nombre guardado antes de mostrar el ticket
+  const nombreUsuario = localStorage.getItem('nombreUsuario');
+  if (!nombreUsuario || nombreUsuario.trim() === '') {
+    window.location.href = '/html/index.html';
+    return;
+  }
+
   // Recuperamos el ticket de compra almacenado en localStorage (JSON)
   const ticketJSON = localStorage.getItem('ticket');
 
@@ -78,4 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Guardamos el PDF con un nombre en francés
     doc.save("reçu_d'achat.pdf");
   });
+
+  // Borrar el nombre del usuario después de mostrar el ticket (compra completada)
+  localStorage.removeItem('nombreUsuario');
 });

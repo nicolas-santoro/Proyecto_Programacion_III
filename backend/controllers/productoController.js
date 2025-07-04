@@ -241,3 +241,48 @@ exports.actualizarProducto = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Error al actualizar producto' });
   }
 };
+
+// Eliminar producto permanentemente de la base de datos (solo admin)
+exports.eliminarProductoPermanentemente = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Validar que sea un ObjectId válido de MongoDB
+    const mongoose = require('mongoose');
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: 'ID de producto inválido' });
+    }
+
+    // Buscar y eliminar el producto
+    const producto = await Producto.findByIdAndDelete(id);
+
+    if (!producto) {
+      return res.status(404).json({ success: false, message: 'Producto no encontrado' });
+    }
+
+    // Registrar la acción en auditoría usando una acción válida del enum
+    try {
+      const Acciones = require('../models/Acciones');
+      await Acciones.create({
+        usuario: req.user.id,
+        accion: 'ELIMINAR_PRODUCTO',
+        detalles: `Usuario ${req.user.nombre} eliminó permanentemente el producto: ${producto.nombre}`
+      });
+    } catch (auditError) {
+      console.error('Error al registrar auditoría:', auditError);
+      // Continuar sin bloquear la respuesta principal
+    }
+
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Producto eliminado permanentemente', 
+      data: producto 
+    });
+  } catch (error) {
+    console.error('Error al eliminar producto permanentemente:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Error al eliminar producto permanentemente' 
+    });
+  }
+};

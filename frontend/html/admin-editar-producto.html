@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../img/HP_LOGO.png">
+    <title>Editar Producto - Hachis Parmentier</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <style>
+        .file-input-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-input-label {
+            display: block;
+            padding: 12px;
+            border: 2px dashed var(--border-color);
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+            background-color: var(--bg-card);
+            color: var(--text-secondary);
+        }
+        
+        .file-input-label:hover {
+            border-color: var(--accent-color);
+            background-color: var(--border-color);
+            opacity: 0.1;
+        }
+        
+        .current-image {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <nav class="navbar">
+        <div class="navbar-content">
+            <img src="../img/HP_LOGO.png" alt="Logo de Hachis Parmentier" style="width: 40px; height: 40px;">
+            <h1>Hachis Parmentier</h1>
+            <div class="navbar-controls">
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    🌙
+                </button>
+                <a href="/html/admin-productos.html" class="back-link">← Volver a Productos</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <h2 id="form-title">Editar Producto</h2>
+                <p id="form-subtitle">Modifica la información del producto</p>
+            </div>
+            
+            <div id="alert" class="alert"></div>
+
+            <form id="producto-form">
+                <div class="form-group">
+                    <label for="nombre">Nombre del Producto:</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="precio">Precio ($):</label>
+                    <input type="number" id="precio" name="precio" step="0.01" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="categoria">Categoría:</label>
+                    <select id="categoria" name="categoria" required>
+                        <option value="">Selecciona una categoría</option>
+                        <option value="comic">Comic</option>
+                        <option value="libro">Libro</option>
+                        <option value="manga">Manga</option>
+                        <option value="separador">Separador</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Imagen del Producto:</label>
+                    <div id="current-image-container" style="display: none; margin-bottom: 1rem;">
+                        <p style="color: #666; margin-bottom: 0.5rem;">Imagen actual:</p>
+                        <img id="current-image" src="" alt="" class="current-image">
+                    </div>
+                    <div class="file-input-container">
+                        <input type="file" id="imagen" name="imagen" accept="image/*" class="file-input">
+                        <label for="imagen" class="file-input-label" id="file-label">
+                            Seleccionar nueva imagen
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="submit-btn">
+                        Actualizar Producto
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="volverAProductos()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 Hachis Parmentier. Nicolás Santoro & Milena Rodriguez</p>
+        </footer>
+    </div>
+    
+    <script src="../js/admin-common.js"></script>
+    <script>
+        let productoId = null;
+
+        function toggleTheme() {
+            AdminCommon.toggleTheme();
+        }
+        
+        function mostrarAlerta(mensaje, tipo) {
+            AdminCommon.showAlert(mensaje, tipo);
+        }
+
+        // Verificar autenticación y cargar producto al cargar la página
+        window.addEventListener('DOMContentLoaded', async function() {
+            const isAuthenticated = await AdminCommon.init();
+            if (!isAuthenticated) return;
+            
+            // Obtener ID del producto desde URL
+            const urlParams = new URLSearchParams(window.location.search);
+            productoId = urlParams.get('id');
+            
+            if (!productoId) {
+                mostrarAlerta('ID de producto no proporcionado', 'error');
+                setTimeout(() => window.location.href = '/html/admin-productos.html', 2000);
+                return;
+            }
+            
+            await cargarProducto();
+        });
+
+        // Cargar datos del producto
+        async function cargarProducto() {
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch(`/api/admin/productos/${productoId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const producto = data.data || data.producto;
+                    
+                    // Llenar formulario
+                    document.getElementById('nombre').value = producto.nombre || '';
+                    document.getElementById('precio').value = producto.precio || '';
+                    document.getElementById('categoria').value = producto.categoria || '';
+                    
+                    // Mostrar imagen actual si existe
+                    if (producto.imagen) {
+                        const currentImageContainer = document.getElementById('current-image-container');
+                        const currentImage = document.getElementById('current-image');
+                        currentImage.src = getImageUrl(producto);
+                        currentImage.alt = producto.nombre;
+                        currentImageContainer.style.display = 'block';
+                    }
+                } else if (response.status === 404) {
+                    mostrarAlerta('Producto no encontrado', 'error');
+                    setTimeout(() => window.location.href = '/html/admin-productos.html', 2000);
+                } else {
+                    throw new Error('Error al cargar producto');
+                }
+            } catch (error) {
+                mostrarAlerta('Error al cargar el producto', 'error');
+                setTimeout(() => window.location.href = '/html/admin-productos.html', 2000);
+            }
+        }
+
+        // Manejar actualización del producto
+        document.getElementById('producto-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const token = localStorage.getItem('token');
+            
+            // Estado de carga
+            const submitBtn = document.getElementById('submit-btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Actualizando...';
+            submitBtn.disabled = true;
+            document.querySelector('.form-container').classList.add('loading');
+            
+            fetch(`/api/admin/productos/${productoId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    mostrarAlerta('Producto actualizado exitosamente', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/html/admin-productos.html';
+                    }, 2000);
+                } else {
+                    mostrarAlerta('Error: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarAlerta('Error al procesar la solicitud', 'error');
+            })
+            .finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                document.querySelector('.form-container').classList.remove('loading');
+            });
+        });
+
+        // UX para archivos
+        document.getElementById('imagen').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name;
+            const fileLabel = document.getElementById('file-label');
+            
+            if (fileName) {
+                fileLabel.textContent = fileName;
+            } else {
+                fileLabel.textContent = 'Seleccionar nueva imagen';
+            }
+        });
+
+        function volverAProductos() {
+            window.location.href = '/html/admin-productos.html';
+        }
+
+        // Función para obtener URL de imagen (reutilizada del código existente)
+        function getImageUrl(producto) {
+            const imagenesDisponibles = [
+                'civil-war-must-have.png', 'demon-slayer-vol-8.png', 'el-hobbit.png',
+                'el-senior-de-los-anillos-la-comunidad-del-anillo.png',
+                'harry-potter-y-el-prisionero-de-askaban.png',
+                'harry-potter-y-la-piedra-filosofal.png', 'HP_LOGO.png',
+                'hunter-x-hunter-vol-17.png', 'jojos-bizarre-adventure-steel-ball-run-vol-2.png',
+                'naruto-vol-19.png', 'separador-arte.png', 'spider-man-la-ultima-caceria-de-kraven-60.png',
+                'superior-iron-man-infamous.png', 'x-men-dias-del-futuro-pasado-must-have.png'
+            ];
+
+            if (producto.imagen && producto.imagen !== 'null' && producto.imagen.trim() !== '') {
+                let imagenNormalizada = producto.imagen.replace(/\\/g, '/');
+                
+                if (imagenNormalizada.startsWith('/uploads/') || imagenNormalizada.startsWith('/img/') || imagenNormalizada.startsWith('http')) {
+                    return imagenNormalizada;
+                }
+                
+                let nombreArchivo = imagenNormalizada.includes('/') ? imagenNormalizada.split('/').pop() : imagenNormalizada;
+                
+                if (imagenesDisponibles.includes(nombreArchivo)) {
+                    return `/img/${nombreArchivo}`;
+                }
+                
+                return `/uploads/${nombreArchivo}`;
+            }
+            
+            return `/img/HP_LOGO.png`;
+        }
+    </script>
+</body>
+</html>
