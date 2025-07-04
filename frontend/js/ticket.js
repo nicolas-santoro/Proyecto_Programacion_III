@@ -41,50 +41,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Configuramos el evento para descargar el ticket en formato PDF al hacer click en el botón
   document.getElementById("btnDescargarPDF").addEventListener("click", () => {
-    const { jsPDF } = window.jspdf; // Obtenemos la clase jsPDF del plugin cargado
-    const doc = new jsPDF(); // Creamos un nuevo documento PDF
-
-    // Obtenemos los textos ya mostrados en pantalla para incluirlos en el PDF
-    const cliente = document.getElementById("cliente").textContent;
-    const fecha = document.getElementById("fecha").textContent;
-    const total = document.getElementById("total").textContent;
-    // Creamos una lista con los productos obteniendo el texto de cada <li>
-    const productosList = Array.from(document.querySelectorAll("#productos li")).map(li => li.textContent);
-
-    let y = 20; // Posición vertical inicial en el PDF
-
-    // Título principal del ticket
-    doc.setFontSize(16);
-    doc.text("Ticket de Compra", 20, y);
-    y += 10;
-
-    // Información del cliente, fecha y total
-    doc.setFontSize(12);
-    doc.text(`Cliente: ${cliente}`, 20, y);
-    y += 7;
-    doc.text(`Fecha: ${fecha}`, 20, y);
-    y += 7;
-    doc.text(`Total: ${total}`, 20, y);
-    y += 10;
-
-    // Listado de productos comprados
-    doc.text("Productos:", 20, y);
-    y += 7;
-    productosList.forEach(producto => {
-      doc.text(`- ${producto}`, 25, y);
-      y += 7;
-    });
-
-    // Mensaje de agradecimiento personalizado en color violeta
-    y += 10; // espacio antes del mensaje
-    doc.setFontSize(14);
-    doc.setTextColor(148, 0, 211); // color violeta RGB
-    doc.text(`Merci d'avoir fait vos achats chez Hachis Parmentier!
-              Somos Milena Rodríguez y Nicolás Santoro, ¡ojalá nos veamos de nuevo!`, 20, y);
-
-    // Guardamos el PDF con un nombre en francés
-    doc.save("reçu_d'achat.pdf");
+    // Simple print function instead of complex PDF generation
+    window.print();
   });
+
+  // Botón finalizar compra (para limpiar limpiar datos y volver al inicio)
+  const btnFinalizar = document.getElementById('btn-finalizar');
+  if (btnFinalizar) {
+    btnFinalizar.addEventListener('click', () => {
+      // Limpiar localStorage y redirigir al inicio
+      localStorage.clear()
+      window.location.href = '/html/index.html';
+    })
+  }
 
   // Borrar el nombre del usuario después de mostrar el ticket (compra completada)
   localStorage.removeItem('nombreUsuario');

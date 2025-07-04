@@ -23,7 +23,7 @@
     </header>
     
     <nav id="navBtn">
-        <a href="/html/admin-login.html" class="btn-admin">
+        <a href="/html/admin-login.html" class="btn-admin" id="btnAdmin" style="display: none;">
            <i class="bi bi-door-open"></i> Ingresar como Administrador
         </a>
     </nav>
@@ -57,6 +57,31 @@
     <footer>
         <p>&copy; 2025 Hachis Parmentier. Nicolás Santoro & Milena Rodriguez</p>
     </footer>
+
+    <script>
+        // Función para mostrar/ocultar el botón de administrador
+        function toggleAdminButton(show) {
+            const btnAdmin = document.getElementById('btnAdmin');
+            if (btnAdmin) {
+                btnAdmin.style.display = show ? 'block' : 'none';
+            }
+        }
+
+        // Event listener para atajos de teclado
+        document.addEventListener('keydown', function(event) {
+            // Verificar si se presiona Ctrl+M (mostrar admin)
+            if (event.ctrlKey && event.key.toLowerCase() === 'm') {
+                event.preventDefault();
+                toggleAdminButton(true);
+            }
+            
+            // Verificar si se presiona Ctrl+O (ocultar admin)
+            if (event.ctrlKey && event.key.toLowerCase() === 'o') {
+                event.preventDefault();
+                toggleAdminButton(false);
+            }
+        });
+    </script>
 
     <script type="module" src="../js/bienvenida.js"></script>
     <script src="../js/theme.js"></script>
