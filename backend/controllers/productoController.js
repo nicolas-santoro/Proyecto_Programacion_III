@@ -10,40 +10,6 @@ exports.obtenerProductos = async (req, res) => {
   }
 };
 
-// Buscar productos activos por nombre (consulta tipo /search?nombre=xxx)
-exports.buscarProducto = async (req, res) => {
-  try {
-    const { nombre } = req.query;
-    if (!nombre) {
-      return res.status(400).json({ error: 'Debes proporcionar un nombre para buscar' });
-    }
-
-    // Busca con expresión regular insensible a mayúsculas
-    const productos = await Producto.find({ 
-      nombre: { $regex: nombre, $options: 'i' }, 
-      activo: true 
-    });
-
-    return res.status(200).json({ data: productos });
-  } catch (error) {
-    return res.status(500).json({ error: 'Error al buscar productos' });
-  }
-};
-
-// Buscar producto por su ID
-exports.buscarProductoPorId = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const producto = await Producto.findById(id);
-
-    if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
-
-    return res.status(200).json({ data: producto });
-  } catch (error) {
-    return res.status(500).json({ error: 'Error al buscar producto por ID' });
-  }
-};
-
 // Crear un nuevo producto (requiere nombre, precio y categoría)
 exports.crearProducto = async (req, res) => {
   try {

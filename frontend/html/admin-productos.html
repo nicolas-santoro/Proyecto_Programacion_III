@@ -223,7 +223,7 @@
         let todosLosProductos = [];
         let filtroActual = 'todos';
         let productoEditando = null;
-        let modalMode = 'edit'; // 'edit', 'deactivate', 'reactivate'
+        let modalMode = 'deactivate'; // 'edit', 'deactivate', 'reactivate'
         
         // Usar funciones comunes del AdminCommon
         function toggleTheme() {
@@ -431,7 +431,7 @@
             modal.style.display = 'block';
         }
         
-        // Editar producto - ahora redirige a página de edición
+        // Editar producto
         function editProduct(id) {
             if (!id || id.trim() === '') {
                 showAlert('Error: ID de producto inválido', 'error');

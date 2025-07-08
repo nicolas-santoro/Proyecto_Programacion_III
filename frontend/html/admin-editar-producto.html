@@ -239,11 +239,6 @@
                 console.error('Error:', error);
                 mostrarAlerta('Error al procesar la solicitud', 'error');
             })
-            .finally(() => {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-                document.querySelector('.form-container').classList.remove('loading');
-            });
         });
 
         // UX para archivos

@@ -13,7 +13,6 @@ function aplicarModo(modo) {
     // Cambiar ícono a sol
     iconModo.className = 'bi bi-sun-fill';
     // Cambiar texto del botón y volver a insertar el ícono al inicio
-    btnToggle.textContent = ' Modo Claro';
     btnToggle.prepend(iconModo);
   } else {
     // Remover clase modo-claro para activar modo oscuro (por defecto)
@@ -21,7 +20,6 @@ function aplicarModo(modo) {
     // Cambiar ícono a luna
     iconModo.className = 'bi bi-moon-fill';
     // Cambiar texto del botón y reinsertar el ícono
-    btnToggle.textContent = ' Modo Oscuro';
     btnToggle.prepend(iconModo);
   }
   // Guardar la preferencia en localStorage para persistirla entre sesiones

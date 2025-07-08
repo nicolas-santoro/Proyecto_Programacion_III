@@ -58,7 +58,7 @@
 
     <script src="../js/admin-common.js"></script>
     <script>
-        // Verificar autenticación inmediatamente
+        // Verificar la autenticación inmediatamente
         (function() {
             const token = localStorage.getItem('token');
             if (!token) {
@@ -67,12 +67,10 @@
             }
         })();
         
-        // Inicializar página
+        // para iniciar la página 
         window.addEventListener('DOMContentLoaded', async function() {
-            const isAuthenticated = await AdminCommon.init();
-            if (isAuthenticated) {
-                await loadStats();
-            }
+            await AdminCommon.init();
+            /*acá se podrían agregar estadísticas en un futuro*/
         });
     </script>
 </body>

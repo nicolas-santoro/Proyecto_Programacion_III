@@ -383,7 +383,7 @@
                     // No redirigir automáticamente, permitir que el usuario haga login manualmente
                 })
                 .catch(error => {
-                    console.error('Error validating token:', error);
+                    console.error('Error validando el token:', error);
                     // En caso de error, limpiar localStorage
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');

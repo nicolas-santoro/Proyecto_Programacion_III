@@ -29,7 +29,7 @@ app.use('/api/authRoutes', require('./backend/routes/authRoutes')); // Rutas rel
 
 // Ruta raíz que sirve el archivo index.html de la carpeta frontend/html
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'html', 'index.html'));
+  res.sendFile(path.join(__dirname, 'frontend', 'html', '/html/index.html'));
 });
 
 // Ruta temporal para crear/verificar usuario administrador (solo para desarrollo)
