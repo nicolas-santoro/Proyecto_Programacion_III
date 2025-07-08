@@ -237,9 +237,39 @@
     </div>
 
     <script>
-        const API_BASE = '/api';
+        /**
+         * CONFIGURACIÓN Y FUNCIONES DEL PANEL DE LOGIN ADMINISTRATIVO
+         * 
+         * Este script maneja toda la funcionalidad del panel de login para administradores:
+         * - Gestión de temas (claro/oscuro)
+         * - Validación de credenciales del lado del cliente
+         * - Autenticación con el servidor
+         * - Manejo de tokens JWT
+         * - Redirección al dashboard administrativo
+         */
+
+        const API_BASE = '/api'; // URL base para las llamadas a la API
         
-        // Toggle tema
+        /**
+         * Alterna entre tema claro y oscuro
+         * 
+         * Esta función permite al usuario cambiar la apariencia visual del panel
+         * entre modo claro y oscuro, guardando la preferencia en localStorage
+         * para mantenerla en futuras visitas.
+         * 
+         * Proceso:
+         * 1. Obtiene el tema actual del atributo data-theme del body
+         * 2. Cambia al tema opuesto
+         * 3. Actualiza el icono del botón (luna/sol)
+         * 4. Guarda la preferencia en localStorage
+         * 
+         * @function toggleTheme
+         * @returns {void}
+         * 
+         * @example
+         * // Si está en tema oscuro → cambia a claro
+         * // Si está en tema claro → cambia a oscuro
+         */
         function toggleTheme() {
             const body = document.body;
             const themeToggle = document.querySelector('.theme-toggle');
@@ -255,7 +285,23 @@
             }
         }
         
-        // Cargar tema guardado
+        /**
+         * Carga el tema guardado desde localStorage
+         * 
+         * Al cargar la página, esta función restaura el tema que el usuario
+         * había seleccionado previamente, o aplica el tema oscuro por defecto.
+         * 
+         * Proceso:
+         * 1. Busca la preferencia guardada en localStorage
+         * 2. Si no existe, usa 'dark' como predeterminado
+         * 3. Aplica el tema al body y actualiza el icono
+         * 
+         * @function loadTheme
+         * @returns {void}
+         * 
+         * @example
+         * // Al cargar la página, restaura el tema preferido del usuario
+         */
         function loadTheme() {
             const savedTheme = localStorage.getItem('admin-theme') || 'dark';
             const body = document.body;
@@ -265,14 +311,40 @@
             themeToggle.innerHTML = savedTheme === 'dark' ? '🌙' : '☀️';
         }
         
+        /**
+         * Manejador principal del formulario de login
+         * 
+         * Esta función asíncrona va a manejar todo el proceso de autenticación:
+         * - Validación del lado del cliente
+         * - Restricción de acceso solo a admin@test.com
+         * - Comunicación con la API de autenticación
+         * - Manejo de respuestas y errores
+         * - Almacenamiento de tokens JWT
+         * - Redirección al dashboard
+         * 
+         * @async
+         * @function handleLoginSubmission
+         * @param {Event} e - Evento de submit del formulario
+         * @returns {Promise<void>}
+         * 
+         * @example
+         * // Usuario ingresa credenciales válidas → recibe token → redirige a dashboard
+         * // Usuario ingresa credenciales inválidas → muestra error específico
+         */
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+            e.preventDefault(); // Previene el envío tradicional del formulario
             
+            // Obtención de datos del formulario
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const alertDiv = document.getElementById('alert');
             
-            // Validación específica: solo admin@test.com puede acceder
+            /**
+             * Validación de seguridad: Solo administrador autorizado
+             * 
+             * Restringe el acceso únicamente al email admin@test.com
+             * para mantener la seguridad del panel administrativo.
+             */
             if (email !== 'admin@test.com') {
                 alertDiv.className = 'alert alert-error';
                 alertDiv.textContent = 'Solo el administrador puede acceder a este panel. Email no autorizado.';
@@ -280,7 +352,12 @@
                 return;
             }
             
-            // Validación básica del lado del cliente
+            /**
+             * Validaciones del lado del cliente
+             * 
+             * Verifica formato básico de email y longitud mínima de contraseña
+             * antes de enviar datos al servidor para optimizar la experiencia.
+             */
             if (!email.includes('@') || !email.includes('.')) {
                 alertDiv.className = 'alert alert-error';
                 alertDiv.textContent = 'Por favor, ingresa un email válido';
@@ -295,13 +372,24 @@
                 return;
             }
             
-            // Deshabilitar el botón mientras se procesa
+            /**
+             * Preparación de UI para proceso de autenticación
+             * 
+             * Deshabilita el botón y cambia el texto para indicar
+             * que el proceso está en curso y prevenir múltiples envíos.
+             */
             const submitBtn = document.querySelector('.btn-login');
             const originalText = submitBtn.textContent;
             submitBtn.textContent = 'Iniciando sesión...';
             submitBtn.disabled = true;
             
             try {
+                /**
+                 * Comunicación con la API de autenticación
+                 * 
+                 * Envía las credenciales al endpoint de login y maneja
+                 * la respuesta del servidor de forma asíncrona.
+                 */
                 const response = await fetch(`${API_BASE}/authRoutes/login`, {
                     method: 'POST',
                     headers: {
@@ -313,21 +401,31 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    // Guardar token en localStorage
+                    /**
+                     * Manejo de autenticación exitosa
+                     * 
+                     * 1. Guarda el token JWT en localStorage
+                     * 2. Guarda los datos del usuario
+                     * 3. Muestra mensaje de bienvenida
+                     * 4. Redirige al dashboard después de 1 segundo
+                     */
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
                     
-                    // Mostrar mensaje de éxito
                     alertDiv.className = 'alert alert-success';
                     alertDiv.textContent = `¡Bienvenido ${data.user.nombre}! Redirigiendo...`;
                     alertDiv.style.display = 'block';
                     
-                    // Redirigir al dashboard después de 1 segundo
                     setTimeout(() => {
                         window.location.href = '/html/admin-dashboard.html';
                     }, 1000);
                 } else {
-                    // Mostrar mensajes de error específicos
+                    /**
+                     * Manejo de errores de autenticación
+                     * 
+                     * Proporciona mensajes específicos según el código de estado HTTP
+                     * para ayudar al usuario a entender qué salió mal.
+                     */
                     let errorMessage = '';
                     
                     switch (response.status) {
@@ -349,22 +447,55 @@
                     alertDiv.style.display = 'block';
                 }
             } catch (error) {
+                /**
+                 * Manejo de errores de conexión
+                 * 
+                 * Captura errores de red o problemas de conectividad
+                 * y proporciona un mensaje comprensible al usuario.
+                 */
                 console.error('Error:', error);
                 alertDiv.className = 'alert alert-error';
                 alertDiv.textContent = 'Error de conexión con el servidor. Verifica tu conexión a internet.';
                 alertDiv.style.display = 'block';
             } finally {
-                // Rehabilitar el botón
+                /**
+                 * Restauración de UI
+                 * 
+                 * Siempre ejecuta esta parte para rehabilitar el botón
+                 * y restaurar el texto original, sin importar el resultado.
+                 */
                 submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
             }
         });
         
-        // Verificar si ya está logueado
+        /**
+         * Inicialización de la página y validación de sesión
+         * 
+         * Esta función se ejecuta cuando el DOM está completamente cargado.
+         * Inicializa el tema y valida si existe un token de sesión válido.
+         * 
+         * Proceso:
+         * 1. Carga el tema guardado
+         * 2. Verifica si existe un token en localStorage
+         * 3. Valida el token haciendo una petición de prueba
+         * 4. Limpia tokens inválidos si es necesario
+         * 
+         * @function initializePage
+         * @returns {void}
+         * 
+         * @example
+         * // Al cargar la página, verifica si el usuario ya tiene una sesión válida
+         */
         window.addEventListener('DOMContentLoaded', function() {
-            loadTheme();
+            loadTheme(); // Carga el tema preferido del usuario
             
-            // Solo limpiar tokens inválidos si existen, pero no redirigir automáticamente
+            /**
+             * Validación de token existente
+             * 
+             * Verifica si hay un token guardado y si sigue siendo válido
+             * haciendo una petición de prueba al servidor.
+             */
             const token = localStorage.getItem('token');
             if (token) {
                 fetch('/api/admin/productos', {
@@ -383,8 +514,11 @@
                     // No redirigir automáticamente, permitir que el usuario haga login manualmente
                 })
                 .catch(error => {
+                    /**
+                     * En caso de error de red o servidor,
+                     * limpia el localStorage para evitar problemas futuros
+                     */
                     console.error('Error validando el token:', error);
-                    // En caso de error, limpiar localStorage
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
                 });

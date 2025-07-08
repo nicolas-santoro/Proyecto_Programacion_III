@@ -59,6 +59,12 @@
     </footer>
 
     <script>
+        /**
+         * Esta función muestra u oculta el botón para ir al panel de admin
+         * Es como un "easter egg" - normalmente está oculto para que los clientes no lo vean
+         * Solo aparece cuando presiono ciertos atajos de teclado
+         * @param {boolean} show - true para mostrar el botón, false para ocultarlo
+         */
         // Función para mostrar/ocultar el botón de administrador
         function toggleAdminButton(show) {
             const btnAdmin = document.getElementById('btnAdmin');
@@ -67,6 +73,12 @@
             }
         }
 
+        /**
+         * Acá manejo los atajos de teclado secretos para mostrar/ocultar el botón de admin
+         * Ctrl+M = mostrar botón de admin
+         * Ctrl+O = ocultar botón de admin
+         * Es útil para que solo los que sepan puedan acceder al panel administrativo
+         */
         // Event listener para atajos de teclado
         document.addEventListener('keydown', function(event) {
             // Verificar si se presiona Ctrl+M (mostrar admin)

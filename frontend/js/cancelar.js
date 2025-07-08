@@ -1,4 +1,5 @@
-// Exporta la función que gestiona la cancelación de una compra
+// Esta función maneja todo lo que pasa cuando el usuario quiere cancelar su compra
+// Configura los botones del modal y borra el carrito si confirma
 export function cancelarCompra() {
   // Elemento del botón que abre el modal de cancelación
   const btnCancelar = document.getElementById('cancelarCompra');
@@ -17,6 +18,7 @@ export function cancelarCompra() {
   }
 
   // Si existe el botón de confirmación dentro del modal
+  // Esta función se ejecuta cuando el usuario confirma que quiere cancelar TODO
   if (btnConfirmarCancelacion) {
     btnConfirmarCancelacion.addEventListener('click', () => {
       // Elimina el carrito del localStorage

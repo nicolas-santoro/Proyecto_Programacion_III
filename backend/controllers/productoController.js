@@ -1,6 +1,12 @@
 const Producto = require('../models/Producto');
 
-// Obtener todos los productos activos (disponibles para venta)
+/**
+ * Obtiene todos los productos activos disponibles para venta.
+ * Solo retorna productos con estado activo = true.
+ * @param {Object} req - Objeto de petición HTTP
+ * @param {Object} res - Objeto de respuesta HTTP
+ * @returns {Promise<void>} Respuesta JSON con array de productos activos
+ */
 exports.obtenerProductos = async (req, res) => {
   try {
     const productos = await Producto.find({ activo: true });
@@ -10,7 +16,19 @@ exports.obtenerProductos = async (req, res) => {
   }
 };
 
-// Crear un nuevo producto (requiere nombre, precio y categoría)
+/**
+ * Crea un nuevo producto en el sistema.
+ * Requiere campos obligatorios: nombre, precio y categoría.
+ * Opcionalmente maneja subida de imagen y registra la acción en auditoría.
+ * @param {Object} req - Objeto de petición HTTP
+ * @param {string} req.body.nombre - Nombre del producto (obligatorio)
+ * @param {number} req.body.precio - Precio del producto (obligatorio)
+ * @param {string} req.body.categoria - Categoría del producto (obligatorio)
+ * @param {Object} [req.file] - Archivo de imagen subido (opcional)
+ * @param {Object} req.user - Datos del usuario autenticado
+ * @param {Object} res - Objeto de respuesta HTTP
+ * @returns {Promise<void>} Respuesta JSON con producto creado o mensaje de error
+ */
 exports.crearProducto = async (req, res) => {
   try {
     const { nombre, precio, categoria } = req.body;
@@ -52,7 +70,14 @@ exports.crearProducto = async (req, res) => {
   }
 };
 
-// Actualizar datos de un producto por su ID
+/**
+ * Actualiza los datos de un producto existente por su ID.
+ * @param {Object} req - Objeto de petición HTTP
+ * @param {string} req.params.id - ID del producto a actualizar
+ * @param {Object} req.body - Datos actualizados del producto
+ * @param {Object} res - Objeto de respuesta HTTP
+ * @returns {Promise<void>} Respuesta JSON con producto actualizado o mensaje de error
+ */
 exports.modificarProducto = async (req, res) => {
   try {
     const { id } = req.params;
@@ -66,8 +91,16 @@ exports.modificarProducto = async (req, res) => {
   }
 };
 
-// "Borrado suave" de producto: marcar como inactivo sin eliminar (solo admin)
-// Incluye logs de auditoría con manejo de errores para no interrumpir el flujo
+/**
+ * Realiza un "borrado suave" marcando el producto como inactivo.
+ * No elimina físicamente el producto de la base de datos.
+ * Registra la acción en auditoría. Solo accesible para administradores.
+ * @param {Object} req - Objeto de petición HTTP
+ * @param {string} req.params.id - ID del producto a desactivar
+ * @param {Object} req.user - Datos del usuario autenticado
+ * @param {Object} res - Objeto de respuesta HTTP
+ * @returns {Promise<void>} Respuesta JSON con producto desactivado o mensaje de error
+ */
 exports.borrarProducto = async (req, res) => {
   try {
     const { id } = req.params;
@@ -96,7 +129,16 @@ exports.borrarProducto = async (req, res) => {
   }
 };
 
-// Recuperar producto marcado como inactivo (solo admin)
+/**
+ * Reactiva un producto previamente marcado como inactivo.
+ * Cambia el estado de activo = false a activo = true.
+ * Registra la acción en auditoría. Solo accesible para administradores.
+ * @param {Object} req - Objeto de petición HTTP
+ * @param {string} req.params.id - ID del producto a reactivar
+ * @param {Object} req.user - Datos del usuario autenticado
+ * @param {Object} res - Objeto de respuesta HTTP
+ * @returns {Promise<void>} Respuesta JSON con producto reactivado o mensaje de error
+ */
 exports.recuperarProducto = async (req, res) => {
   try {
     const { id } = req.params;
@@ -124,8 +166,15 @@ exports.recuperarProducto = async (req, res) => {
   }
 };
 
-// Obtener todos los productos, incluyendo inactivos (solo admin/editor)
-// Registra la acción en auditoría
+/**
+ * Obtiene todos los productos del sistema, incluyendo los inactivos.
+ * Función administrativa que muestra el inventario completo.
+ * Registra la consulta en auditoría. Solo para administradores/editores.
+ * @param {Object} req - Objeto de petición HTTP
+ * @param {Object} req.user - Datos del usuario autenticado
+ * @param {Object} res - Objeto de respuesta HTTP
+ * @returns {Promise<void>} Respuesta JSON con todos los productos o mensaje de error
+ */
 exports.obtenerTodosProductos = async (req, res) => {
   try {
     const productos = await Producto.find();
@@ -143,7 +192,16 @@ exports.obtenerTodosProductos = async (req, res) => {
   }
 };
 
-// Obtener producto por ID para admin/editor, validando ID y auditando consulta
+/**
+ * Obtiene un producto específico por su ID para uso administrativo.
+ * Valida que el ID sea un ObjectId válido de MongoDB.
+ * Registra la consulta en auditoría. Solo para administradores/editores.
+ * @param {Object} req - Objeto de petición HTTP
+ * @param {string} req.params.id - ID del producto a consultar
+ * @param {Object} req.user - Datos del usuario autenticado
+ * @param {Object} res - Objeto de respuesta HTTP
+ * @returns {Promise<void>} Respuesta JSON con datos del producto o mensaje de error
+ */
 exports.obtenerProductoPorId = async (req, res) => {
   try {
     const { id } = req.params;
@@ -178,7 +236,18 @@ exports.obtenerProductoPorId = async (req, res) => {
   }
 };
 
-// Actualizar producto completamente (admin/editor), incluye manejo de imagen
+/**
+ * Actualiza completamente un producto existente.
+ * Maneja actualización de datos y subida de nueva imagen.
+ * Registra la acción en auditoría. Solo para administradores/editores.
+ * @param {Object} req - Objeto de petición HTTP
+ * @param {string} req.params.id - ID del producto a actualizar
+ * @param {Object} req.body - Nuevos datos del producto
+ * @param {Object} [req.file] - Nueva imagen del producto (opcional)
+ * @param {Object} req.user - Datos del usuario autenticado
+ * @param {Object} res - Objeto de respuesta HTTP
+ * @returns {Promise<void>} Respuesta JSON con producto actualizado o mensaje de error
+ */
 exports.actualizarProducto = async (req, res) => {
   try {
     const { id } = req.params;
@@ -208,7 +277,16 @@ exports.actualizarProducto = async (req, res) => {
   }
 };
 
-// Eliminar producto permanentemente de la base de datos (solo admin)
+/**
+ * Elimina permanentemente un producto de la base de datos.
+ * Esta acción es irreversible, a diferencia del borrado suave.
+ * Valida ObjectId y registra en auditoría. Solo para administradores.
+ * @param {Object} req - Objeto de petición HTTP
+ * @param {string} req.params.id - ID del producto a eliminar permanentemente
+ * @param {Object} req.user - Datos del usuario autenticado
+ * @param {Object} res - Objeto de respuesta HTTP
+ * @returns {Promise<void>} Respuesta JSON confirmando eliminación o mensaje de error
+ */
 exports.eliminarProductoPermanentemente = async (req, res) => {
   try {
     const { id } = req.params;

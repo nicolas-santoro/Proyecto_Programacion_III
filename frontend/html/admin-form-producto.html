@@ -137,15 +137,30 @@
     <!-- Cargar admin-common.js PRIMERO -->
     <script src="../js/admin-common.js"></script>
     <script>
+    /**
+     * Función para cambiar el tema - la uso en el botón del navbar
+     * Solo llama a la función común que tengo en admin-common.js
+     */
     // SOLO funciones necesarias para CREAR productos
     function toggleTheme() {
         AdminCommon.toggleTheme();
     }
     
+    /**
+     * Mi función universal para mostrar alertas al usuario
+     * Es un wrapper de la función común para mantener consistencia
+     * @param {string} mensaje - el texto que quiero mostrar
+     * @param {string} tipo - success, error, warning, etc.
+     */
     function mostrarAlerta(mensaje, tipo) {
         AdminCommon.showAlert(mensaje, tipo);
     }
 
+    /**
+     * Esta función se ejecuta cuando se carga la página
+     * Verifica que el usuario esté autenticado antes de mostrar el formulario
+     * Si no está logueado, lo manda al login automáticamente
+     */
     // Verificar autenticación al cargar la página
     window.addEventListener('DOMContentLoaded', async function() {
         const isAuthenticated = await AdminCommon.init();
@@ -154,6 +169,11 @@
         // Esta página SOLO es para CREAR (no tiene la lógica de edición)
     });
 
+    /**
+     * Acá manejo el envío del formulario para crear un producto nuevo
+     * Toma todos los datos del form, los envía al servidor y maneja la respuesta
+     * También se encarga de mostrar el estado de "cargando" mientras procesa
+     */
     // Manejar SOLO la creación de productos
     document.getElementById('producto-form').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -199,6 +219,11 @@
         });
     });
 
+    /**
+     * Esta función mejora la experiencia del usuario con el input de archivos
+     * Cuando selecciona un archivo, muestra el nombre en lugar del texto genérico
+     * Es para que se vea más claro qué archivo seleccionó
+     */
     // UX para archivos
     document.getElementById('imagen').addEventListener('change', function(e) {
         const fileName = e.target.files[0]?.name;
@@ -211,6 +236,10 @@
         }
     });
 
+    /**
+     * Función simple para volver a la lista de productos
+     * La uso en el botón "Cancelar" para que el usuario pueda salir sin guardar
+     */
     function volverAlDashboard() {
         window.location.href = '/html/admin-productos.html';
     }

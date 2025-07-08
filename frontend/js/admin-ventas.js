@@ -12,6 +12,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 });
 
+/**
+ * Esta función va al servidor y trae todas las ventas
+ * Es asíncrona porque tiene que esperar la respuesta del backend
+ * Si el token está mal, redirige al login automáticamente
+ */
 // Carga los datos de ventas desde la API
 async function cargarVentas() {
     try {
@@ -40,6 +45,11 @@ async function cargarVentas() {
     }
 }
 
+/**
+ * Acá tomo las ventas que me devolvió el servidor y las muestro en una tabla HTML
+ * Si no hay ventas, pongo un mensaje diciendo que está vacío
+ * @param {Array} ventas - array con todos los objetos de venta del servidor
+ */
 // Muestra las ventas en una tabla HTML
 function mostrarVentas(ventas) {
     const tbody = document.getElementById('ventasTableBody');
@@ -80,11 +90,23 @@ function mostrarVentas(ventas) {
     });
 }
 
+/**
+ * Función que reutilizo en todo el admin para mostrar mensajes al usuario
+ * Básicamente es un wrapper de la función común que está en admin-common.js
+ * @param {string} mensaje - lo que quiero decirle al usuario
+ * @param {string} tipo - error, success, warning, etc.
+ */
 // Muestra una alerta temporal con un mensaje y tipo visual (ej: error, info)
 function mostrarAlerta(mensaje, tipo) {
     AdminCommon.showAlert(mensaje, tipo);
 }
 
+/**
+ * Esta función busca una venta específica por su ID
+ * Hace otra petición al servidor para traer todos los detalles
+ * Después llama a mostrarDetalleVenta() para mostrarlo en el modal
+ * @param {string} ventaId - el ID único de la venta que quiero ver
+ */
 // Carga y muestra el detalle de una venta específica en un modal
 async function verDetalle(ventaId) {
     try {
@@ -108,6 +130,11 @@ async function verDetalle(ventaId) {
     }
 }
 
+/**
+ * Acá armo todo el HTML para mostrar el detalle de la venta en un modal
+ * Incluye info general (fecha, cliente, total) y una tabla con todos los productos
+ * @param {Object} venta - el objeto completo de la venta con todos sus datos
+ */
 // Muestra la información detallada de una venta en el modal
 function mostrarDetalleVenta(venta) {
     const content = document.getElementById('detalleVentaContent');

@@ -234,7 +234,8 @@
             AdminCommon.showAlert(message, type);
         }
         
-        // Cargar productos desde la API
+        // Esta función se encarga de traer todos los productos desde el servidor
+        // La uso para llenar la lista que se muestra en pantalla
         async function loadProducts() {
             const token = localStorage.getItem('token');
             
@@ -261,7 +262,8 @@
             }
         }
         
-        // Renderizar productos según el filtro actual
+        // Esta función toma la lista de productos y los muestra en pantalla
+        // Dependiendo del filtro seleccionado (todos, activos, inactivos)
         function renderProducts() {
             const container = document.getElementById('productsContainer');
             
@@ -343,7 +345,8 @@
             }
         }
         
-        // Configurar modal según el modo
+        // Esta función prepara el modal según la acción que quiero hacer
+        // Puede ser para editar, desactivar, reactivar o eliminar un producto
         function configureModal(mode, producto) {
             modalMode = mode;
             productoEditando = producto;
@@ -431,7 +434,8 @@
             modal.style.display = 'block';
         }
         
-        // Editar producto
+        // Función que se ejecuta cuando hago clic en "Editar" de un producto
+        // Me manda a la página de edición con el ID del producto
         function editProduct(id) {
             if (!id || id.trim() === '') {
                 showAlert('Error: ID de producto inválido', 'error');
@@ -441,7 +445,8 @@
             window.location.href = `/html/admin-editar-producto.html?id=${id}`;
         }
         
-        // Desactivar producto (borrado suave)
+        // Esta función abre el modal de confirmación para desactivar un producto
+        // No lo elimina de verdad, solo lo marca como inactivo
         function deleteProduct(id, nombre) {
             const producto = todosLosProductos.find(p => p._id === id);
             if (producto) {
@@ -451,7 +456,8 @@
             }
         }
 
-        // Eliminar producto permanentemente
+        // Esta función abre el modal para eliminar un producto DE VERDAD
+        // Una vez eliminado así, no se puede recuperar
         function permanentDeleteProduct(id, nombre) {
             const producto = todosLosProductos.find(p => p._id === id);
             if (producto) {
@@ -461,7 +467,7 @@
             }
         }
         
-        // Reactivar producto
+        // Esta función abre el modal para volver a activar un producto que estaba desactivado
         function recoverProduct(id, nombre) {
             const producto = todosLosProductos.find(p => p._id === id);
             if (producto) {
@@ -593,7 +599,8 @@
             }
         }
         
-        // Manejar reactivación de producto
+        // Esta función maneja cuando confirmo que quiero reactivar un producto
+        // Le dice al servidor que vuelva a marcarlo como activo
         async function handleReactivateProduct() {
             const token = localStorage.getItem('token');
             
@@ -630,7 +637,8 @@
             }
         }
         
-        // Manejar eliminación permanente de producto
+        // Esta función maneja la eliminación PERMANENTE de un producto
+        // Una vez que se ejecuta esto, el producto desaparece para siempre
         async function handlePermanentDeleteProduct() {
             const token = localStorage.getItem('token');
             
@@ -666,7 +674,8 @@
             }
         }
         
-        // Manejar filtros
+        // Esta función configura los botones de filtro (Todos, Activos, Inactivos)
+        // Cuando hago clic en uno, cambia lo que se muestra en pantalla
         function setupFilters() {
             const botonesFilter = document.querySelectorAll('.filter-btn');
             
@@ -687,7 +696,8 @@
             });
         }
         
-        // Cargar producto desde la API si no está en cache
+        // Esta función trae un producto específico del servidor si no lo tengo en memoria
+        // La uso cuando necesito datos actualizados de un producto
         async function loadProductFromAPI(id) {
             const token = localStorage.getItem('token');
             
@@ -741,7 +751,8 @@
             'harry-potter-y-el-prisionero-de-azkaban': 'harry-potter-y-el-prisionero-de-askaban'
         };
 
-        // Función para normalizar nombres de archivos
+        // Esta función toma el nombre de un producto y lo convierte en un nombre válido para archivo
+        // Por ejemplo: "Harry Potter" se convierte en "harry-potter"
         function normalizeFileName(text) {
             const normalized = text.toLowerCase()
                 .replace(/:/g, '')              // quitar dos puntos
@@ -799,7 +810,8 @@
             'x-men-dias-del-futuro-pasado-must-have.png'
         ];
 
-        // Función para obtener la URL correcta de la imagen con fallbacks inteligentes
+        // Esta función decide qué imagen mostrar para cada producto
+        // Primero busca si tiene imagen propia, sino usa una por categoría
         function getImageUrl(producto) {
             // Si tiene imagen definida
             if (producto.imagen && producto.imagen !== 'null' && producto.imagen.trim() !== '') {
@@ -838,10 +850,10 @@
             // Si no existe archivo específico, usar separador por categoría
             const separadorCategoria = categoriaSeparadores[producto.categoria?.toLowerCase()] || 'arte';
             return `/img/separador-${separadorCategoria}.png`;
-            return `/img/separador-${separadorCategoria}.png`;
         }
         
-        // Función mejorada para manejar errores de carga de imágenes
+        // Esta función se ejecuta cuando no se puede cargar una imagen
+        // Intenta con otras opciones antes de mostrar el logo genérico
         function handleImageError(imgElement, producto) {
             const srcActual = imgElement.src;
             
@@ -879,7 +891,8 @@
             imgElement.onerror = null; // Evitar más intentos
         }
 
-        // Función para manejar fallback de separadores
+        // Esta función maneja cuando falla cargar un separador
+        // Prueba con diferentes tipos de separadores antes del logo genérico
         function handleSeparadorFallback(imgElement, categoria) {
             const categoriaLower = categoria.toLowerCase();
             

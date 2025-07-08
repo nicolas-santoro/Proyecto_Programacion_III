@@ -137,14 +137,27 @@
     <script>
         let productoId = null;
 
+        /**
+         * Función para cambiar tema - wrapper de la función común
+         */
         function toggleTheme() {
             AdminCommon.toggleTheme();
         }
         
+        /**
+         * Mi función para mostrar alertas - mantiene consistencia en toda la app
+         * @param {string} mensaje - lo que quiero decirle al usuario
+         * @param {string} tipo - success, error, warning, etc.
+         */
         function mostrarAlerta(mensaje, tipo) {
             AdminCommon.showAlert(mensaje, tipo);
         }
 
+        /**
+         * Esta función se ejecuta al cargar la página
+         * Verifica autenticación, obtiene el ID del producto de la URL y carga sus datos
+         * Si algo falla, redirige automáticamente a la lista de productos
+         */
         // Verificar autenticación y cargar producto al cargar la página
         window.addEventListener('DOMContentLoaded', async function() {
             const isAuthenticated = await AdminCommon.init();
@@ -163,6 +176,11 @@
             await cargarProducto();
         });
 
+        /**
+         * Esta función va al servidor a buscar los datos del producto que quiero editar
+         * Llena automáticamente el formulario con la info actual
+         * También muestra la imagen actual si existe
+         */
         // Cargar datos del producto
         async function cargarProducto() {
             const token = localStorage.getItem('token');
@@ -203,6 +221,11 @@
             }
         }
 
+        /**
+         * Acá manejo el envío del formulario para actualizar el producto
+         * Toma los datos modificados y los envía al servidor con PUT
+         * También maneja el estado visual de "cargando"
+         */
         // Manejar actualización del producto
         document.getElementById('producto-form').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -241,6 +264,10 @@
             })
         });
 
+        /**
+         * Mejora la UX del input de archivos mostrando el nombre del archivo seleccionado
+         * Cuando el usuario elige una nueva imagen, se ve claramente cuál eligió
+         */
         // UX para archivos
         document.getElementById('imagen').addEventListener('change', function(e) {
             const fileName = e.target.files[0]?.name;
@@ -253,10 +280,21 @@
             }
         });
 
+        /**
+         * Función para cancelar la edición y volver a la lista
+         * La uso en el botón "Cancelar"
+         */
         function volverAProductos() {
             window.location.href = '/html/admin-productos.html';
         }
 
+        /**
+         * Esta función es súper importante para mostrar las imágenes correctamente
+         * Maneja todos los casos: imágenes subidas, imágenes por defecto, rutas relativas, etc.
+         * Básicamente "traduce" el nombre de imagen a una URL completa y válida
+         * @param {Object} producto - el objeto producto con su propiedad imagen
+         * @returns {string} la URL completa de la imagen
+         */
         // Función para obtener URL de imagen (reutilizada del código existente)
         function getImageUrl(producto) {
             const imagenesDisponibles = [

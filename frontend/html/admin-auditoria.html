@@ -56,11 +56,20 @@
 
     <script src="../js/admin-common.js"></script>
     <script>
+        /**
+         * Función para cambiar tema - wrapper de la función común
+         * La tengo acá para que funcione con el onclick del botón en el navbar
+         */
         // Usar función común de toggle theme
         function toggleTheme() {
             AdminCommon.toggleTheme();
         }
         
+        /**
+         * Esta función se ejecuta al cargar la página
+         * Se encarga de aplicar el tema guardado para evitar el "parpadeo" visual
+         * Es importante que sea lo primero que se ejecute para la UX
+         */
         // Cargar tema al inicializar
         window.addEventListener('DOMContentLoaded', function() {
             AdminCommon.loadTheme();

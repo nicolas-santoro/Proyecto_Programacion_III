@@ -3,7 +3,15 @@ const path = require('path');
 const Usuario = require(path.join(__dirname, '../models/Usuario'));
 require('dotenv').config();
 
-// Controlador para login
+/**
+ * Maneja el proceso de autenticación de usuarios.
+ * Valida credenciales, genera token JWT y retorna datos del usuario.
+ * @param {Object} req - Objeto de petición HTTP
+ * @param {string} req.body.email - Email del usuario
+ * @param {string} req.body.password - Contraseña del usuario
+ * @param {Object} res - Objeto de respuesta HTTP
+ * @returns {Promise<void>} Respuesta JSON con token y datos de usuario o mensaje de error
+ */
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -47,7 +55,13 @@ exports.login = async (req, res) => {
     }
 };
 
-// Controlador para logout (simple, sin gestión de tokens invalidos)
+/**
+ * Maneja el cierre de sesión del usuario.
+ * En implementación JWT simple, solo responde con mensaje de éxito.
+ * @param {Object} req - Objeto de petición HTTP
+ * @param {Object} res - Objeto de respuesta HTTP
+ * @returns {Promise<void>} Respuesta JSON con mensaje de logout exitoso
+ */
 exports.logout = async (req, res) => {
     try {
         // Solo responde OK, en JWT no se suele invalidar explícitamente token aquí
@@ -57,7 +71,15 @@ exports.logout = async (req, res) => {
     }
 };
 
-// Controlador para obtener el perfil del usuario autenticado
+/**
+ * Obtiene el perfil del usuario autenticado.
+ * Excluye la contraseña de la respuesta por seguridad.
+ * @param {Object} req - Objeto de petición HTTP
+ * @param {Object} req.user - Datos del usuario autenticado (agregado por middleware)
+ * @param {string} req.user.id - ID del usuario autenticado
+ * @param {Object} res - Objeto de respuesta HTTP
+ * @returns {Promise<void>} Respuesta JSON con datos del perfil de usuario
+ */
 exports.getProfile = async (req, res) => {
     try {
         const user = await Usuario.findById(req.user.id).select('-password');

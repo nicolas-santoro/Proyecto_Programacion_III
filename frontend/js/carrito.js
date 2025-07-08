@@ -1,16 +1,37 @@
 // === FUNCIONES PARA GESTIÓN DEL CARRITO ===
 
-// Obtiene el carrito desde localStorage (o devuelve uno vacío)
+/**
+ * Obtiene el carrito desde localStorage (o devuelve uno vacío)
+ * Si nunca compraste nada, te devuelve una bolsa vacía
+ * 
+ * @returns {Array} - Lista de productos en el carrito
+ */
 function getCarrito() {
   return JSON.parse(localStorage.getItem('carrito')) || [];
 }
 
-// Guarda el carrito en localStorage
+/**
+ * Guarda el carrito en localStorage
+ * 
+ * @param {Array} carrito - La lista de productos a guardar
+ */
 function setCarrito(carrito) {
   localStorage.setItem('carrito', JSON.stringify(carrito));
 }
 
-// Renderiza el carrito en la tabla HTML
+/**
+ * Renderiza el carrito en la tabla HTML
+ * Esta función toma todos los productos del carrito y los muestra bonito en una tabla
+ * 
+ * Por cada producto hace una fila con:
+ * - Nombre del producto
+ * - Precio individual
+ * - Botones para sumar/restar cantidad
+ * - Subtotal (precio × cantidad)
+ * - Botón para eliminar
+ * 
+ * También calcula y muestra el total general al final
+ */
 function renderCarrito() {
   const carrito = getCarrito();
   const tbody = document.getElementById('carrito-body');
@@ -61,7 +82,17 @@ function renderCarrito() {
 document.addEventListener('DOMContentLoaded', () => {
   renderCarrito(); // Muestra el carrito al cargar
 
-  // Manejo de eventos para botones dentro del carrito
+  /**
+   * Manejo de eventos para botones dentro del carrito
+   * Esta función escucha cuando haces clic en cualquier botón de la tabla del carrito
+   * 
+   * Dependiendo del botón que clickees hace:
+   * - Botón [+]: suma 1 a la cantidad
+   * - Botón [-]: resta 1 a la cantidad (mínimo 1)
+   * - Botón "Eliminar": saca el producto completo del carrito
+   * 
+   * Después de cualquier cambio, vuelve a mostrar la tabla actualizada
+   */
   document.getElementById('carrito-body').addEventListener('click', (e) => {
     let btn = e.target;
 
@@ -107,13 +138,28 @@ const formCompra = document.getElementById('formCompra');
 const modalConfirmacion = new bootstrap.Modal(document.getElementById('modalConfirmacion'));
 const btnConfirmarCompra = document.getElementById('btnConfirmarCompra');
 
-// Al enviar el formulario, mostramos el modal (no compramos todavía)
+/**
+ * Al enviar el formulario, mostramos el modal (no compramos todavía)
+ * Es como decir "¿estás seguro de que quieres comprar todo esto?"
+ * Todavía no se procesa la compra, solo se muestra la confirmación
+ */
 formCompra.addEventListener('submit', function(e) {
   e.preventDefault();
   modalConfirmacion.show();
 });
 
-// Al confirmar en el modal, se realiza la compra
+/**
+ * Al confirmar en el modal, se realiza la compra
+ * Esta función se ejecuta cuando clickeas "Sí, confirmar compra" en el modal
+ * 
+ * Hace todo el proceso final:
+ * 1. Agarra el nombre del cliente y los productos del carrito
+ * 2. Calcula el total
+ * 3. Arma el objeto de venta con toda la info
+ * 4. Lo envía a la API del servidor
+ * 5. Si todo sale bien: guarda el ticket, borra el carrito y te lleva al ticket
+ * 6. Si algo falla: muestra un mensaje de error
+ */
 btnConfirmarCompra.addEventListener('click', async function() {
   const nombreCliente = localStorage.getItem('nombreUsuario') || 'Cliente';
   const carrito = getCarrito();

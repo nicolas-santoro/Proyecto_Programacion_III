@@ -1,3 +1,10 @@
+/**
+ * Esta función es super útil para mostrar mensajes al usuario
+ * La uso en toda la app cuando necesito avisar algo (errores, éxitos, etc.)
+ * Crea una alerta visual bonita y también una accesible para lectores de pantalla
+ * @param {string} mensaje - el texto que quiero mostrar al usuario
+ * @param {string} tipo - el tipo de alerta (success, danger, warning, info, etc.)
+ */
 // Exporta una función para mostrar una alerta visual y accesible en pantalla
 export function mostrarAlerta(mensaje, tipo) {
     // Contenedor donde se mostrará la alerta visual (Bootstrap)

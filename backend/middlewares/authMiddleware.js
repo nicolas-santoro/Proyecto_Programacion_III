@@ -3,8 +3,14 @@ const Usuario = require('../models/Usuario');
 require('dotenv').config();
 
 /**
- * Middleware para verificar el token JWT enviado en la cabecera Authorization
- * 
+ * Middleware para verificar el token JWT enviado en la cabecera Authorization.
+ * Valida que el usuario esté autenticado y tenga permisos de administrador.
+ * @param {Object} req - Objeto de petición HTTP
+ * @param {string} req.headers.authorization - Header de autorización en formato "Bearer <token>"
+ * @param {Object} res - Objeto de respuesta HTTP
+ * @param {Function} next - Función para continuar al siguiente middleware
+ * @returns {Promise<void>} Continúa al siguiente middleware o responde con error
+ * @description
  * - Extrae el token del header `Authorization` en formato "Bearer <token>"
  * - Verifica que el token sea válido y no haya expirado usando la clave secreta
  * - Busca el usuario asociado al token en la base de datos
@@ -48,6 +54,24 @@ const verifyToken = async (req, res, next) => {
     }
 };
 
+/**
+ * Middleware para verificar autenticación en rutas HTML de administración.
+ * Redirige al login si no está autenticado, permite el acceso si tiene token válido.
+ * @param {Object} req - Objeto de petición HTTP
+ * @param {string} req.path - Ruta actual de la petición
+ * @param {string} [req.headers.authorization] - Header de autorización opcional
+ * @param {string} [req.cookies.adminToken] - Token de admin en cookies opcional
+ * @param {Object} res - Objeto de respuesta HTTP
+ * @param {Function} next - Función para continuar al siguiente middleware
+ * @returns {void} Redirige al login o continúa al siguiente middleware
+ * @description
+ * - No protege la ruta de login para permitir acceso inicial
+ * - Busca token en header Authorization o en cookies
+ * - Si no hay token, redirige a la página de login
+ * - Verifica y decodifica el token JWT
+ * - Si el token es válido, adjunta datos del usuario y continúa
+ * - Si el token es inválido, redirige al login
+ */
 // Middleware para verificar autenticación en rutas HTML de administración
 const verificarTokenAdminHTML = (req, res, next) => {
   // No proteger la ruta de login

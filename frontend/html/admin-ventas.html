@@ -70,11 +70,21 @@
 
     <script src="../js/admin-common.js"></script>
     <script>
+        /**
+         * Función que uso para cambiar entre tema claro y oscuro
+         * Es un wrapper que llama a la función del AdminCommon
+         * La tengo acá para que funcione con el onclick del HTML
+         */
         // Usar función común de toggle theme
         function toggleTheme() {
             AdminCommon.toggleTheme();
         }
         
+        /**
+         * Esta función se ejecuta cuando se carga la página
+         * Se encarga de aplicar el tema que el usuario tenía guardado
+         * Es para que no se vea el "parpadeo" de cambio de tema al cargar
+         */
         // Cargar tema al inicializar
         window.addEventListener('DOMContentLoaded', function() {
             AdminCommon.loadTheme();

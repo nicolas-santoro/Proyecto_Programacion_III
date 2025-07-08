@@ -58,6 +58,11 @@
 
     <script src="../js/admin-common.js"></script>
     <script>
+        /**
+         * Esta función se ejecuta apenas se carga la página (antes de que esté lista)
+         * Es una verificación súper rápida de autenticación
+         * Si no hay token, manda al login inmediatamente sin esperar nada más
+         */
         // Verificar la autenticación inmediatamente
         (function() {
             const token = localStorage.getItem('token');
@@ -67,6 +72,11 @@
             }
         })();
         
+        /**
+         * Esta función se ejecuta cuando el DOM está completamente listo
+         * Hace la inicialización completa: carga tema, verifica auth completa, etc.
+         * Acá es donde podría agregar estadísticas o datos del dashboard en el futuro
+         */
         // para iniciar la página 
         window.addEventListener('DOMContentLoaded', async function() {
             await AdminCommon.init();

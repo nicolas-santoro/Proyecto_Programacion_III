@@ -6,6 +6,12 @@ const iconModo = document.getElementById('iconModo');
 
 // --- FUNCIÓN PARA APLICAR EL MODO ---
 // Recibe 'claro' u 'oscuro' y ajusta clases, texto e ícono en la UI
+/**
+ * Esta función se encarga de cambiar todo el tema de la página
+ * Basicamente lo que hace es cambiar las clases CSS y los iconos
+ * También guarda la preferencia del usuario en el localStorage para que no se pierda
+ * @param {string} modo - puede ser 'claro' u 'oscuro'
+ */
 function aplicarModo(modo) {
   if (modo === 'claro') {
     // Activar modo claro agregando la clase CSS correspondiente

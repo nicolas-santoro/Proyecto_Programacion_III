@@ -12,6 +12,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 });
 
+/**
+ * Esta función trae todos los registros de auditoría del servidor
+ * La auditoría es como un "historial" de todo lo que pasa en el sistema
+ * Ordena las acciones de más reciente a más antigua para que sea fácil de leer
+ */
 // Carga los datos de auditoría desde la API
 async function cargarAuditoria() {
     try {
@@ -45,6 +50,12 @@ async function cargarAuditoria() {
     }
 }
 
+/**
+ * Acá tomo todos los registros de auditoría y los muestro en una tabla
+ * Solo se muestran los primeros 50 para que no se cuelgue la página si hay muchos
+ * Cada acción tiene un color diferente según el tipo (crear, editar, borrar, etc.)
+ * @param {Array} acciones - array con todos los registros de auditoría
+ */
 // Muestra las acciones de auditoría en una tabla HTML
 function mostrarAuditoria(acciones) {
     const tbody = document.getElementById('auditoriaTableBody');
@@ -103,6 +114,13 @@ function mostrarAuditoria(acciones) {
     }
 }
 
+/**
+ * Esta función decide qué color usar para el badge del rol
+ * Admin es rojo (danger), editor es amarillo (warning), etc.
+ * Es solo para que se vea más organizado visualmente
+ * @param {string} rol - el rol del usuario (admin, editor, vendedor, etc.) -igual ahora sólo hay admin-
+ * @returns {string} la clase CSS de Bootstrap para el color
+ */
 // Retorna el color del badge según el rol del usuario
 function getRolColor(rol) {
     const colors = {
@@ -115,6 +133,13 @@ function getRolColor(rol) {
     return colors[rol] || 'secondary';
 }
 
+/**
+ * Similar a getRolColor pero para las acciones
+ * CREATE es verde (success), DELETE es rojo (danger), LOGIN es azul (info), etc.
+ * Ayuda a identificar rápidamente qué tipo de acción se hizo
+ * @param {string} accion - el tipo de acción realizada
+ * @returns {string} la clase CSS de Bootstrap para el color
+ */
 // Retorna el color del badge según la acción realizada
 function getAccionColor(accion) {
     const colors = {
@@ -133,6 +158,12 @@ function getAccionColor(accion) {
     return colors[accion] || 'secondary';
 }
 
+/**
+ * Wrapper de la función común para mostrar alertas
+ * La uso acá para mantener consistencia con el resto del admin
+ * @param {string} mensaje - el mensaje a mostrar al usuario
+ * @param {string} tipo - tipo de alerta (error, success, etc.)
+ */
 // Muestra una alerta temporal en pantalla with un mensaje y un tipo (info, error, etc.)
 function mostrarAlerta(mensaje, tipo) {
     AdminCommon.showAlert(mensaje, tipo);

@@ -1,4 +1,7 @@
-// Controlador de autenticación para el panel de administrador
+/**
+ * Controlador de autenticación para el panel de administrador.
+ * Maneja el login, logout y verificación de permisos de acceso.
+ */
 const AuthController = {
     // Elementos del DOM utilizados por el controlador
     elements: {
@@ -6,7 +9,10 @@ const AuthController = {
         loginForm: document.getElementById('formAdminLogin')  // Formulario de inicio de sesión
     },
 
-    // Inicializa el controlador y configura los eventos al cargar la página
+    /**
+     * Inicializa el controlador de autenticación.
+     * Configura los event listeners y verifica el estado de autenticación.
+     */
     init() {
         document.addEventListener('DOMContentLoaded', () => {
             this.checkAuthStatus();     // Verifica si el usuario está autenticado
@@ -14,7 +20,10 @@ const AuthController = {
         });
     },
 
-    // Configura los listeners de eventos: login y logout
+    /**
+     * Configura los event listeners para los elementos de autenticación.
+     * Conecta los eventos de los botones de login y logout con sus respectivas funciones.
+     */
     setupEventListeners() {
         // Listener para cerrar sesión
         if (this.elements.logoutBtn) {
@@ -32,7 +41,12 @@ const AuthController = {
         }
     },
 
-    // Verifica el estado de autenticación del usuario
+    /**
+     * Verifica el estado de autenticación del usuario y controla el acceso a páginas protegidas.
+     * Redirige al login si no está autenticado o al dashboard si ya lo está.
+     * @async
+     * @returns {Promise<void>}
+     */
     async checkAuthStatus() {
         const token = localStorage.getItem('token');
         const user = localStorage.getItem('user');
@@ -104,7 +118,12 @@ const AuthController = {
         }
     },
 
-    // Maneja el proceso de login del usuario
+    /**
+     * Maneja el proceso de inicio de sesión del administrador.
+     * Envía las credenciales al servidor y guarda el token si es exitoso.
+     * @async
+     * @returns {Promise<void>}
+     */
     async handleLogin() {
         try {
             const email = document.getElementById('adminMail').value;
@@ -124,7 +143,11 @@ const AuthController = {
         }
     },
 
-    // Cierra sesión del usuario
+    /**
+     * Cierra la sesión del usuario administrador.
+     * Limpia el localStorage y redirige a la página de login.
+     */
+
     logout() {
         // Limpia el almacenamiento local
         localStorage.removeItem('token');

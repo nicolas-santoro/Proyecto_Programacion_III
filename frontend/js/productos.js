@@ -7,12 +7,16 @@ const productosEspeciales = {
   'harry-potter-y-el-prisionero-de-azkaban': 'harry-potter-y-el-prisionero-de-askaban'
 };
 
-// --- NORMALIZACIÓN DE NOMBRES PARA ARCHIVOS ---
-// Convierte un texto a formato válido para nombres de archivo y revisa si hay un nombre especial
+/**
+ * Normaliza el nombre de un producto para generar un nombre de archivo válido.
+ * Convierte a minúsculas, elimina caracteres especiales y reemplaza espacios con guiones.
+ * @param {string} text - El texto del nombre del producto a normalizar
+ * @returns {string} El nombre normalizado para usar como nombre de archivo
+ */
 function normalizeFileName(text) {
   const normalized = text.toLowerCase()
-    .replace(/:/g, '')              // quitar dos puntos
-    .replace(/'/g, '')              // quitar apóstrofes
+    .replace(/:/g, '')// quitar dos puntos
+    .replace(/'/g, '')// quitar apóstrofes
     .replace(/\./g, '')             // quitar puntos
     .replace(/\s+/g, '-')           // espacios por guiones
     .replace(/[áàäâ]/g, 'a')        // normalizar acentos
@@ -68,8 +72,12 @@ const imagenesDisponibles = [
   'x-men-dias-del-futuro-pasado-must-have.png'
 ];
 
-// --- FUNCION PARA OBTENER LA URL CORRECTA DE LA IMAGEN ---
-// Recibe el producto y devuelve la URL adecuada con fallbacks
+/**
+ * Determina la URL de la imagen que debe mostrarse para un producto.
+ * Busca primero una imagen específica del producto, luego una por categoría.
+ * @param {Object} producto - El objeto producto con propiedades como imagen, nombre y categoria
+ * @returns {string} La URL completa de la imagen a mostrar
+ */
 function getImageUrl(producto) {
   if (producto.imagen && producto.imagen !== 'null' && producto.imagen.trim() !== '') {
     // Normalizar barras invertidas a barras normales
@@ -106,8 +114,12 @@ function getImageUrl(producto) {
   return `/img/separador-${separadorCategoria}.png`;
 }
 
-// --- MANEJO DE ERROR DE CARGA DE IMAGENES ---
-// Para reemplazar imágenes rotas con un logo genérico sin generar loops infinitos
+/**
+ * Maneja el error cuando una imagen no se puede cargar.
+ * Reemplaza la imagen fallida con el logo genérico de la aplicación.
+ * @param {HTMLImageElement} imgElement - El elemento de imagen que falló al cargar
+ * @param {Object} producto - El objeto producto asociado a la imagen
+ */
 function handleImageError(imgElement, producto) {
   const srcActual = imgElement.src;
   if (srcActual.includes('HP_LOGO.png')) {
@@ -141,9 +153,12 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       }
 
-      // --- FUNCIONES PARA RENDERIZAR PRODUCTOS ---
-
-      // Renderiza productos en un contenedor dado
+      /**
+       * Renderiza una lista de productos en el contenedor especificado.
+       * Crea tarjetas HTML con imagen, precio y controles de carrito para cada producto.
+       * @param {HTMLElement} contenedor - El elemento DOM donde se renderizarán los productos
+       * @param {Array} productos - Array de objetos producto a renderizar
+       */
       function renderizarProductos(contenedor, productos) {
         contenedor.innerHTML = ''; // limpiar contenedor
 
@@ -234,31 +249,40 @@ document.addEventListener('DOMContentLoaded', () => {
             actualizarCantidadCarrito();
           });
 
+          /**
+           * Actualiza el badge de cantidad que aparece sobre la tarjeta del producto.
+           * Muestra u oculta el indicador visual de cantidad en el carrito.
+           * @param {HTMLElement} div - El elemento div de la tarjeta del producto
+           * @param {number} cantidad - La cantidad actual del producto en el carrito
+           */
+          function actualizarBadge(div, cantidad) {
+            let badge = div.querySelector('.cantidad-badge');
+            if (!badge && cantidad > 0) {
+              badge = document.createElement('span');
+              badge.classList.add('badge', 'bg-gradient', 'position-absolute', 'top-0', 'end-0', 'cantidad-badge');
+              div.querySelector('.card-body').appendChild(badge);
+            }
+            if (badge) {
+              if (cantidad > 0) {
+                badge.textContent = cantidad;
+              } else {
+                badge.remove();
+              }
+            }
+          }
+
           // Agregar producto al contenedor
           contenedor.appendChild(div);
         });
       }
 
-      // Actualiza el badge con la cantidad del producto (o lo remueve si es 0)
-      function actualizarBadge(div, cantidad) {
-        let badge = div.querySelector('.cantidad-badge');
-        if (!badge && cantidad > 0) {
-          badge = document.createElement('span');
-          badge.classList.add('badge', 'bg-gradient', 'position-absolute', 'top-0', 'end-0', 'cantidad-badge');
-          div.querySelector('.card-body').appendChild(badge);
-        }
-        if (badge) {
-          if (cantidad > 0) {
-            badge.textContent = cantidad;
-          } else {
-            badge.remove();
-          }
-        }
-      }
-
       let categoriaActual = 'todos';
 
-      // Renderiza productos filtrados por categoría (excepto separadores)
+      /**
+       * Filtra y renderiza productos según la categoría seleccionada.
+       * Excluye los productos de tipo 'separador' que tienen su propio contenedor.
+       * @param {string} categoria - La categoría a filtrar ('todos', 'libro', 'comic', 'manga')
+       */
       function renderizarProductosPorCategoria(categoria) {
         let filtrados;
         if (categoria === 'todos') {
@@ -269,13 +293,17 @@ document.addEventListener('DOMContentLoaded', () => {
         renderizarProductos(contenedorLibros, filtrados);
       }
 
-      // Renderiza productos que son separadores
+      /**
+       * Renderiza únicamente los productos de tipo 'separador' en su contenedor específico.
+       * Los separadores son elementos decorativos que se muestran por separado.
+       */
       function renderizarSeparadores() {
         const separadores = activos.filter(p => p.categoria === 'separador');
         renderizarProductos(contenedorSeparadores, separadores);
       }
 
-      // Maneja click en botones de categoría
+      // Esta función maneja cuando hago clic en los botones de categoría
+      // Cambia qué productos se muestran según el filtro elegido
       botonesDiv.addEventListener('click', (e) => {
         if (e.target.tagName === 'BUTTON') {
           botonesDiv.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
@@ -297,17 +325,27 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // --- FUNCIONES DE CARRITO ---
-// Leer carrito desde localStorage
+
+/**
+ * Obtiene el carrito de compras almacenado en localStorage.
+ * @returns {Array} Array de objetos representando los productos en el carrito
+ */
 function getCarrito() {
   return JSON.parse(localStorage.getItem('carrito')) || [];
 }
 
-// Guardar carrito en localStorage
+/**
+ * Guarda el carrito de compras en localStorage.
+ * @param {Array} carrito - Array de objetos producto a guardar en el carrito
+ */
 function setCarrito(carrito) {
   localStorage.setItem('carrito', JSON.stringify(carrito));
 }
 
-// Agregar producto o aumentar cantidad en carrito
+/**
+ * Agrega un producto al carrito o incrementa su cantidad si ya existe.
+ * @param {Object} producto - El objeto producto a agregar al carrito
+ */
 function agregarAlCarrito(producto) {
   let carrito = getCarrito();
   const index = carrito.findIndex(p => p._id === producto._id);
@@ -324,7 +362,10 @@ function agregarAlCarrito(producto) {
   setCarrito(carrito);
 }
 
-// Restar cantidad de producto, o eliminar si llega a 0
+/**
+ * Reduce la cantidad de un producto en el carrito o lo elimina si llega a 0.
+ * @param {string} id - El ID del producto a reducir en el carrito
+ */
 function restarDelCarrito(id) {
   let carrito = getCarrito();
   const index = carrito.findIndex(p => p._id === id);
@@ -338,14 +379,20 @@ function restarDelCarrito(id) {
   setCarrito(carrito);
 }
 
-// Quitar producto del carrito
+/**
+ * Elimina completamente un producto del carrito sin importar su cantidad.
+ * @param {string} id - El ID del producto a eliminar del carrito
+ */
 function quitarDelCarrito(id) {
   let carrito = getCarrito();
   carrito = carrito.filter(p => p._id !== id);
   setCarrito(carrito);
 }
 
-// Actualizar contador total de productos en el carrito
+/**
+ * Actualiza el indicador visual de cantidad total en el ícono del carrito.
+ * Calcula la suma de todos los productos en el carrito y actualiza el badge.
+ */
 function actualizarCantidadCarrito() {
   const carrito = getCarrito();
   const cantidad = carrito.reduce((acc, prod) => acc + prod.cantidad, 0);
@@ -353,7 +400,11 @@ function actualizarCantidadCarrito() {
   if (span) span.textContent = cantidad;
 }
 
-// Obtener cantidad de un producto en el carrito
+/**
+ * Obtiene la cantidad específica de un producto en el carrito.
+ * @param {string} id - El ID del producto a consultar
+ * @returns {number} La cantidad del producto en el carrito (0 si no está)
+ */
 function getCantidadEnCarrito(id) {
   const carrito = getCarrito();
   const item = carrito.find(p => p._id === id);

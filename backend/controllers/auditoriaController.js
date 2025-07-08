@@ -1,7 +1,14 @@
 const Acciones = require('../models/Acciones');
-
-// Obtener todas las acciones (Solo admin/auditor)
-// Permite filtrar por tipo de acción, usuario, rango de fechas, y paginar resultados
+/**
+ * Obtiene todas las acciones de auditoría del sistema con paginación.
+ * Permite filtrar y paginar resultados para facilitar la consulta de logs.
+ * Solo accesible para usuarios con rol administrador o auditor.
+ * @param {Object} req - Objeto de petición HTTP
+ * @param {number} [req.query.page=1] - Número de página para paginación
+ * @param {number} [req.query.limit=50] - Límite de resultados por página
+ * @param {Object} res - Objeto de respuesta HTTP
+ * @returns {Promise<void>} Respuesta JSON con acciones paginadas y metadatos de paginación
+ */
 exports.obtenerAcciones = async (req, res) => {
   try {
     const { page = 1, limit = 50} = req.query;
