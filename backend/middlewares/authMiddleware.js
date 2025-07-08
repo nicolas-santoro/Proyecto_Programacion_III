@@ -45,7 +45,7 @@ const verifyToken = async (req, res, next) => {
             return res.status(403).json({message: 'Solo los administradores pueden acceder a esta funcionalidad'});
         }
 
-        // Adjuntar usuario al request para middleware o rutas siguientes
+        // Adjuntar usuario al request para middleware o rutas siguientes0
         req.user = user;
         next();
     } catch (error){
