@@ -102,5 +102,5 @@ Aquí puedes ver algunas capturas de pantalla de **Hachis Parmentier** en acció
 
 Este proyecto ha sido desarrollado por:
 
-* **Milena Rodríguez**
-* **Nicolás Santoro**
+* [Milena Rodríguez](https://github.com/MilenaRodriguezzz)
+* [Nicolás Santoro](https://github.com/nicolas-santoro)
